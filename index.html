@@ -9,7 +9,7 @@
 <title>DataSports — Mundial 2026</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Raleway:wght@400;700&display=swap');
 
   :root {
     --header-h: 80px;
@@ -33,7 +33,7 @@
   body {
     background: var(--fondo);
     color: var(--texto);
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
     min-height: 100dvh;
     padding-bottom: 80px;
@@ -60,7 +60,7 @@
     height:0;
   }
   header h1 {
-    font-family:'Bebas Neue',sans-serif;
+    font-family:'Inter',sans-serif;
     font-size: 2.6rem; letter-spacing:3px; color:#fff; line-height:1;
   }
   header h1 span { color: var(--verde); }
@@ -89,7 +89,7 @@
     border-bottom:3px solid transparent;
     cursor:pointer; transition: all .2s; white-space:nowrap;
     background:none; border-left:none; border-right:none; border-top:none;
-    font-family:'Raleway',sans-serif;
+    font-family:'Inter',sans-serif;
   }
   .tab.active { color:#fff; border-bottom-color: var(--verde); }
 
@@ -116,7 +116,7 @@
   .po-equipo-form { background:var(--mid); border-radius:10px; padding:10px 12px; }
   .po-form-titulo { font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px; margin-bottom:4px; }
   .po-form-nombre { font-size:.8rem; font-weight:700; color:#fff; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .po-form-sistema { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; color:var(--verde); letter-spacing:1px; margin-bottom:8px; }
+  .po-form-sistema { font-family:'Inter',sans-serif; font-size:1.1rem; color:var(--verde); letter-spacing:1px; margin-bottom:8px; }
   .po-jugador { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:.72rem; }
   .po-jugador:last-child { border-bottom:none; }
   .po-num { color:var(--muted); font-size:.68rem; width:16px; text-align:right; flex-shrink:0; }
@@ -130,7 +130,7 @@
   .search-box:focus-within { border-color:var(--verde); }
   .search-input {
     flex:1; background:none; border:none; outline:none;
-    color:#fff; font-family:'Raleway',sans-serif;
+    color:#fff; font-family:'Inter',sans-serif;
     font-size:.88rem; padding:11px 0;
   }
   .search-input::placeholder { color:var(--muted); }
@@ -155,7 +155,7 @@
   .chip-dow { font-size:.58rem; font-weight:700; text-transform:uppercase; color:var(--muted); }
   .fecha-chip.active .chip-dow { color:rgba(255,255,255,.7); }
   .fecha-chip.hoy-chip .chip-dow { color:var(--rojo); }
-  .chip-num { font-family:'Bebas Neue',sans-serif; font-size:1.25rem; color:#fff; line-height:1.1; }
+  .chip-num { font-family:'Inter',sans-serif; font-size:1.25rem; color:#fff; line-height:1.1; }
   .chip-mes { font-size:.55rem; color:var(--muted); text-transform:uppercase; font-weight:600; }
   .fecha-chip.active .chip-mes { color:rgba(255,255,255,.6); }
 
@@ -167,7 +167,7 @@
   .fase-nav::-webkit-scrollbar { display:none; }
   .fase-btn {
     flex-shrink:0; background:var(--mid); border:1.5px solid var(--borde);
-    color:var(--muted); font-family:'Raleway',sans-serif;
+    color:var(--muted); font-family:'Inter',sans-serif;
     font-size:.7rem; font-weight:600; text-transform:uppercase;
     padding:6px 13px; border-radius:20px; cursor:pointer; transition:all .2s;
   }
@@ -194,7 +194,7 @@
   /* Día con partido en vivo: barra roja */
   .dia-header.tiene-live { border-left-color: var(--rojo); }
   .dia-header.tiene-live .dia-count { background: var(--rojo); }
-  .dia-fecha { font-family:'Bebas Neue',sans-serif; font-size:1.15rem; letter-spacing:1px; color:#fff; flex:1; }
+  .dia-fecha { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:700; letter-spacing:.3px; color:#fff; flex:1; text-transform:uppercase; }
   .dia-fecha .dia-nombre { color:var(--verde); margin-right:5px; }
   .dia-count { background:var(--verde); color:#fff; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:12px; }
   .chevron { color:var(--muted); font-size:.9rem; transition:transform .2s; }
@@ -212,9 +212,9 @@
   .partido:hover { background:#1e1e3a; }
   .partido-highlight { background:rgba(60,172,59,.09) !important; border-left:3px solid var(--verde); }
 
-  .hora { font-family:'Bebas Neue',sans-serif; font-size:1.15rem; color:var(--verde); width:50px; flex-shrink:0; }
-  .hora-fin  { font-family:'Bebas Neue',sans-serif; font-size:.85rem; font-weight:700; color:#fff; background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:50px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
-  .hora-live { font-family:'Bebas Neue',sans-serif; font-size:.85rem; color:var(--rojo); width:50px; flex-shrink:0; text-align:center; animation:pulso 1.5s infinite; }
+  .hora { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; color:var(--verde); width:50px; flex-shrink:0; }
+  .hora-fin  { font-family:'Inter',sans-serif; font-size:.85rem; font-weight:700; color:#fff; background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:50px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
+  .hora-live { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--rojo); width:50px; flex-shrink:0; text-align:center; animation:pulso 1.5s infinite; }
 
   .partido-info { flex:1; min-width:0; }
   .equipos {
@@ -245,7 +245,7 @@
     display:inline-flex; align-items:center; gap:4px;
     border-radius:6px; padding:2px 10px;
     flex-shrink:0; width:auto;
-    font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px;
+    font-family:'Inter',sans-serif; font-size:1.1rem; letter-spacing:2px;
   }
   .resultado-badge.finalizado { background:var(--mid); border:1px solid var(--borde); }
   .resultado-badge.en-vivo { background:rgba(230,29,37,.12); border:1px solid var(--rojo); animation:pulso 1.5s infinite; }
@@ -279,7 +279,7 @@
     content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
     background: linear-gradient(90deg, var(--verde) 0%, var(--azul) 50%, var(--rojo) 100%);
   }
-  .grupo-titulo { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:1.5px; color:#fff; }
+  .grupo-titulo { font-family:'Inter',sans-serif; font-size:1.2rem; letter-spacing:1.5px; color:#fff; }
   .grupo-equipos-mini { font-size:.7rem; color:rgba(255,255,255,.6); margin-top:2px; }
   .grupo-chevron { color:rgba(255,255,255,.6); font-size:.9rem; transition:transform .2s; }
   .grupo-header.closed .grupo-chevron { transform:rotate(-90deg); }
@@ -359,7 +359,7 @@
   .conv-info { flex:1; min-width:0; }
   .conv-nombre { font-size:.75rem; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .conv-pos { font-size:.62rem; color:var(--muted); }
-  .conv-num { font-family:'Bebas Neue',sans-serif; font-size:.9rem; color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
+  .conv-num { font-family:'Inter',sans-serif; font-size:.9rem; color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
   .conv-derecha { flex-direction:row-reverse; }
   .conv-derecha .conv-info { text-align:right; }
 
@@ -385,7 +385,7 @@
   .ficha-sub { font-size:.75rem; color:var(--muted); margin-top:2px; }
   .ficha-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
   .ficha-stat { background:var(--mid); border-radius:8px; padding:8px 10px; }
-  .ficha-stat-val { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; color:var(--verde); }
+  .ficha-stat-val { font-family:'Inter',sans-serif; font-size:1.3rem; color:var(--verde); }
   .ficha-stat-label { font-size:.62rem; color:var(--muted); text-transform:uppercase; }
 
   /* ── TABS DEL PARTIDO ── */
@@ -399,7 +399,7 @@
     cursor:pointer; border-bottom:2px solid transparent;
     text-transform:uppercase; letter-spacing:.3px;
     background:none; border-top:none; border-left:none; border-right:none;
-    font-family:'Raleway',sans-serif;
+    font-family:'Inter',sans-serif;
   }
   .po-tab.activa { color:var(--verde); border-bottom-color:var(--verde); }
 
@@ -421,7 +421,7 @@
   .po-back {
     background:none; border:none; color:var(--verde);
     font-size:.85rem; font-weight:700; cursor:pointer;
-    font-family:'Raleway',sans-serif; padding:0;
+    font-family:'Inter',sans-serif; padding:0;
   }
   .po-fase { color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; flex:1; }
   .po-live { background:var(--rojo); color:#fff; font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; animation:pulso 1.2s infinite; }
@@ -439,8 +439,8 @@
   .po-flag { font-size:2rem; line-height:1; }
   .po-nombre { font-size:.8rem; font-weight:700; text-align:center; color:#fff; }
   .po-score-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
-  .po-score { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:#fff; letter-spacing:2px; line-height:1; }
-  .po-hora-big { font-family:'Bebas Neue',sans-serif; font-size:2rem; color:var(--verde); letter-spacing:1px; }
+  .po-score { font-family:'Inter',sans-serif; font-size:3rem; color:#fff; letter-spacing:2px; line-height:1; }
+  .po-hora-big { font-family:'Inter',sans-serif; font-size:2rem; color:var(--verde); letter-spacing:1px; }
   .po-fecha-small { font-size:.65rem; color:var(--muted); text-align:center; }
   .po-sede-small  { font-size:.65rem; color:var(--muted); text-align:center; }
 
@@ -473,7 +473,7 @@
     font-size:.68rem; justify-content:flex-end; text-align:right;
     overflow:hidden;
   }
-  .ev-min-s  { font-family:'Bebas Neue',sans-serif; font-size:.8rem; color:var(--verde); flex-shrink:0; }
+  .ev-min-s  { font-family:'Inter',sans-serif; font-size:.8rem; color:var(--verde); flex-shrink:0; }
   .ev-icon-s { flex-shrink:0; font-size:.82rem; }
   .ev-nombre-s { color:#fff; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
   .ev-col-header {
@@ -497,8 +497,8 @@
     flex: 1; display: flex; flex-direction: column; align-items: center;
     justify-content: center; padding: 8px 4px;
     cursor: pointer; background: none; border: none;
-    color: var(--muted); font-family: 'Raleway', sans-serif;
-    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    color: var(--muted); font-family: 'Inter', sans-serif;
+    font-size: .78rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .3px; border-top: 2px solid transparent;
     transition: color .2s, border-color .2s;
   }
@@ -552,7 +552,7 @@
     display: block; width: 100%; padding: 10px 20px;
     border: none; border-left: 3px solid transparent;
     background: none; color: var(--muted); font-size: .82rem; font-weight: 500;
-    cursor: pointer; font-family: 'Raleway', sans-serif;
+    cursor: pointer; font-family: 'Inter', sans-serif;
     text-align: left; transition: all .2s; border-bottom: 1px solid var(--borde);
   }
   .comp-btn.active { color: #fff; border-left-color: var(--verde); background: rgba(76,175,80,.08); }
@@ -572,7 +572,7 @@
   .grupos-filtro-box:focus-within { border-color:var(--verde); }
   .grupos-filtro-input {
     flex:1; background:none; border:none; outline:none;
-    color:#fff; font-family:'Raleway',sans-serif;
+    color:#fff; font-family:'Inter',sans-serif;
     font-size:.88rem; padding:11px 0;
   }
   .grupos-filtro-input::placeholder { color:var(--muted); }
@@ -589,7 +589,7 @@
     flex-shrink:0; background:var(--mid); border:1.5px solid var(--borde);
     color:var(--muted); font-size:.68rem; font-weight:700;
     padding:4px 11px; border-radius:20px; cursor:pointer;
-    transition:all .15s; font-family:'Raleway',sans-serif;
+    transition:all .15s; font-family:'Inter',sans-serif;
     text-transform:uppercase; letter-spacing:.3px;
   }
   .g-chip:hover { border-color:var(--verde); color:var(--verde); }
@@ -606,7 +606,7 @@
     display:flex; flex-direction:column; gap:6px;
   }
   .bracket-fase-titulo {
-    font-family:'Bebas Neue',sans-serif; font-size:1rem;
+    font-family:'Inter',sans-serif; font-size:1rem;
     letter-spacing:2px; color:var(--verde); padding:10px 2px 4px;
     text-transform:uppercase; display:flex; align-items:center; gap:8px;
     white-space:nowrap;
@@ -630,7 +630,7 @@
   /* Mini cabecera con fecha y hora */
   .bk-num {
     color: rgba(255,255,255,.50);
-    font-family:'Bebas Neue',sans-serif;
+    font-family:'Inter',sans-serif;
     font-size:.8rem; letter-spacing:.5px;
     flex-shrink:0;
   }
@@ -639,7 +639,7 @@
     display:flex; justify-content:space-between; align-items:center; gap:6px;
   }
   .bk-meta-fecha { font-size:.55rem; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:.3px; }
-  .bk-meta-hora  { font-family:'Bebas Neue',sans-serif; font-size:.85rem; color:#fff; letter-spacing:.5px; }
+  .bk-meta-hora  { font-family:'Inter',sans-serif; font-size:.85rem; color:#fff; letter-spacing:.5px; }
   .bk-live-pip   { width:6px; height:6px; border-radius:50%; background:var(--rojo); animation:pulso 1.2s infinite; }
 
   /* Equipos */
@@ -654,7 +654,7 @@
   .bk-eq.ganador   { color:var(--verde); }
   .bk-eq-flag      { font-size:.9rem; flex-shrink:0; }
   .bk-eq-name      { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
-  .bk-eq-gol       { font-family:'Bebas Neue',sans-serif; font-size:1rem; min-width:14px; text-align:right; flex-shrink:0; }
+  .bk-eq-gol       { font-family:'Inter',sans-serif; font-size:1rem; min-width:14px; text-align:right; flex-shrink:0; }
 
   /* Final — ocupa las 2 columnas centrado */
   .bracket-final {
@@ -679,8 +679,8 @@
       <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#fff;flex:1;text-align:center;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="partidoAbierto !== null ? abrirPartido(partidoAbierto) : cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Raleway',sans-serif">↻</button>
+    <div style="font-family:'Inter',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#fff;flex:1;text-align:center;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
+    <button onclick="partidoAbierto !== null ? abrirPartido(partidoAbierto) : cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -720,9 +720,9 @@
 <!-- ══════════ FIXTURE TAB ══════════ -->
 <!-- sub-nav del Mundial -->
 <div style="display:flex;gap:0;border-bottom:1px solid var(--borde);background:var(--card);">
-  <button class="mundial-tab active" id="wt-fixture" onclick="showTab('fixture')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Fixture</button>
-  <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Grupos</button>
-  <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Fase Final</button>
+  <button class="mundial-tab active" id="wt-fixture" onclick="showTab('fixture')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fixture</button>
+  <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Grupos</button>
+  <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fase Final</button>
 </div>
 
 <div id="tab-fixture">
@@ -828,8 +828,8 @@
       <span id="comp-panel-titulo" style="color:#fff;font-weight:700;font-size:.9rem;"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
-      <button class="comp-tab active" id="ct-fixture" onclick="showCompTab('fixture')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Fixture</button>
-      <button class="comp-tab" id="ct-posiciones" onclick="showCompTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Posiciones</button>
+      <button class="comp-tab active" id="ct-fixture" onclick="showCompTab('fixture')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fixture</button>
+      <button class="comp-tab" id="ct-posiciones" onclick="showCompTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Posiciones</button>
     </div>
     <div id="comp-fixture-wrap" style="padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
     <div id="comp-posiciones-wrap" style="display:none;padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
@@ -1369,11 +1369,11 @@ async function abrirPartido(id) {
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0">
                 <div style="text-align:center">
                   <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">${p.local}</div>
-                  <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--verde)">${lineups[0]?.formation || '—'}</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde)">${lineups[0]?.formation || '—'}</div>
                 </div>
                 <div style="text-align:center">
                   <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">${p.visita}</div>
-                  <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--verde)">${lineups[1]?.formation || '—'}</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde)">${lineups[1]?.formation || '—'}</div>
                 </div>
               </div>
             `}
@@ -1487,13 +1487,29 @@ async function abrirPartido(id) {
       const stroke   = esLocal ? '#3CAC3B' : '#E61D25';
 
       const filas = {};
+      // Agrupar por grid si existe, sino por posición (fallback)
+      const posOrder = { 'G':1, 'D':2, 'M':3, 'F':4 };
+      const posGroups = {};
       titulares.forEach(j => {
         const grid = j.player?.grid;
-        if (!grid) return;
-        const [fila, col] = grid.split(':').map(Number);
-        if (!filas[fila]) filas[fila] = [];
-        filas[fila].push({ ...j, fila, col });
+        if (grid) {
+          const [fila, col] = grid.split(':').map(Number);
+          if (!filas[fila]) filas[fila] = [];
+          filas[fila].push({ ...j, fila, col });
+        } else {
+          // Fallback: agrupar por posición
+          const pos = j.player?.pos || 'M';
+          const fila = posOrder[pos] || 3;
+          if (!posGroups[fila]) posGroups[fila] = [];
+          posGroups[fila].push(j);
+        }
       });
+      // Si no había grids, usar posGroups
+      if (Object.keys(filas).length === 0) {
+        Object.entries(posGroups).forEach(([fila, jugadores]) => {
+          filas[fila] = jugadores.map((j, idx) => ({ ...j, fila: parseInt(fila), col: idx+1 }));
+        });
+      }
 
       const maxFila  = Math.max(...Object.keys(filas).map(Number));
       const radio    = 13;
@@ -1526,9 +1542,9 @@ async function abrirPartido(id) {
           return `<g style="cursor:pointer" onclick="abrirFichaCancha(${j.player?.id},'${(j.player?.name||'').replace(/'/g,"\\'")}','${j.player?.photo||''}',0,'Unknown')">
             <circle cx="${cxFinal.toFixed(1)}" cy="${cy.toFixed(1)}" r="${radio}" fill="${color}" stroke="${stroke}" stroke-width="2"/>
             <text x="${cxFinal.toFixed(1)}" y="${(cy+1).toFixed(1)}" text-anchor="middle" dominant-baseline="middle"
-              font-family="Raleway,sans-serif" font-size="9" font-weight="700" fill="${numColor}">${num}</text>
+              font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="${numColor}">${num}</text>
             <text x="${cxFinal.toFixed(1)}" y="${(cy+radio+9).toFixed(1)}" text-anchor="middle"
-              font-family="Raleway,sans-serif" font-size="6.5" fill="rgba(255,255,255,.9)">${apellido}</text>
+              font-family="Inter,sans-serif" font-size="6.5" fill="rgba(255,255,255,.9)">${apellido}</text>
             ${icons ? `<text x="${(cxFinal+radio).toFixed(1)}" y="${(cy-radio+4).toFixed(1)}" font-size="9" text-anchor="middle">${icons}</text>` : ''}
           </g>`;
         });
@@ -1560,9 +1576,9 @@ async function abrirPartido(id) {
         <rect x="${W/2-28}" y="${H-32}" width="56" height="22" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
         <!-- Labels equipos a la izquierda -->
         <text x="18" y="${H/2-6}" text-anchor="start"
-          font-family="Raleway,sans-serif" font-size="8" fill="rgba(255,255,255,.5)" font-weight="700">${equipoL} ${formL}</text>
+          font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,.5)" font-weight="700">${equipoL} ${formL}</text>
         <text x="18" y="${H/2+14}" text-anchor="start"
-          font-family="Raleway,sans-serif" font-size="8" fill="rgba(255,255,255,.5)" font-weight="700">${equipoV} ${formV}</text>
+          font-family="Inter,sans-serif" font-size="8" fill="rgba(255,255,255,.5)" font-weight="700">${equipoV} ${formV}</text>
         <!-- Jugadores -->
         ${jugadoresL}
         ${jugadoresV}
@@ -2385,10 +2401,10 @@ async function cargarCompActual() {
           const gL = f.goals.home ?? '';
           const gV = f.goals.away ?? '';
           const horaStr = terminado
-            ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#fff">${gL}-${gV}</span>`
+            ? `<span style="font-family:'Inter',sans-serif;font-size:1.1rem;color:#fff">${gL}-${gV}</span>`
             : enVivo
-            ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--rojo)">${gL}-${gV}</span>`
-            : `<span style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--verde)">${hh}:${mm}</span>`;
+            ? `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--rojo)">${gL}-${gV}</span>`
+            : `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--verde)">${hh}:${mm}</span>`;
           return `<div class="partido" style="cursor:default">
             <div style="width:50px;flex-shrink:0;text-align:center;">
               ${horaStr}
