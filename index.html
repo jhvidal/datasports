@@ -7,16 +7,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>DataSports — Mundial 2026</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20130%20130'%3E%3Cpath%20d='M12%2C8%20L118%2C8%20L118%2C82%20Q118%2C114%2065%2C126%20Q12%2C114%2012%2C82%20Z'%20fill='%23ffffff'%20stroke='%234CAF50'%20stroke-width='5'/%3E%3Ctext%20x='46'%20y='76'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='52'%20fill='%23ffffff'%20stroke='%234CAF50'%20stroke-width='2.5'%20paint-order='stroke'%3ED%3C/text%3E%3Ctext%20x='84'%20y='76'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='52'%20fill='%234CAF50'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap');
 
   :root {
-    --header-h: 80px;
+    --header-h: 62px;
     --sidebar-w: 160px;
     --bottom-nav-h: 56px;
     --azul:   #2A398D;
-    --verde:  #3CAC3B;
+    --verde:  #4CAF50;
     --rojo:   #E61D25;
     --fondo:  #0e0e1a;
     --card:   #181830;
@@ -82,7 +82,7 @@
   .tabs::-webkit-scrollbar { display:none; }
   .tab {
     flex-shrink:0; padding:14px 20px;
-    font-size:.8rem; font-weight:700; letter-spacing:.5px;
+    font-size:.9rem; font-weight:700; letter-spacing:.5px;
     text-transform:uppercase; color:var(--muted);
     border-bottom:3px solid transparent;
     cursor:pointer; transition: all .2s; white-space:nowrap;
@@ -672,7 +672,7 @@
     <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
       <svg width="38" height="38" viewBox="0 0 130 130" style="flex-shrink:0">
         <path d="M12,8 L118,8 L118,82 Q118,114 65,126 Q12,114 12,82 Z" fill="none" stroke="#4CAF50" stroke-width="5"/>
-        <text x="65" y="76" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="700" font-size="48" fill="#fff">D<tspan fill="#4CAF50">S</tspan></text>
+        <text x="49" y="76" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="400" font-size="48" fill="#fff">D</text><text x="83" y="76" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="700" font-size="48" fill="#4CAF50">S</text>
       </svg>
       <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
@@ -774,7 +774,7 @@
     <!-- MUNDIAL -->
     <div class="comp-grupo comp-grupo-mundial">
       <div class="comp-grupo-body" style="display:block;">
-        <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarComp(this)">🏆 FIFA World Cup 2026</button>
+        <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarComp(this)">FIFA World Cup 2026</button>
       </div>
     </div>
 
@@ -2355,7 +2355,20 @@ async function cargarCompActual() {
       let html = '';
 
       rondas.forEach(ronda => {
-        const partidos = porRonda[ronda].sort((a,b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+        const ahora = Date.now();
+        const partidos = porRonda[ronda].sort((a,b) => {
+          const ta = new Date(a.fixture.date).getTime();
+          const tb = new Date(b.fixture.date).getTime();
+          const stA = a.fixture.status.short;
+          const stB = b.fixture.status.short;
+          const esNSa = stA === 'NS';
+          const esNSb = stB === 'NS';
+          // NS primero (próximos), luego jugados más recientes
+          if (esNSa && !esNSb) return -1;
+          if (!esNSa && esNSb) return 1;
+          if (esNSa && esNSb) return ta - tb; // próximos: más cercano primero
+          return tb - ta; // jugados: más reciente primero
+        });
         const rows = partidos.map(f => {
           const horaARG = new Date(new Date(f.fixture.date).getTime() - 3*60*60*1000);
           const hh = horaARG.getHours().toString().padStart(2,'0');
@@ -2407,6 +2420,19 @@ async function cargarCompActual() {
         </div>`;
       });
       document.getElementById('comp-fixture-wrap').innerHTML = html;
+      // Scroll al primer partido próximo (NS)
+      setTimeout(() => {
+        const wrap = document.getElementById('comp-fixture-wrap');
+        const proximos = wrap.querySelectorAll('.partido');
+        // Buscar el primer partido que tenga hora en verde (NS)
+        for (const p of proximos) {
+          const hora = p.querySelector('span[style*="verde"]');
+          if (hora) {
+            p.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            break;
+          }
+        }
+      }, 100);
     }
 
     // POSICIONES
