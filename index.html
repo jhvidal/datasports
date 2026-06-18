@@ -12,7 +12,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap');
 
   :root {
-    --header-h: 80px;
+    --header-h: 62px;
     --sidebar-w: 160px;
     --bottom-nav-h: 56px;
     --azul:   #2A398D;
@@ -43,7 +43,7 @@
   /* ── HEADER ── */
   header {
     background: linear-gradient(135deg, var(--azul) 0%, var(--fondo) 100%);
-    padding: 20px 16px 0;
+    padding: 10px 12px 0;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -176,6 +176,11 @@
   main { padding:10px 12px 0; }
 
   .dia-block { margin-bottom:7px; }
+  /* Skeleton loader */
+  .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.05) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .skeleton-partido { height:64px; margin:4px 0; }
+
   .dia-header {
     display:flex; align-items:center; gap:10px;
     padding:12px 14px; background:var(--mid);
@@ -663,16 +668,18 @@
 <body>
 
 <header>
-  <div style="display:flex;align-items:center;gap:0;position:absolute;top:14px;left:14px;">
-    <svg width="44" height="44" viewBox="0 0 130 130" style="flex-shrink:0">
-      <path d="M12,8 L118,8 L118,82 Q118,114 65,126 Q12,114 12,82 Z" fill="none" stroke="#4CAF50" stroke-width="3"/>
-      <text x="65" y="76" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="400" font-size="48" fill="#fff">D<tspan fill="#4CAF50">S</tspan></text>
-    </svg>
-    <div style="width:2px;height:34px;background:#4CAF50;margin:0 10px;flex-shrink:0;"></div>
-    <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1.1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50">Sports</span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;">
+    <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
+      <svg width="38" height="38" viewBox="0 0 130 130" style="flex-shrink:0">
+        <path d="M12,8 L118,8 L118,82 Q118,114 65,126 Q12,114 12,82 Z" fill="none" stroke="#4CAF50" stroke-width="3"/>
+        <text x="65" y="76" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="400" font-size="48" fill="#fff">D<tspan fill="#4CAF50">S</tspan></text>
+      </svg>
+      <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
+      <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50">Sports</span></div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#fff;flex:1;text-align:center;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
+    <button onclick="cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Raleway',sans-serif">↻</button>
   </div>
-  <h1>MUNDIAL <span>2026</span></h1>
-  <button onclick="cargarResultados()" style="position:absolute;top:12px;right:12px;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Raleway',sans-serif">↻ Actualizar</button>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
 
@@ -877,9 +884,41 @@ async function apiFetch(endpoint) {
   const [path, qs] = endpoint.split('?');
   const params = new URLSearchParams(qs || '');
   params.set('path', path);
+
+  // TTL según tipo de llamada
+  let ttlSeg = 120;
+  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 30;
+  else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
+  else if (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN') || path.includes('predictions')) ttlSeg = 3600;
+  else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('lineups') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
+
+  // Intentar desde caché local
+  const cacheKey = 'ds_' + endpoint;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const { ts, data } = JSON.parse(cached);
+      if (Date.now() - ts < ttlSeg * 1000) return data;
+    }
+  } catch(e) {}
+
+  // Llamar al Worker
   const res = await fetch(`https://datasports-api.vidaljonathanh.workers.dev?${params.toString()}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  const data = await res.json();
+
+  // Guardar en caché local
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+  } catch(e) {
+    // localStorage lleno — limpiar caché viejo
+    try {
+      Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
+      localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+    } catch(e2) {}
+  }
+
+  return data;
 }
 
 // ── Mapear nombre de equipo API → nombre en nuestro fixture ──
