@@ -678,7 +678,7 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#fff;flex:1;text-align:center;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Raleway',sans-serif">↻</button>
+    <button onclick="partidoAbierto !== null ? abrirPartido(partidoAbierto) : cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Raleway',sans-serif">↻</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -890,7 +890,9 @@ async function apiFetch(endpoint) {
   if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 30;
   else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
   else if (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN') || path.includes('predictions')) ttlSeg = 3600;
-  else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('lineups') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
+  else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
+  else if (path.includes('lineups')) ttlSeg = 3600; // lineups no cambian una vez confirmados
+  else if (path.includes('fixtures') && endpoint.includes('id=')) ttlSeg = 3600; // fixture individual FT
 
   // Intentar desde caché local
   const cacheKey = 'ds_' + endpoint;
@@ -907,15 +909,17 @@ async function apiFetch(endpoint) {
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
 
-  // Guardar en caché local
-  try {
-    localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
-  } catch(e) {
-    // localStorage lleno — limpiar caché viejo
+  // Guardar en caché local SOLO si hay datos (no cachear respuestas vacías)
+  if (data.results > 0 || (Array.isArray(data.response) && data.response.length > 0)) {
     try {
-      Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
       localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
-    } catch(e2) {}
+    } catch(e) {
+      // localStorage lleno — limpiar caché viejo
+      try {
+        Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
+        localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+      } catch(e2) {}
+    }
   }
 
   return data;
@@ -1143,11 +1147,20 @@ async function cargarResultados() {
         if (partido && !partido.fixtureId) {
           partido.fixtureId = f.fixture?.id;
         }
+        // Guardar en fixtureCache para que el overlay lo encuentre
+        if (f.fixture?.id) fixtureCache[f.fixture.id] = f;
       });
     }
 
     render();
     if (tabActual === 'posiciones') renderPosiciones();
+    // Si hay un partido abierto en vivo, refrescar sus datos sin cerrar el overlay
+    if (partidoAbierto !== null) {
+      const r = RESULTADOS[partidoAbierto];
+      if (r && ['1H','2H','HT','ET','P'].includes(r.estado)) {
+        refrescarOverlayVivo();
+      }
+    }
   } catch(e) {
     console.error('Error cargando resultados:', e);
   }
@@ -1420,19 +1433,27 @@ async function abrirPartido(id) {
     </div>`;
 
   if (!r.fixtureId) {
-    // Intentar buscar el fixtureId en la API
-    try {
-      const idL = TEAM_IDS[p.local]  || null;
-      const idV = TEAM_IDS[p.visita] || null;
-      if (idL && idV) {
+    // Intentar buscar el fixtureId — primero desde PARTIDOS hardcodeados, luego API
+    const idL = TEAM_IDS[p.local]  || null;
+    const idV = TEAM_IDS[p.visita] || null;
+    // Buscar en fixtureCache (ya cargados antes)
+    const cachedFx = Object.values(fixtureCache || {}).find(f =>
+      (f.teams?.home?.id === idL && f.teams?.away?.id === idV) ||
+      (f.teams?.home?.id === idV && f.teams?.away?.id === idL)
+    );
+    if (cachedFx) r.fixtureId = cachedFx.fixture?.id;
+
+    if (!r.fixtureId && idL && idV) {
+      try {
+        // Buscar con los dos equipos para reducir resultados
         const fxData = await apiFetch(`fixtures?league=1&season=2026&team=${idL}`);
         const fxMatch = fxData.response?.find(f =>
           (f.teams?.home?.id === idL && f.teams?.away?.id === idV) ||
           (f.teams?.home?.id === idV && f.teams?.away?.id === idL)
         );
         if (fxMatch) r.fixtureId = fxMatch.fixture?.id;
-      }
-    } catch(e) {}
+      } catch(e) {}
+    }
     
     if (!r.fixtureId) {
       document.getElementById('po-detalles').innerHTML = '<div class="po-sin-datos">Sin detalles disponibles</div>';
@@ -1743,6 +1764,33 @@ function switchTab(tab) {
 function cerrarPartido() {
   partidoAbierto = null;
   document.getElementById('partido-overlay').style.display = 'none';
+}
+
+// Refresca solo el marcador y los eventos del overlay cuando hay partido en vivo
+async function refrescarOverlayVivo() {
+  const id = partidoAbierto;
+  if (id === null) return;
+  const r = RESULTADOS[id];
+  if (!r || !r.fixtureId) return;
+  try {
+    const [evData, fixtureData] = await Promise.all([
+      apiFetch(`fixtures/events?fixture=${r.fixtureId}`),
+      apiFetch(`fixtures?id=${r.fixtureId}`)
+    ]);
+    if (partidoAbierto !== id) return; // usuario cerró el overlay
+    const eventos = evData.response || [];
+    const fi = fixtureData.response?.[0];
+    // Actualizar marcador en el overlay sin re-renderizar todo
+    const scoreEl = document.querySelector('#partido-overlay .po-score');
+    if (scoreEl) scoreEl.textContent = `${r.gL} - ${r.gV}`;
+    const badgeEl = document.querySelector('#partido-overlay .po-live');
+    if (badgeEl && r.min) badgeEl.textContent = `EN VIVO ${r.min}'`;
+    // Re-renderizar solo los eventos si el contenedor existe
+    const evEl = document.getElementById('po-tab-resumen');
+    if (evEl && eventos.length) {
+      evEl.innerHTML = buildEventosHTML(eventos, id);
+    }
+  } catch(e) {}
 }
 
 // Ficha desde la cancha
@@ -2864,6 +2912,15 @@ if (hayHoy) {
   fechaActiva = hoyFecha;
   buildFechaChips();
 }
+// Limpiar entradas vacías del localStorage (fix una sola vez)
+try {
+  const version = '2';
+  if (localStorage.getItem('ds_cache_version') !== version) {
+    Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('ds_cache_version', version);
+  }
+} catch(e) {}
+
 render();
 cargarResultados().then(() => {
   iniciarPolling();
