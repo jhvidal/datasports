@@ -12,9 +12,9 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap');
 
   :root {
-    --header-h: 62px;
+    --header-h: 80px;
     --sidebar-w: 160px;
-    --bottom-nav-h: 56px;
+    --bottom-nav-h: 62px;
     --azul:   #2A398D;
     --verde:  #4CAF50;
     --rojo:   #E61D25;
@@ -45,7 +45,9 @@
     background: linear-gradient(135deg, var(--azul) 0%, var(--fondo) 100%);
     padding: 14px 16px 0;
     text-align: center;
-    position: relative;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 30;
     overflow: hidden;
   }
   header::before {
@@ -496,8 +498,8 @@
     justify-content: center; padding: 8px 4px;
     cursor: pointer; background: none; border: none;
     color: var(--muted); font-family: 'Raleway', sans-serif;
-    font-size: .62rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .5px; border-top: 2px solid transparent;
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .3px; border-top: 2px solid transparent;
     transition: color .2s, border-color .2s;
   }
   .sb-label { display: block; }
@@ -2371,10 +2373,10 @@ async function cargarCompActual() {
         });
         const rows = partidos.map(f => {
           const horaARG = new Date(new Date(f.fixture.date).getTime() - 3*60*60*1000);
-          const hh = horaARG.getHours().toString().padStart(2,'0');
-          const mm = horaARG.getMinutes().toString().padStart(2,'0');
-          const dd = horaARG.getDate();
-          const mes = meses[horaARG.getMonth()];
+          const hh = horaARG.getUTCHours().toString().padStart(2,'0');
+          const mm = horaARG.getUTCMinutes().toString().padStart(2,'0');
+          const dd = horaARG.getUTCDate();
+          const mes = meses[horaARG.getUTCMonth()];
           const st = f.fixture.status.short;
           const terminado = ['FT','AET','PEN'].includes(st);
           const enVivo = ['1H','HT','2H','ET'].includes(st);
@@ -2413,7 +2415,22 @@ async function cargarCompActual() {
 
         html += `<div class="dia-block">
           <div class="dia-header" style="cursor:default">
-            <div class="dia-fecha">${ronda}</div>
+            <div class="dia-fecha">${(ronda => {
+            // Regular Season - 17 → Fecha 17
+            const mRS = ronda.match(/Regular Season\s*[-–]\s*(\d+)/i);
+            if (mRS) return 'Fecha ' + mRS[1];
+            // Group Stage - 1 → Fecha 1
+            const mGS = ronda.match(/Group Stage\s*[-–]\s*(\d+)/i);
+            if (mGS) return 'Fecha ' + mGS[1];
+            // Round of 16 → 16avos de Final
+            if (/round of 16/i.test(ronda)) return '16avos de Final';
+            if (/round of 32/i.test(ronda)) return '16avos de Final';
+            if (/quarter.final/i.test(ronda)) return 'Cuartos de Final';
+            if (/semi.final/i.test(ronda)) return 'Semifinales';
+            if (/^final$/i.test(ronda.trim())) return 'Final';
+            if (/3rd place/i.test(ronda)) return 'Tercer Puesto';
+            return ronda;
+          })(ronda)}</div>
             <span class="dia-count">${partidos.length}p</span>
           </div>
           <div class="partidos-list">${rows}</div>
@@ -3011,6 +3028,17 @@ try {
     localStorage.setItem('ds_cache_version', version);
   }
 } catch(e) {}
+
+// Ajustar padding-top al alto real del header
+function ajustarHeader() {
+  const h = document.querySelector('header');
+  if (h) {
+    const altura = h.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--header-h', altura + 'px');
+  }
+}
+ajustarHeader();
+window.addEventListener('resize', ajustarHeader);
 
 render();
 cargarResultados().then(() => {
