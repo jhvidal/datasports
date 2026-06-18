@@ -213,7 +213,7 @@
   .partido-highlight { background:rgba(60,172,59,.09) !important; border-left:3px solid var(--verde); }
 
   .hora { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; color:var(--verde); width:50px; flex-shrink:0; }
-  .hora-fin  { font-family:'Inter',sans-serif; font-size:.85rem; font-weight:700; color:#fff; background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:50px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
+  .hora-fin  { font-family:'Inter',sans-serif; font-size:.68rem; font-weight:700; color:#fff; background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:44px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
   .hora-live { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--rojo); width:50px; flex-shrink:0; text-align:center; animation:pulso 1.5s infinite; }
 
   .partido-info { flex:1; min-width:0; }
@@ -230,6 +230,7 @@
   }
   .equipo-nombre span.eq-text {
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:.78rem; font-weight:500;
   }
   .equipo-nombre.local  { flex-direction:row; justify-content:flex-start; }
   .equipo-nombre.visita { flex-direction:row-reverse; justify-content:flex-start; }
@@ -679,7 +680,7 @@
       <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
-    <div style="font-family:'Inter',sans-serif;font-size:1.6rem;letter-spacing:2px;color:#fff;flex:1;text-align:center;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
+    <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
     <button onclick="partidoAbierto !== null ? abrirPartido(partidoAbierto) : cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
@@ -889,12 +890,12 @@ async function apiFetch(endpoint) {
 
   // TTL según tipo de llamada
   let ttlSeg = 120;
-  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 30;
+  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 20;
   else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
-  else if (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN') || path.includes('predictions')) ttlSeg = 3600;
+  else if (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN') || path.includes('predictions')) ttlSeg = 86400;
   else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
-  else if (path.includes('lineups')) ttlSeg = 3600; // lineups no cambian una vez confirmados
-  else if (path.includes('fixtures') && endpoint.includes('id=')) ttlSeg = 3600; // fixture individual FT
+  else if (path.includes('lineups')) ttlSeg = 86400; // lineups no cambian
+  else if (path.includes('fixtures') && endpoint.includes('id=')) ttlSeg = 86400; // fixture FT
 
   // Intentar desde caché local
   const cacheKey = 'ds_' + endpoint;
@@ -3038,7 +3039,7 @@ if (esAltaMadrugada && hayAyer) {
 }
 // Limpiar entradas vacías del localStorage (fix una sola vez)
 try {
-  const version = '2';
+  const version = '3';
   if (localStorage.getItem('ds_cache_version') !== version) {
     Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
     localStorage.setItem('ds_cache_version', version);
