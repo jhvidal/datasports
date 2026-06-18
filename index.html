@@ -1084,18 +1084,14 @@ async function cargarFaseFinal() {
 async function cargarResultados() {
   try {
     // Hacer llamadas separadas por cada status para evitar problemas con guiones
-    const [ft, aet, pen, h1, ht, h2, et, ns] = await Promise.all([
-      apiFetch(`fixtures?league=1&season=2026&status=FT`),
-      apiFetch(`fixtures?league=1&season=2026&status=AET`),
-      apiFetch(`fixtures?league=1&season=2026&status=PEN`),
-      apiFetch(`fixtures?league=1&season=2026&status=1H`),
-      apiFetch(`fixtures?league=1&season=2026&status=HT`),
-      apiFetch(`fixtures?league=1&season=2026&status=2H`),
-      apiFetch(`fixtures?league=1&season=2026&status=ET`),
+    // Una sola llamada con todos los status — mucho más rápido
+    const [jugados, enVivo, ns] = await Promise.all([
+      apiFetch(`fixtures?league=1&season=2026&status=FT-AET-PEN`),
+      apiFetch(`fixtures?league=1&season=2026&status=1H-HT-2H-ET-P`),
       apiFetch(`fixtures?league=1&season=2026&status=NS`),
     ]);
 
-    [ft, aet, pen, h1, ht, h2, et].forEach(data => {
+    [jugados, enVivo].forEach(data => {
       if (data.response) data.response.forEach(procesarFixtureAF);
     });
 
