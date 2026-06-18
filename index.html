@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>DataSports — Mundial 2026</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='14'%20fill='%230e0e1a'/%3E%3Ctext%20x='28'%20y='68'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='56'%20fill='%23ffffff'%3ED%3C/text%3E%3Ctext%20x='72'%20y='68'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='56'%20fill='%234CAF50'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20130%20130'%3E%3Cpath%20d='M12%2C8%20L118%2C8%20L118%2C82%20Q118%2C114%2065%2C126%20Q12%2C114%2012%2C82%20Z'%20fill='%23ffffff'%20stroke='%234CAF50'%20stroke-width='5'/%3E%3Ctext%20x='46'%20y='76'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='52'%20fill='%23ffffff'%20stroke='%234CAF50'%20stroke-width='2.5'%20paint-order='stroke'%3ED%3C/text%3E%3Ctext%20x='84'%20y='76'%20text-anchor='middle'%20font-family='Arial%2Csans-serif'%20font-weight='900'%20font-size='52'%20fill='%234CAF50'%3ES%3C/text%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap');
 
@@ -717,7 +717,7 @@
 
 <!-- ══════════ FIXTURE TAB ══════════ -->
 <!-- sub-nav del Mundial -->
-<div style="display:flex;gap:0;border-bottom:1px solid var(--borde);background:var(--card);position:sticky;top:42px;z-index:18;">
+<div style="display:flex;gap:0;border-bottom:1px solid var(--borde);background:var(--card);">
   <button class="mundial-tab active" id="wt-fixture" onclick="showTab('fixture')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Fixture</button>
   <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Grupos</button>
   <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')" style="flex:1;padding:10px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Raleway',sans-serif;">Fase Final</button>
@@ -1276,13 +1276,18 @@ async function abrirPartido(id) {
           if (fxMatch) fixtureIdPre = fxMatch.fixture?.id;
         }
 
-        const [sqL, sqV, lineupPre, fxInfoPre, predPre] = await Promise.all([
+        const [resL, resV, resLineup, resFxInfo, resPred] = await Promise.allSettled([
           apiFetch(`players/squads?team=${idLocal}`),
           apiFetch(`players/squads?team=${idVisita}`),
           fixtureIdPre ? apiFetch(`fixtures/lineups?fixture=${fixtureIdPre}`) : Promise.resolve({response:[]}),
           fixtureIdPre ? apiFetch(`fixtures?id=${fixtureIdPre}`) : Promise.resolve({response:[]}),
           fixtureIdPre ? apiFetch(`predictions?fixture=${fixtureIdPre}`) : Promise.resolve({response:[]})
         ]);
+        const sqL      = resL.status      === 'fulfilled' ? resL.value      : {response:[]};
+        const sqV      = resV.status      === 'fulfilled' ? resV.value      : {response:[]};
+        const lineupPre = resLineup.status === 'fulfilled' ? resLineup.value : {response:[]};
+        const fxInfoPre = resFxInfo.status === 'fulfilled' ? resFxInfo.value : {response:[]};
+        const predPre   = resPred.status   === 'fulfilled' ? resPred.value   : {response:[]};
 
         const jugL = sqL.response?.[0]?.players || [];
         const jugV = sqV.response?.[0]?.players || [];
@@ -1566,12 +1571,19 @@ async function abrirPartido(id) {
 
 
   try {
-    const [evData, lineupData, fixtureData, statsData] = await Promise.all([
+    // Fase 1: eventos + info + stats (rápido) — mostrar resumen enseguida
+    // Fase 2: lineups (puede tardar) — agregar tab cuando llega
+    const [resEv, resFx, resSt] = await Promise.allSettled([
       apiFetch(`fixtures/events?fixture=${r.fixtureId}`),
-      apiFetch(`fixtures/lineups?fixture=${r.fixtureId}`),
       apiFetch(`fixtures?id=${r.fixtureId}`),
       apiFetch(`fixtures/statistics?fixture=${r.fixtureId}`)
     ]);
+    const evData      = resEv.status === 'fulfilled' ? resEv.value : {response:[]};
+    const fixtureData = resFx.status === 'fulfilled' ? resFx.value : {response:[]};
+    const statsData   = resSt.status === 'fulfilled' ? resSt.value : {response:[]};
+    // Lineups en paralelo pero sin bloquear el render
+    const lineupPromise = apiFetch(`fixtures/lineups?fixture=${r.fixtureId}`);
+    const lineupData = { response: [] }; // placeholder
 
     const eventos = evData.response || [];
     const lineups = lineupData.response || [];
@@ -1701,6 +1713,48 @@ async function abrirPartido(id) {
     `;
 
     document.getElementById('po-detalles').innerHTML = tabsHTML;
+
+    // Fase 2: cuando llegan los lineups, agregar el tab Formaciones sin re-renderizar todo
+    lineupPromise.then(lineupData2 => {
+      const lineups2 = lineupData2?.response || [];
+      if (lineups2.length < 2) return; // sin datos, no hacer nada
+      if (partidoAbierto !== id) return; // usuario ya cerró el overlay
+      // Insertar botón Formaciones en el po-tabs si no existe
+      const tabsEl = document.querySelector('#partido-overlay .po-tabs');
+      if (!tabsEl || tabsEl.querySelector('[onclick*="formaciones"]')) return;
+      const btnEst = tabsEl.querySelector('[onclick*="estadisticas"]');
+      const btnForm = document.createElement('button');
+      btnForm.className = 'po-tab';
+      btnForm.setAttribute('onclick', "switchTab('formaciones')");
+      btnForm.textContent = 'Formaciones';
+      if (btnEst) tabsEl.insertBefore(btnForm, btnEst);
+      else tabsEl.appendChild(btnForm);
+      // Insertar el contenido de formaciones
+      const detallesEl = document.getElementById('po-detalles');
+      if (!detallesEl) return;
+      const divForm = document.createElement('div');
+      divForm.id = 'tab-formaciones';
+      divForm.style.display = 'none';
+      const colorL2 = lineups2[0]?.team?.colors?.player?.primary ? `#${lineups2[0].team.colors.player.primary}` : '#3CAC3B';
+      const colorV2 = lineups2[1]?.team?.colors?.player?.primary ? `#${lineups2[1].team.colors.player.primary}` : '#E61D25';
+      divForm.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:.75rem;font-weight:700;color:#fff">${p.local} <span style="color:var(--verde)">${lineups2[0]?.formation||''}</span></span>
+          <span style="font-size:.75rem;font-weight:700;color:#fff"><span style="color:var(--verde)">${lineups2[1]?.formation||''}</span> ${p.visita}</span>
+        </div>
+        ${lineups2[0]?.startXI?.length >= 2 ? canchaHTML(lineups2[0], lineups2[1], eventos) : ''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+          <div>
+            <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase">Suplentes ${p.local}</div>
+            ${suplentesHTML(lineups2[0], true)}
+          </div>
+          <div>
+            <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;text-align:right">Suplentes ${p.visita}</div>
+            ${suplentesHTML(lineups2[1], false)}
+          </div>
+        </div>`;
+      detallesEl.appendChild(divForm);
+    }).catch(() => {});
 
     function eventoItem(ev) {
       const equipoNombre = mapTeam(ev.team?.name || '');
@@ -2905,10 +2959,21 @@ function renderLlaves() {
 
 // ── INIT ──
 buildFechaChips();
-// Prefiltrar a hoy al abrir
+// Prefiltrar al día correcto al abrir:
+// Si son madrugada y hay partido en vivo de ayer → quedarse en ayer
+// Si no, ir a hoy
 const hoyFecha = fechaHoyARG();
-const hayHoy = PARTIDOS.some(p => p.fecha === hoyFecha);
-if (hayHoy) {
+const ahoraMins = (() => { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes() - 180; })(); // minutos ARG desde medianoche
+const esAltaMadrugada = ahoraMins >= 0 && ahoraMins < 180; // entre 00:00 y 03:00 ARG
+const ayerFecha = (() => { const d = new Date(hoyFecha + 'T12:00:00'); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); })();
+const hayAyer = PARTIDOS.some(p => p.fecha === ayerFecha);
+const hayHoy  = PARTIDOS.some(p => p.fecha === hoyFecha);
+// Si es madrugada y hay partidos de ayer → mostrar ayer por defecto
+// (los partidos en vivo de ayer se detectan después de cargarResultados)
+if (esAltaMadrugada && hayAyer) {
+  fechaActiva = ayerFecha;
+  buildFechaChips();
+} else if (hayHoy) {
   fechaActiva = hoyFecha;
   buildFechaChips();
 }
@@ -2925,6 +2990,18 @@ render();
 cargarResultados().then(() => {
   iniciarPolling();
   setInterval(() => { iniciarPolling(); }, 300000);
+  // Tras cargar resultados: si es madrugada y hay partido en vivo de ayer, ir a ayer
+  if (esAltaMadrugada && hayAyer) {
+    const hayVivoAyer = Object.values(RESULTADOS).some(r => r.estado === 'live');
+    if (hayVivoAyer) {
+      fechaActiva = ayerFecha;
+    } else {
+      // No hay partido en vivo de ayer, ir a hoy si hay partidos
+      if (hayHoy && fechaActiva === ayerFecha) fechaActiva = hoyFecha;
+    }
+    buildFechaChips();
+    render();
+  }
 });
 cargarFaseFinal();
 </script>
