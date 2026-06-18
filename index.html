@@ -1157,6 +1157,8 @@ async function cargarResultados() {
 
     render();
     if (tabActual === 'posiciones') renderPosiciones();
+    // Pre-cachear en vivo después de cada polling
+    if (hayPartidoEnCurso()) preCachearPartidos();
     // Si hay un partido abierto en vivo, refrescar sus datos sin cerrar el overlay
     if (partidoAbierto !== null) {
       const r = RESULTADOS[partidoAbierto];
@@ -3017,6 +3019,29 @@ function renderLlaves() {
   `</div>`;
 }
 
+// ── PRE-CACHE EN BACKGROUND ──
+async function preCachearPartidos() {
+  const hoy = fechaHoyARG();
+  const ayer = (() => { const d = new Date(hoy + 'T12:00:00'); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); })();
+  const partidos = Object.values(RESULTADOS).filter(r => {
+    if (!r.fixtureId) return false;
+    // FT de hoy y ayer, y partidos en vivo
+    const esFT = ['FT','AET','PEN'].includes(r.estado);
+    const esVivo = ['1H','2H','HT','ET','P'].includes(r.estado);
+    return esVivo || (esFT && (r.fecha === hoy || r.fecha === ayer));
+  });
+
+  // Pre-cachear de a uno con delay para no saturar la API
+  for (const r of partidos) {
+    try {
+      await apiFetch(`fixtures/events?fixture=${r.fixtureId}`);
+      await apiFetch(`fixtures/lineups?fixture=${r.fixtureId}`);
+      await apiFetch(`fixtures/statistics?fixture=${r.fixtureId}`);
+      await new Promise(res => setTimeout(res, 300)); // 300ms entre cada partido
+    } catch(e) {}
+  }
+}
+
 // ── INIT ──
 buildFechaChips();
 // Prefiltrar al día correcto al abrir:
@@ -3061,6 +3086,8 @@ render();
 cargarResultados().then(() => {
   iniciarPolling();
   setInterval(() => { iniciarPolling(); }, 300000);
+  // Pre-cachear en background detalles de partidos FT y en vivo de hoy
+  preCachearPartidos();
   // Tras cargar resultados: si es madrugada y hay partido en vivo de ayer, ir a ayer
   if (esAltaMadrugada && hayAyer) {
     const hayVivoAyer = Object.values(RESULTADOS).some(r => r.estado === 'live');
