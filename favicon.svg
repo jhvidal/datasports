@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 130">
   <defs>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');</style>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&amp;display=swap');</style>
   </defs>
   <path d="M12,8 L118,8 L118,82 Q118,114 65,126 Q12,114 12,82 Z" fill="#1a2460" stroke="#4CAF50" stroke-width="5"/>
   <text x="49" y="82" text-anchor="middle" font-family="Raleway,sans-serif" font-weight="400" font-size="52" fill="#ffffff">D</text>
