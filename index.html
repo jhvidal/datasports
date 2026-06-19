@@ -892,10 +892,12 @@ async function apiFetch(endpoint) {
   let ttlSeg = 120;
   if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 20;
   else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
-  else if (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN') || path.includes('predictions')) ttlSeg = 86400;
+  // Lista de partidos FT (cambia cada vez que termina un partido nuevo) — TTL corto
+  else if (path === 'fixtures' && (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN'))) ttlSeg = 30;
+  else if (path.includes('predictions')) ttlSeg = 86400;
   else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
-  else if (path.includes('lineups')) ttlSeg = 86400; // lineups no cambian
-  else if (path.includes('fixtures') && endpoint.includes('id=')) ttlSeg = 86400; // fixture FT
+  else if (path.includes('lineups')) ttlSeg = 86400; // lineups de un fixture puntual no cambian
+  else if (path === 'fixtures' && endpoint.includes('id=')) ttlSeg = 86400; // fixture individual FT
 
   // Intentar desde caché local
   const cacheKey = 'ds_' + endpoint;
@@ -3064,7 +3066,7 @@ if (esAltaMadrugada && hayAyer) {
 }
 // Limpiar entradas vacías del localStorage (fix una sola vez)
 try {
-  const version = '3';
+  const version = '4';
   if (localStorage.getItem('ds_cache_version') !== version) {
     Object.keys(localStorage).filter(k => k.startsWith('ds_')).forEach(k => localStorage.removeItem(k));
     localStorage.setItem('ds_cache_version', version);
