@@ -2681,18 +2681,31 @@ function horaOFin(p) {
 function buildFechaChips() {
   const fechas = [...new Set(PARTIDOS.map(p => p.fecha))].sort();
   const hoy = fechaHoyARG();
-  document.getElementById('fechaScroll').innerHTML = fechas.map(f => {
+  const cont = document.getElementById('fechaScroll');
+  cont.innerHTML = fechas.map(f => {
     const d = new Date(f+'T12:00:00');
     const dow = DIAS_ES[d.getDay()];
     const num = d.getDate();
     const mes = MESES_ES[d.getMonth()-6] || '';
     return `<div class="fecha-chip ${fechaActiva===f?'active':''} ${f===hoy?'hoy-chip':''}"
+      data-fecha="${f}"
       onclick="toggleFecha('${f}')">
       <span class="chip-dow">${dow}</span>
       <span class="chip-num">${num}</span>
       <span class="chip-mes">${mes}</span>
     </div>`;
   }).join('');
+  // Centrar el scroll en el chip activo (o en hoy si no hay activo)
+  setTimeout(() => {
+    const target = fechaActiva || hoy;
+    const chip = cont.querySelector(`[data-fecha="${target}"]`);
+    if (chip) {
+      const contRect = cont.getBoundingClientRect();
+      const chipRect = chip.getBoundingClientRect();
+      const scrollTarget = cont.scrollLeft + (chipRect.left - contRect.left) - (contRect.width/2) + (chipRect.width/2);
+      cont.scrollTo({ left: scrollTarget, behavior: 'auto' });
+    }
+  }, 0);
 }
 
 function toggleFecha(f) {
