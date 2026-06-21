@@ -152,14 +152,15 @@
     transition:all .15s; min-width:44px;
   }
   .fecha-chip:hover { border-color:var(--verde); }
-  .fecha-chip.active { background:var(--card); border-color:var(--verde); border-width:2px; box-shadow:0 3px 10px rgba(76,175,80,.25); }
+  .fecha-chip.active { background:var(--verde); border-color:var(--verde); border-width:2px; box-shadow:0 3px 10px rgba(76,175,80,.3); }
   .fecha-chip.hoy-chip { border-color:var(--verde); }
   .chip-dow { font-size:.58rem; font-weight:700; text-transform:uppercase; color:var(--muted); }
-  .fecha-chip.active .chip-dow { color:var(--azul); }
+  .fecha-chip.active .chip-dow { color:#fff; }
   .fecha-chip.hoy-chip .chip-dow { color:var(--verde-texto); }
-  .chip-num { font-family:'Inter',sans-serif; font-size:1.25rem; color:var(--texto); line-height:1.1; }
+  .chip-num { font-family:'Inter',sans-serif; font-size:1.25rem; color:var(--texto); line-height:1.1; font-weight:600; }
+  .fecha-chip.active .chip-num { color:#fff; font-weight:800; }
   .chip-mes { font-size:.55rem; color:var(--muted); text-transform:uppercase; font-weight:600; }
-  .fecha-chip.active .chip-mes { color:var(--azul); }
+  .fecha-chip.active .chip-mes { color:#fff; }
 
   /* ── FASE NAV ── */
   .fase-nav {
@@ -2698,6 +2699,10 @@ function filtrar() {
       }
       return false;
     });
+  } else if (!busqueda) {
+    // Sin filtro de fecha ni búsqueda: mostrar desde hoy en adelante por defecto
+    const hoy = fechaHoyARG();
+    res = res.filter(p => p.fecha >= hoy);
   }
   if (busqueda) {
     const q = normalize(busqueda);
@@ -2902,7 +2907,10 @@ function render() {
             </div>
           </div>`;
         }).join('');
-        const logoLiga = fixturesLiga[0]?.league?.logo || '';
+        const LOGOS_LIGAS_FIJOS = {
+          129: 'https://assets.football-logos.cc/logos/argentina/256x256/primera-nacional.5ff4a9c9.png',
+        };
+        const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixturesLiga[0]?.league?.logo || '';
         return `<div class="dia-block dia-block-menor">
           <div class="dia-header ${abiertoMenor?'':'closed'} ${tieneLiveMenor?'tiene-live':''}" onclick="toggleDiaMenor('${fecha}','${lid}')">
             ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display='none'">` : ''}
@@ -2918,7 +2926,7 @@ function render() {
 
     return `<div class="dia-block">
       <div class="dia-header ${abierto?'':'closed'} ${tieneLive?'tiene-live':''}" onclick="toggleDia('${fecha}')">
-        <img class="liga-logo" src="https://media.api-sports.io/football/leagues/1.png" alt="">
+        <img class="liga-logo" src="https://assets.football-logos.cc/logos/tournaments/256x256/fifa-world-cup-2026.31d2489d.png" alt="" onerror="this.style.display='none'">
         <div class="dia-fecha-wrap">
           <div class="liga-label liga-mundial">Mundial 2026</div>
         </div>
