@@ -154,6 +154,12 @@
   .fecha-chip:hover { border-color:var(--verde); }
   .fecha-chip.active { background:var(--verde); border-color:var(--verde); box-shadow:0 2px 6px rgba(76,175,80,.3); }
   .fecha-chip.hoy-chip { border-color:var(--verde); }
+  .fecha-chip-vivo { border-color:var(--rojo); }
+  .fecha-chip-vivo .chip-dow { color:var(--rojo); animation:pulso 1.2s infinite; }
+  .fecha-chip-vivo.active { background:var(--rojo); border-color:var(--rojo); }
+  .fecha-chip-vivo.active .chip-dow,
+  .fecha-chip-vivo.active .chip-num,
+  .fecha-chip-vivo.active .chip-mes { color:#fff; }
   .chip-dow { font-size:.58rem; font-weight:700; text-transform:uppercase; color:var(--muted); }
   .fecha-chip.active .chip-dow { color:#fff; }
   .fecha-chip.hoy-chip .chip-dow { color:var(--verde-texto); }
@@ -243,6 +249,7 @@
   .equipo-nombre.local  { flex-direction:row; justify-content:flex-start; }
   .equipo-nombre.visita { flex-direction:row-reverse; justify-content:flex-start; }
   .eq-flag { font-size:.95rem; flex-shrink:0; }
+  .eq-escudo { width:18px; height:18px; object-fit:contain; flex-shrink:0; }
   .vs-wrap {
     color:var(--muted); font-weight:400; font-size:.72rem;
     text-align:center; flex-shrink:0; padding:0 2px;
@@ -306,7 +313,7 @@
   th:first-child { text-align:left; padding-left:12px; width:45%; }
   td {
     padding:9px 4px; text-align:center;
-    border-bottom:1px solid rgba(42,42,80,.5);
+    border-bottom:1px solid var(--borde);
     white-space:nowrap; overflow:hidden;
   }
   td:first-child { text-align:left; padding-left:12px; }
@@ -320,7 +327,7 @@
 
   .equipo-td { display:flex; align-items:center; gap:8px; }
   .bandera { font-size:1.1rem; }
-  .eq-nombre { font-weight:600; font-size:.82rem; }
+  .eq-nombre { font-weight:600; font-size:.82rem; color:var(--texto); }
   .pts-td { font-weight:700; color:var(--texto); font-size:.9rem; }
   .dg-pos { color:var(--verde-texto); }
   .dg-neg { color:var(--rojo); }
@@ -894,6 +901,7 @@ let pollingInterval = null;
 // Fixtures de ligas menores (B Nacional, B Metro) agrupados por fecha ARG
 // Estructura: { 'YYYY-MM-DD': { 129: [fixtures...], 131: [fixtures...] } }
 const LIGAS_MENORES = {};
+let ligasMenoresCargadas = false;
 const LIGAS_MENORES_INFO = {
   129: { nombre: 'Primera Nacional', orden: 1 },
   131: { nombre: 'Primera B Metro',  orden: 2 },
@@ -931,8 +939,12 @@ async function cargarLigasMenores() {
       });
     });
 
+    ligasMenoresCargadas = true;
     render();
-  } catch(e) {}
+  } catch(e) {
+    ligasMenoresCargadas = true;
+    render();
+  }
 }
 
 // ── Fecha actual en horario Argentina (UTC-3) ──
@@ -2268,6 +2280,7 @@ const MESES_ES = ['Jun','Jul','Ago'];
 let tabActual     = 'fixture';
 let faseActual    = 'todos';
 let fechaActiva   = null;
+let filtroEnVivo  = false;
 let busqueda      = '';
 let diasAbiertos  = {};
 let gruposAbiertos = {};
@@ -2424,9 +2437,14 @@ async function cargarCompActual() {
         return 99;
       };
 
+      // Filtrar: desde ayer en adelante (para no mostrar todo el historial)
+      const ayerTs = Date.now() - 24*60*60*1000;
+      const fixturesFiltrados = fixtures.filter(f => new Date(f.fixture.date).getTime() >= ayerTs);
+      const fixturesParaMostrar = fixturesFiltrados.length > 0 ? fixturesFiltrados : fixtures.slice(-10);
+
       // Agrupar por ronda
       const porRonda = {};
-      fixtures.forEach(f => {
+      fixturesParaMostrar.forEach(f => {
         const r = f.league.round || 'Sin ronda';
         if (!porRonda[r]) porRonda[r] = [];
         porRonda[r].push(f);
@@ -2691,6 +2709,9 @@ function agrupar(lista) {
 function filtrar() {
   let res = PARTIDOS;
   if (faseActual !== 'todos') res = res.filter(p => p.fase === faseActual);
+  if (filtroEnVivo) {
+    return res.filter(p => RESULTADOS[p.id]?.estado === 'live');
+  }
   if (fechaActiva) {
     res = res.filter(p => {
       if (p.fecha === fechaActiva) return true;
@@ -2751,12 +2772,20 @@ function buildFechaChips() {
   const fechas = [...new Set(PARTIDOS.map(p => p.fecha))].sort();
   const hoy = fechaHoyARG();
   const cont = document.getElementById('fechaScroll');
-  cont.innerHTML = fechas.map(f => {
+  const hayPartidoVivo = Object.values(RESULTADOS).some(r => r.estado === 'live');
+  const chipVivo = hayPartidoVivo ? `<div class="fecha-chip fecha-chip-vivo ${filtroEnVivo?'active':''}"
+      data-fecha="__vivo__"
+      onclick="toggleFiltroEnVivo()">
+      <span class="chip-dow">●</span>
+      <span class="chip-num" style="font-size:.68rem">EN</span>
+      <span class="chip-mes">VIVO</span>
+    </div>` : '';
+  cont.innerHTML = chipVivo + fechas.map(f => {
     const d = new Date(f+'T12:00:00');
     const dow = DIAS_ES[d.getDay()];
     const num = d.getDate();
     const mes = MESES_ES[d.getMonth()-6] || '';
-    return `<div class="fecha-chip ${fechaActiva===f?'active':''} ${f===hoy?'hoy-chip':''}"
+    return `<div class="fecha-chip ${fechaActiva===f && !filtroEnVivo?'active':''} ${f===hoy?'hoy-chip':''}"
       data-fecha="${f}"
       onclick="toggleFecha('${f}')">
       <span class="chip-dow">${dow}</span>
@@ -2779,6 +2808,16 @@ function buildFechaChips() {
 
 function toggleFecha(f) {
   fechaActiva = fechaActiva===f ? null : f;
+  filtroEnVivo = false;
+  busqueda=''; document.getElementById('searchInput').value='';
+  document.getElementById('searchClear').classList.remove('visible');
+  diasAbiertos={};
+  buildFechaChips(); render();
+}
+
+function toggleFiltroEnVivo() {
+  filtroEnVivo = !filtroEnVivo;
+  fechaActiva = null;
   busqueda=''; document.getElementById('searchInput').value='';
   document.getElementById('searchClear').classList.remove('visible');
   diasAbiertos={};
@@ -2859,12 +2898,12 @@ function render() {
         <div class="partido-info">
           <div class="equipos">
             <span class="equipo-nombre local">
-              <span class="eq-flag">${flag(p.local)}</span>
+              ${TEAM_IDS[p.local] ? `<img class="eq-escudo" src="https://media.api-sports.io/football/teams/${TEAM_IDS[p.local]}.png" alt="" onerror="this.outerHTML='<span class=eq-flag>${flag(p.local)}</span>'">` : `<span class="eq-flag">${flag(p.local)}</span>`}
               <span class="eq-text">${nombreCorto(p.local)}</span>
             </span>
             ${resultadoBadge(p) || `<span class="vs-wrap">vs</span>`}
             <span class="equipo-nombre visita">
-              <span class="eq-flag">${flag(p.visita)}</span>
+              ${TEAM_IDS[p.visita] ? `<img class="eq-escudo" src="https://media.api-sports.io/football/teams/${TEAM_IDS[p.visita]}.png" alt="" onerror="this.outerHTML='<span class=eq-flag>${flag(p.visita)}</span>'">` : `<span class="eq-flag">${flag(p.visita)}</span>`}
               <span class="eq-text">${nombreCorto(p.visita)}</span>
             </span>
           </div>
@@ -2877,7 +2916,9 @@ function render() {
     }).join('');
     // Ligas menores (B Nacional, B Metro) para este día
     const menoresDelDia = LIGAS_MENORES[fecha] || {};
-    const bloquesMenores = Object.entries(LIGAS_MENORES_INFO)
+    const bloquesMenores = !ligasMenoresCargadas && esHoy
+      ? `<div class="dia-block dia-block-menor"><div class="dia-header"><div class="skeleton" style="width:80px;height:14px"></div></div><div class="partidos-list"><div class="skeleton skeleton-partido"></div><div class="skeleton skeleton-partido"></div></div></div>`
+      : Object.entries(LIGAS_MENORES_INFO)
       .sort((a,b) => a[1].orden - b[1].orden)
       .map(([lid, infoLiga]) => {
         const fixturesLiga = menoresDelDia[lid];
@@ -2913,6 +2954,7 @@ function render() {
         }).join('');
         const LOGOS_LIGAS_FIJOS = {
           129: 'https://assets.football-logos.cc/logos/argentina/1500x1500/primera-nacional.5ff4a9c9.png',
+          131: 'https://blogger.googleusercontent.com/img/a/AVvXsEhfjz92x5ByszzIV35H2DCBIEyDuFW0xtGF9_QJp7YEWK0a57U-1qNud9H1laGZtlEwyK53Vj-ReOjtbOXN5ZJxVprI2cw2XxWIIBw-UgiBha9Q6K88TmlYw0jPqBIPjQYuYNPkunaLl9OS1IeKzi7e2CtoN3ZuegRd0CC4dURdSD6JmKWgNjA2fqM6=s512',
         };
         const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixturesLiga[0]?.league?.logo || '';
         return `<div class="dia-block dia-block-menor">
@@ -2942,6 +2984,55 @@ function render() {
     </div>
     <div class="bloques-menores-sep">${bloquesMenores}</div>`;
   }).join('');
+
+  // Si hay búsqueda activa, agregar resultados de B Nacional / B Metro también
+  if (busqueda) {
+    const q = normalize(busqueda);
+    const extras = [];
+    Object.entries(LIGAS_MENORES).forEach(([fecha, ligas]) => {
+      Object.entries(ligas).forEach(([lid, fixturesLiga]) => {
+        fixturesLiga.forEach(f => {
+          const local = f.teams.home.name, visita = f.teams.away.name;
+          if (normalize(local).includes(q) || normalize(visita).includes(q)) {
+            extras.push({ fecha, lid, f });
+          }
+        });
+      });
+    });
+    if (extras.length) {
+      const filasExtra = extras.map(({lid, f}) => {
+        const st = f.fixture.status.short;
+        const ft = ['FT','AET','PEN'].includes(st);
+        const lv = ['1H','2H','HT','ET','P'].includes(st);
+        const local = f.teams.home.name, visita = f.teams.away.name;
+        const gL = f.goals.home, gV = f.goals.away;
+        const horaARG = new Date(new Date(f.fixture.date).getTime() - 3*60*60*1000);
+        const hh = horaARG.getUTCHours().toString().padStart(2,'0');
+        const mm = horaARG.getUTCMinutes().toString().padStart(2,'0');
+        let horaHtml = ft ? `<span class="hora-fin">FIN</span>`
+          : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
+          : `<span class="hora">${hh}:${mm}</span>`;
+        const resultadoHtml = (ft || lv)
+          ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
+          : `<span class="vs-wrap">vs</span>`;
+        return `<div class="partido partido-highlight" onclick="abrirPartidoMenor(${f.fixture.id})">
+          <div style="width:50px;flex-shrink:0">${horaHtml}</div>
+          <div class="partido-info">
+            <div class="equipos">
+              <span class="equipo-nombre local"><span class="eq-text">${local}</span></span>
+              ${resultadoHtml}
+              <span class="equipo-nombre visita"><span class="eq-text">${visita}</span></span>
+            </div>
+            <div class="meta"><span class="tag tag-sede">${LIGAS_MENORES_INFO[lid]?.nombre || ''}</span></div>
+          </div>
+        </div>`;
+      }).join('');
+      cal.innerHTML += `<div class="dia-block dia-block-menor" style="margin-top:10px">
+        <div class="dia-header"><div class="liga-label">Otras ligas</div></div>
+        <div class="partidos-list">${filasExtra}</div>
+      </div>`;
+    }
+  }
 }
 
 function toggleDiaMenor(fecha, lid) {
