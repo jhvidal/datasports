@@ -17,18 +17,19 @@
     --bottom-nav-h: 62px;
     --azul:   #2A398D;
     --verde:  #4CAF50;
+    --verde-texto: #2E7D32;
     --rojo:   #E61D25;
-    --fondo:  #0e0e1a;
-    --card:   #181830;
-    --mid:    #1c1c38;
-    --borde:  #2a2a50;
-    --texto:  #ffffff;
-    --muted:  #8888aa;
+    --fondo:  #eef0f5;
+    --card:   #ffffff;
+    --mid:    #f4f5f9;
+    --borde:  #e2e4ec;
+    --texto:  #1a1a3e;
+    --muted:  #6b6b8a;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  html { background: #0e0e1a; }
+  html { background: var(--fondo); }
 
   body {
     background: var(--fondo);
@@ -42,7 +43,7 @@
 
   /* ── HEADER ── */
   header {
-    background: linear-gradient(135deg, var(--azul) 0%, var(--fondo) 100%);
+    background: linear-gradient(135deg, var(--azul) 0%, #0e0e1a 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
@@ -51,19 +52,20 @@
     overflow: hidden;
   }
   header::before {
-    content:''; position:absolute; top:-50px; right:-50px;
-    width:200px; height:200px; border-radius:50%;
-    background: rgba(60,172,59,0.07);
+    content:''; position:absolute; top:-60px; right:-40px;
+    width:220px; height:220px; border-radius:50%;
+    border: 2px solid rgba(76,175,80,0.12);
   }
   header::after {
-    content:''; position:absolute; bottom:0; left:0; right:0;
-    height:0;
+    content:''; position:absolute; bottom:-50px; left:-30px;
+    width:140px; height:140px; border-radius:50%;
+    border: 2px solid rgba(76,175,80,0.08);
   }
   header h1 {
     font-family:'Inter',sans-serif;
     font-size: 2.6rem; letter-spacing:3px; color:#fff; line-height:1;
   }
-  header h1 span { color: var(--verde); }
+  header h1 span { color: var(--verde-texto); }
   header p { font-size:.72rem; color:rgba(255,255,255,.55); margin-top:4px; letter-spacing:1px; text-transform:uppercase; }
   /* Barra tricolor debajo del header: verde | azul | rojo */
   .header-bar {
@@ -91,7 +93,7 @@
     background:none; border-left:none; border-right:none; border-top:none;
     font-family:'Inter',sans-serif;
   }
-  .tab.active { color:#fff; border-bottom-color: var(--verde); }
+  .tab.active { color:var(--texto); border-bottom-color: var(--verde-texto); }
 
   /* ── BUSCADOR ── */
   .search-wrap { padding:12px 12px 0; position:relative; }
@@ -105,7 +107,7 @@
   .sug-item {
     display:flex; align-items:center; gap:8px;
     padding:10px 14px; cursor:pointer; font-size:.85rem;
-    border-bottom:1px solid var(--borde); color:#fff;
+    border-bottom:1px solid var(--borde); color:var(--texto);
     transition:background .15s;
   }
   .sug-item:last-child { border-bottom:none; }
@@ -115,12 +117,12 @@
   .po-formacion-wrap { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
   .po-equipo-form { background:var(--mid); border-radius:10px; padding:10px 12px; }
   .po-form-titulo { font-size:.65rem; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px; margin-bottom:4px; }
-  .po-form-nombre { font-size:.8rem; font-weight:700; color:#fff; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .po-form-sistema { font-family:'Inter',sans-serif; font-size:1.1rem; color:var(--verde); letter-spacing:1px; margin-bottom:8px; }
-  .po-jugador { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:.72rem; }
+  .po-form-nombre { font-size:.8rem; font-weight:700; color:var(--texto); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .po-form-sistema { font-family:'Inter',sans-serif; font-size:1.1rem; color:var(--verde-texto); letter-spacing:1px; margin-bottom:8px; }
+  .po-jugador { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid var(--borde); font-size:.72rem; }
   .po-jugador:last-child { border-bottom:none; }
   .po-num { color:var(--muted); font-size:.68rem; width:16px; text-align:right; flex-shrink:0; }
-  .po-jugador-nombre { flex:1; color:#fff; }
+  .po-jugador-nombre { flex:1; color:var(--texto); }
   .po-suplente .po-jugador-nombre { color:var(--muted); }
   .search-box {
     display:flex; align-items:center; gap:8px;
@@ -130,7 +132,7 @@
   .search-box:focus-within { border-color:var(--verde); }
   .search-input {
     flex:1; background:none; border:none; outline:none;
-    color:#fff; font-family:'Inter',sans-serif;
+    color:var(--texto); font-family:'Inter',sans-serif;
     font-size:.88rem; padding:11px 0;
   }
   .search-input::placeholder { color:var(--muted); }
@@ -150,14 +152,14 @@
     transition:all .15s; min-width:44px;
   }
   .fecha-chip:hover { border-color:var(--verde); }
-  .fecha-chip.active { background:var(--azul); border-color:var(--verde); }
-  .fecha-chip.hoy-chip { border-color:var(--rojo); }
+  .fecha-chip.active { background:var(--card); border-color:var(--verde); border-width:2px; box-shadow:0 3px 10px rgba(76,175,80,.25); }
+  .fecha-chip.hoy-chip { border-color:var(--verde); }
   .chip-dow { font-size:.58rem; font-weight:700; text-transform:uppercase; color:var(--muted); }
-  .fecha-chip.active .chip-dow { color:rgba(255,255,255,.7); }
-  .fecha-chip.hoy-chip .chip-dow { color:var(--rojo); }
-  .chip-num { font-family:'Inter',sans-serif; font-size:1.25rem; color:#fff; line-height:1.1; }
+  .fecha-chip.active .chip-dow { color:var(--azul); }
+  .fecha-chip.hoy-chip .chip-dow { color:var(--verde-texto); }
+  .chip-num { font-family:'Inter',sans-serif; font-size:1.25rem; color:var(--texto); line-height:1.1; }
   .chip-mes { font-size:.55rem; color:var(--muted); text-transform:uppercase; font-weight:600; }
-  .fecha-chip.active .chip-mes { color:rgba(255,255,255,.6); }
+  .fecha-chip.active .chip-mes { color:var(--azul); }
 
   /* ── FASE NAV ── */
   .fase-nav {
@@ -171,15 +173,15 @@
     font-size:.7rem; font-weight:600; text-transform:uppercase;
     padding:6px 13px; border-radius:20px; cursor:pointer; transition:all .2s;
   }
-  .fase-btn:hover { border-color:var(--verde); color:var(--verde); }
-  .fase-btn.active { background:var(--azul); border-color:var(--verde); color:#fff; }
+  .fase-btn:hover { border-color:var(--verde); color:var(--verde-texto); }
+  .fase-btn.active { background:var(--card); border-color:var(--verde); color:var(--azul); }
 
   /* ── FIXTURE ── */
   main { padding:10px 12px 0; }
 
   .dia-block { margin-bottom:7px; }
   /* Skeleton loader */
-  .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.05) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+  .skeleton { background: linear-gradient(90deg, var(--mid) 25%, var(--borde) 50%, var(--mid) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   .skeleton-partido { height:64px; margin:4px 0; }
 
@@ -189,17 +191,17 @@
     border-radius:10px 10px 0 0; cursor:pointer;
     border-left:4px solid var(--verde); transition:background .15s;
   }
-  .dia-header:hover { background:#222244; }
+  .dia-header:hover { background:var(--mid); }
   .dia-header.closed { border-radius:10px; }
   /* Día con partido en vivo: barra roja */
-  .dia-header.tiene-live { border-left-color: var(--rojo); }
-  .dia-header.tiene-live .dia-count { background: var(--rojo); }
-  .dia-fecha { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:700; letter-spacing:.3px; color:#fff; flex:1; text-transform:uppercase; }
-  .dia-fecha .dia-nombre { color:var(--verde); margin-right:5px; }
-  .dia-count { background:var(--verde); color:#fff; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:12px; }
+  .dia-header.tiene-live { border-left-color: var(--verde); }
+  .dia-header.tiene-live .dia-count { background: var(--verde); }
+  .dia-fecha { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:700; letter-spacing:.3px; color:var(--texto); flex:1; text-transform:uppercase; }
+  .dia-fecha .dia-nombre { color:var(--verde-texto); margin-right:5px; }
+  .dia-count { background:var(--verde); color:var(--texto); font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:12px; }
   .chevron { color:var(--muted); font-size:.9rem; transition:transform .2s; }
   .dia-header.closed .chevron { transform:rotate(-90deg); }
-  .today-badge { background:var(--rojo); color:#fff; font-size:.6rem; font-weight:700; padding:2px 7px; border-radius:10px; text-transform:uppercase; }
+  .today-badge { background:var(--verde); color:#fff; font-size:.6rem; font-weight:700; padding:2px 7px; border-radius:10px; text-transform:uppercase; }
 
   .partidos-list { background:var(--card); border-radius:0 0 10px 10px; overflow:hidden; border-left:4px solid var(--verde); }
 
@@ -209,16 +211,16 @@
     transition:background .15s;
   }
   .partido:last-child { border-bottom:none; }
-  .partido:hover { background:#1e1e3a; }
+  .partido:hover { background:var(--mid); }
   .partido-highlight { background:rgba(60,172,59,.09) !important; border-left:3px solid var(--verde); }
 
-  .hora { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; color:var(--verde); width:50px; flex-shrink:0; }
-  .hora-fin  { font-family:'Inter',sans-serif; font-size:.68rem; font-weight:700; color:#fff; background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:44px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
+  .hora { font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; color:var(--verde-texto); width:50px; flex-shrink:0; }
+  .hora-fin  { font-family:'Inter',sans-serif; font-size:.68rem; font-weight:700; color:var(--texto); background:var(--mid); border:1px solid var(--borde); border-radius:5px; width:44px; flex-shrink:0; text-align:center; padding:2px 4px; letter-spacing:1px; }
   .hora-live { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--rojo); width:50px; flex-shrink:0; text-align:center; animation:pulso 1.5s infinite; }
 
   .partido-info { flex:1; min-width:0; }
   .equipos {
-    font-size:.88rem; font-weight:600; color:#fff;
+    font-size:.88rem; font-weight:600; color:var(--texto);
     display:grid;
     grid-template-columns: 1fr auto 1fr;
     align-items:center;
@@ -249,17 +251,18 @@
     font-family:'Inter',sans-serif; font-size:1.1rem; letter-spacing:2px;
   }
   .resultado-badge.finalizado { background:var(--mid); border:1px solid var(--borde); }
-  .resultado-badge.en-vivo { background:rgba(230,29,37,.12); border:1px solid var(--rojo); animation:pulso 1.5s infinite; }
-  .gol-local, .gol-visita { color:#fff; min-width:12px; text-align:center; }
+  .resultado-badge.en-vivo { background:var(--verde); border:1px solid var(--verde); animation:pulso 1.5s infinite; box-shadow:0 3px 10px rgba(76,175,80,.4); }
+  .gol-local, .gol-visita { color:var(--texto); min-width:12px; text-align:center; font-weight:700; }
+  .resultado-badge.en-vivo .gol-local, .resultado-badge.en-vivo .gol-visita { color:#fff; }
   .sep-gol { color:var(--muted); font-size:.8rem; }
-  .live-dot { width:6px; height:6px; border-radius:50%; background:var(--rojo); margin-left:2px; }
+  .live-dot { width:6px; height:6px; border-radius:50%; background:#fff; margin-left:2px; animation:pulso 1.2s infinite; }
 
   @keyframes pulso { 0%,100%{opacity:1} 50%{opacity:.5} }
 
   .meta { display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
   .tag { font-size:.64rem; font-weight:600; padding:2px 7px; border-radius:10px; text-transform:uppercase; }
-  .tag-grupo { background:rgba(60,172,59,.15); color:var(--verde); border:1px solid rgba(60,172,59,.3); }
-  .tag-sede { background:rgba(255,255,255,.05); color:var(--muted); }
+  .tag-grupo { background:rgba(60,172,59,.15); color:var(--verde-texto); border:1px solid rgba(60,172,59,.3); }
+  .tag-sede { background:var(--mid); color:var(--muted); }
   .tag-fase { background:rgba(230,29,37,.15); color:var(--rojo); border:1px solid rgba(230,29,37,.3); }
   .tag-madrugada { background:rgba(42,57,141,.3); color:#aaaaff; border:1px solid rgba(42,57,141,.5); }
 
@@ -273,16 +276,16 @@
   }
   .grupo-header {
     display:flex; align-items:center; justify-content:space-between;
-    padding:12px 16px; background:var(--azul);
-    cursor:pointer; position:relative;
+    padding:12px 16px; background:#e2e3e8;
+    cursor:pointer; position:relative; border-bottom:2px solid var(--azul);
   }
   .grupo-header::after {
     content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
     background: linear-gradient(90deg, var(--verde) 0%, var(--azul) 50%, var(--rojo) 100%);
   }
-  .grupo-titulo { font-family:'Inter',sans-serif; font-size:1.2rem; letter-spacing:1.5px; color:#fff; }
-  .grupo-equipos-mini { font-size:.7rem; color:rgba(255,255,255,.6); margin-top:2px; }
-  .grupo-chevron { color:rgba(255,255,255,.6); font-size:.9rem; transition:transform .2s; }
+  .grupo-titulo { font-family:'Inter',sans-serif; font-size:.88rem; font-weight:700; letter-spacing:1px; color:var(--azul); }
+  .grupo-equipos-mini { font-size:.7rem; color:var(--muted); margin-top:2px; }
+  .grupo-chevron { color:var(--azul); font-size:.9rem; transition:transform .2s; }
   .grupo-header.closed .grupo-chevron { transform:rotate(-90deg); }
 
   .tabla-wrap { overflow-x:hidden; }
@@ -302,18 +305,17 @@
   td:first-child { text-align:left; padding-left:12px; }
   tr:last-child td { border-bottom:none; }
 
-  .pos-num { color:var(--muted); font-size:.72rem; width:16px; display:inline-block; text-align:right; }
-  .pos-1, .pos-2 { background:rgba(60,172,59,.07); }
-  .pos-1 .pos-num { color:var(--verde); font-weight:700; }
-  .pos-2 .pos-num { color:var(--verde); }
-  .pos-3 { background:rgba(42,57,141,.1); }
+  .pos-num { color:var(--muted); font-size:.72rem; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; }
+  .pos-1 .pos-num, .pos-2 .pos-num { background:var(--verde); color:#fff; font-weight:700; }
+  .pos-1 .eq-nombre, .pos-2 .eq-nombre { font-weight:700; }
+  .pos-3 .pos-num { background:var(--azul); color:#fff; font-weight:700; }
   .pos-4 { }
 
   .equipo-td { display:flex; align-items:center; gap:8px; }
   .bandera { font-size:1.1rem; }
   .eq-nombre { font-weight:600; font-size:.82rem; }
-  .pts-td { font-weight:700; color:#fff; font-size:.9rem; }
-  .dg-pos { color:var(--verde); }
+  .pts-td { font-weight:700; color:var(--texto); font-size:.9rem; }
+  .dg-pos { color:var(--verde-texto); }
   .dg-neg { color:var(--rojo); }
   .clasifica-bar {
     width:3px; position:absolute; left:0; top:0; bottom:0;
@@ -347,18 +349,18 @@
   }
   .convocado-item {
     display:flex; align-items:center; gap:6px;
-    padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04);
+    padding:5px 0; border-bottom:1px solid var(--borde);
     cursor:pointer; transition:background .15s;
   }
   .convocado-item:last-child { border-bottom:none; }
-  .convocado-item:hover { background:rgba(255,255,255,.04); border-radius:6px; padding-left:4px; }
+  .convocado-item:hover { background:var(--mid); border-radius:6px; padding-left:4px; }
   .conv-foto {
     width:28px; height:28px; border-radius:50%;
     object-fit:cover; flex-shrink:0; border:1px solid var(--borde);
     background:var(--mid);
   }
   .conv-info { flex:1; min-width:0; }
-  .conv-nombre { font-size:.75rem; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .conv-nombre { font-size:.75rem; font-weight:600; color:var(--texto); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .conv-pos { font-size:.62rem; color:var(--muted); }
   .conv-num { font-family:'Inter',sans-serif; font-size:.9rem; color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
   .conv-derecha { flex-direction:row-reverse; }
@@ -382,11 +384,11 @@
   }
   .ficha-header { display:flex; gap:14px; align-items:center; margin-bottom:14px; }
   .ficha-foto { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid var(--verde); }
-  .ficha-nombre { font-size:1rem; font-weight:700; color:#fff; }
+  .ficha-nombre { font-size:1rem; font-weight:700; color:var(--texto); }
   .ficha-sub { font-size:.75rem; color:var(--muted); margin-top:2px; }
   .ficha-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
   .ficha-stat { background:var(--mid); border-radius:8px; padding:8px 10px; }
-  .ficha-stat-val { font-family:'Inter',sans-serif; font-size:1.3rem; color:var(--verde); }
+  .ficha-stat-val { font-family:'Inter',sans-serif; font-size:1.3rem; color:var(--verde-texto); }
   .ficha-stat-label { font-size:.62rem; color:var(--muted); text-transform:uppercase; }
 
   /* ── TABS DEL PARTIDO ── */
@@ -402,12 +404,12 @@
     background:none; border-top:none; border-left:none; border-right:none;
     font-family:'Inter',sans-serif;
   }
-  .po-tab.activa { color:var(--verde); border-bottom-color:var(--verde); }
+  .po-tab.activa { color:var(--verde-texto); border-bottom-color:var(--verde-texto); }
 
   /* Estadísticas */
   .stats-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:5px 8px; align-items:center; }
-  .stat-local  { text-align:right; font-size:.78rem; color:#fff; font-weight:600; }
-  .stat-visita { text-align:left;  font-size:.78rem; color:#fff; font-weight:600; }
+  .stat-local  { text-align:right; font-size:.78rem; color:var(--texto); font-weight:600; }
+  .stat-visita { text-align:left;  font-size:.78rem; color:var(--texto); font-weight:600; }
   .stat-label  { text-align:center; font-size:.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; }
   .stat-bar-wrap { grid-column:1/-1; display:flex; height:3px; border-radius:2px; overflow:hidden; margin-bottom:2px; }
   .stat-bar-l { background:var(--verde); }
@@ -420,12 +422,12 @@
     margin-bottom:16px;
   }
   .po-back {
-    background:none; border:none; color:var(--verde);
+    background:none; border:none; color:var(--verde-texto);
     font-size:.85rem; font-weight:700; cursor:pointer;
     font-family:'Inter',sans-serif; padding:0;
   }
   .po-fase { color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; flex:1; }
-  .po-live { background:var(--rojo); color:#fff; font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; animation:pulso 1.2s infinite; }
+  .po-live { background:var(--verde); color:#fff; font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; animation:pulso 1.2s infinite; }
   .po-ft   { background:var(--mid); color:var(--muted); font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; }
 
   .po-marcador {
@@ -438,10 +440,10 @@
   .po-marcador.po-proxim { grid-template-columns:1fr auto 1fr; }
   .po-equipo { display:flex; flex-direction:column; align-items:center; gap:8px; }
   .po-flag { font-size:2rem; line-height:1; }
-  .po-nombre { font-size:.8rem; font-weight:700; text-align:center; color:#fff; }
+  .po-nombre { font-size:.8rem; font-weight:700; text-align:center; color:var(--texto); }
   .po-score-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
-  .po-score { font-family:'Inter',sans-serif; font-size:3rem; color:#fff; letter-spacing:2px; line-height:1; }
-  .po-hora-big { font-family:'Inter',sans-serif; font-size:2rem; color:var(--verde); letter-spacing:1px; }
+  .po-score { font-family:'Inter',sans-serif; font-size:3rem; color:var(--texto); letter-spacing:2px; line-height:1; }
+  .po-hora-big { font-family:'Inter',sans-serif; font-size:2rem; color:var(--verde-texto); letter-spacing:1px; }
   .po-fecha-small { font-size:.65rem; color:var(--muted); text-align:center; }
   .po-sede-small  { font-size:.65rem; color:var(--muted); text-align:center; }
 
@@ -474,9 +476,9 @@
     font-size:.68rem; justify-content:flex-end; text-align:right;
     overflow:hidden;
   }
-  .ev-min-s  { font-family:'Inter',sans-serif; font-size:.8rem; color:var(--verde); flex-shrink:0; }
+  .ev-min-s  { font-family:'Inter',sans-serif; font-size:.8rem; color:var(--verde-texto); flex-shrink:0; }
   .ev-icon-s { flex-shrink:0; font-size:.82rem; }
-  .ev-nombre-s { color:#fff; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
+  .ev-nombre-s { color:var(--texto); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; }
   .ev-col-header {
     font-size:.62rem; font-weight:700; color:var(--muted);
     text-transform:uppercase; padding:2px 6px; letter-spacing:.3px;
@@ -504,7 +506,7 @@
     transition: color .2s, border-color .2s;
   }
   .sb-label { display: block; }
-  .sb-item.active { color: #fff; border-top-color: var(--verde); }
+  .sb-item.active { color: var(--texto); border-top-color: var(--verde-texto); }
   .main-content { 
     padding-top: var(--header-h); 
     padding-bottom: calc(var(--bottom-nav-h) + 8px); 
@@ -525,7 +527,7 @@
       border-top: none; border-left: 3px solid transparent;
       border-radius: 0 8px 8px 0; margin-right: 8px; text-align: left;
     }
-    .sb-item.active { border-left-color: var(--verde); color: #fff; background: rgba(76,175,80,.1); border-top-color: transparent; }
+    .sb-item.active { border-left-color: var(--verde-texto); color: var(--texto); background: rgba(76,175,80,.1); border-top-color: transparent; }
     .main-content { 
       margin-left: var(--sidebar-w); 
       padding-top: var(--header-h); 
@@ -534,8 +536,16 @@
     }
   }
 
-  .mundial-tab.active { color:#fff !important; border-bottom-color: var(--verde) !important; }
-  .comp-tab.active { color:#fff !important; border-bottom-color: var(--verde) !important; }
+  @media (min-width: 1024px) {
+    .main-content {
+      max-width: 720px;
+      margin-left: calc(var(--sidebar-w) + 24px);
+    }
+    body { background: var(--fondo); }
+  }
+
+  .mundial-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
+  .comp-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
 
   .comp-grupo-header {
     display:flex; justify-content:space-between; align-items:center;
@@ -544,7 +554,7 @@
     cursor:pointer; border-bottom:1px solid var(--borde);
     transition: color .2s;
   }
-  .comp-grupo-header:hover { color:#fff; }
+  .comp-grupo-header:hover { color:var(--texto); }
   .comp-grupo-body { display:none; }
   .comp-grupo-body.open { display:block; }
   .comp-grupo-arrow { transition: transform .2s; }
@@ -556,12 +566,12 @@
     cursor: pointer; font-family: 'Inter', sans-serif;
     text-align: left; transition: all .2s; border-bottom: 1px solid var(--borde);
   }
-  .comp-btn.active { color: #fff; border-left-color: var(--verde); background: rgba(76,175,80,.08); }
+  .comp-btn.active { color: var(--texto); border-left-color: var(--verde-texto); background: rgba(76,175,80,.08); }
   .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #ffd700; font-size: 0.95rem; padding: 10px 16px; }
   .comp-btn-mundial.active { background: rgba(255,215,0,.12) !important; border-left-color: #ffd700 !important; }
   .comp-grupo-mundial { border: 1px solid rgba(255,215,0,.2); border-radius: 8px; margin-bottom: 8px; background: rgba(255,215,0,.04); }
   .comp-grupo-mundial .comp-grupo-body { padding: 4px 0; }
-  .comp-btn:hover { color: #fff; }
+  .comp-btn:hover { color: var(--texto); }
 
   /* ── FILTRO GRUPOS ── */
   .grupos-filtro-wrap { padding:10px 12px 0; }
@@ -573,7 +583,7 @@
   .grupos-filtro-box:focus-within { border-color:var(--verde); }
   .grupos-filtro-input {
     flex:1; background:none; border:none; outline:none;
-    color:#fff; font-family:'Inter',sans-serif;
+    color:var(--texto); font-family:'Inter',sans-serif;
     font-size:.88rem; padding:11px 0;
   }
   .grupos-filtro-input::placeholder { color:var(--muted); }
@@ -593,8 +603,8 @@
     transition:all .15s; font-family:'Inter',sans-serif;
     text-transform:uppercase; letter-spacing:.3px;
   }
-  .g-chip:hover { border-color:var(--verde); color:var(--verde); }
-  .g-chip.active { background:var(--azul); border-color:var(--verde); color:#fff; }
+  .g-chip:hover { border-color:var(--verde); color:var(--verde-texto); }
+  .g-chip.active { background:var(--card); border-color:var(--verde); color:var(--azul); }
 
   /* ── LLAVES ELIMINATORIAS — BRACKET ── */
   #tab-fase-final { padding:10px 12px 0; overflow-x:auto; }
@@ -608,7 +618,7 @@
   }
   .bracket-fase-titulo {
     font-family:'Inter',sans-serif; font-size:1rem;
-    letter-spacing:2px; color:var(--verde); padding:10px 2px 4px;
+    letter-spacing:2px; color:var(--verde-texto); padding:10px 2px 4px;
     text-transform:uppercase; display:flex; align-items:center; gap:8px;
     white-space:nowrap;
   }
@@ -626,11 +636,11 @@
     overflow:hidden; border:1px solid var(--borde);
     display:flex; flex-direction:column;
   }
-  .bk-partido.live-now { border-color:var(--rojo); }
+  .bk-partido.live-now { border-color:var(--verde); }
 
   /* Mini cabecera con fecha y hora */
   .bk-num {
-    color: rgba(255,255,255,.50);
+    color: var(--muted);
     font-family:'Inter',sans-serif;
     font-size:.8rem; letter-spacing:.5px;
     flex-shrink:0;
@@ -639,9 +649,9 @@
     background:var(--azul); padding:3px 8px;
     display:flex; justify-content:space-between; align-items:center; gap:6px;
   }
-  .bk-meta-fecha { font-size:.55rem; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:.3px; }
-  .bk-meta-hora  { font-family:'Inter',sans-serif; font-size:.85rem; color:#fff; letter-spacing:.5px; }
-  .bk-live-pip   { width:6px; height:6px; border-radius:50%; background:var(--rojo); animation:pulso 1.2s infinite; }
+  .bk-meta-fecha { font-size:.55rem; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; }
+  .bk-meta-hora  { font-family:'Inter',sans-serif; font-size:.85rem; color:var(--texto); letter-spacing:.5px; }
+  .bk-live-pip   { width:6px; height:6px; border-radius:50%; background:var(--verde); animation:pulso 1.2s infinite; }
 
   /* Equipos */
   .bk-eq {
@@ -651,8 +661,8 @@
     white-space:nowrap; overflow:hidden;
   }
   .bk-eq:last-child { border-bottom:none; }
-  .bk-eq.definido  { color:#fff; }
-  .bk-eq.ganador   { color:var(--verde); }
+  .bk-eq.definido  { color:var(--texto); }
+  .bk-eq.ganador   { color:var(--verde-texto); }
   .bk-eq-flag      { font-size:.9rem; flex-shrink:0; }
   .bk-eq-name      { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
   .bk-eq-gol       { font-family:'Inter',sans-serif; font-size:1rem; min-width:14px; text-align:right; flex-shrink:0; }
@@ -740,7 +750,7 @@
   <div class="fase-nav" id="faseNav">
     <button class="fase-btn active" data-fase="todos">Todos</button>
     <button class="fase-btn" data-fase="Grupos">Grupos</button>
-    <button class="fase-btn" data-fase="32vos">32avos</button>
+    <button class="fase-btn" data-fase="32vos">16avos</button>
     <button class="fase-btn" data-fase="Octavos">Octavos</button>
     <button class="fase-btn" data-fase="Cuartos">Cuartos</button>
     <button class="fase-btn" data-fase="Semis">Semis</button>
@@ -826,7 +836,7 @@
   <div id="comp-panel" style="display:none;">
     <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);border-top:1px solid var(--borde);">
       <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">←</button>
-      <span id="comp-panel-titulo" style="color:#fff;font-weight:700;font-size:.9rem;"></span>
+      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.9rem;"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
       <button class="comp-tab active" id="ct-fixture" onclick="showCompTab('fixture')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fixture</button>
@@ -840,7 +850,7 @@
 <!-- TAB JUGADORES (deshabilitado temporalmente) -->
 <div id="main-jugadores" style="display:none;">
   <div style="padding:40px 20px;text-align:center;">
-    <div style="color:#fff;font-size:1.1rem;font-weight:600;margin-bottom:8px;">Jugadores</div>
+    <div style="color:var(--texto);font-size:1.1rem;font-weight:600;margin-bottom:8px;">Jugadores</div>
     <div style="color:var(--muted);font-size:.85rem;">Próximamente</div>
   </div>
 </div>
@@ -848,7 +858,7 @@
 <!-- TAB NOTICIAS -->
 <div id="main-noticias" style="display:none;">
   <div style="padding:40px 20px;text-align:center;">
-    <div style="color:#fff;font-size:1.1rem;font-weight:600;margin-bottom:8px;">Noticias</div>
+    <div style="color:var(--texto);font-size:1.1rem;font-weight:600;margin-bottom:8px;">Noticias</div>
     <div style="color:var(--muted);font-size:.85rem;">Próximamente</div>
   </div>
 </div>
@@ -1349,7 +1359,7 @@ async function abrirPartido(id) {
         // Si hay formaciones confirmadas — armar tabs
         const hayFormaciones = lineups.length >= 2;
         const labelFormTab = esProable ? 'Formación probable' : 'Formaciones';
-        const badgeProbable = esProable ? `<span style="background:transparent;color:rgba(255,255,255,.45);font-size:.55rem;font-weight:600;margin-left:4px;vertical-align:middle;letter-spacing:.03em">· probable</span>` : '';
+        const badgeProbable = esProable ? `<span style="background:transparent;color:var(--muted);font-size:.55rem;font-weight:600;margin-left:4px;vertical-align:middle;letter-spacing:.03em">· probable</span>` : '';
         const tabsPreHTML = hayFormaciones ? `
           <div class="po-tabs" style="margin-bottom:10px">
             <button class="po-tab activa" onclick="switchTab('pre-formaciones')">${labelFormTab}${badgeProbable}</button>
@@ -1374,11 +1384,11 @@ async function abrirPartido(id) {
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0">
                 <div style="text-align:center">
                   <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">${p.local}</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde)">${lineups[0]?.formation || '—'}</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde-texto)">${lineups[0]?.formation || '—'}</div>
                 </div>
                 <div style="text-align:center">
                   <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">${p.visita}</div>
-                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde)">${lineups[1]?.formation || '—'}</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:2rem;color:var(--verde-texto)">${lineups[1]?.formation || '—'}</div>
                 </div>
               </div>
             `}
@@ -1635,7 +1645,7 @@ async function abrirPartido(id) {
         const content = esLocal
           ? `${badge}${j.player?.number} ${j.player?.name}${min}`
           : `${min}${j.player?.name} ${j.player?.number} ${badge}`;
-        return `<div onclick="abrirFichaCancha(${j.player?.id},'${(j.player?.name||'').replace(/'/g,"\\'")}','${j.player?.photo||''}',${j.player?.age||0},'${j.player?.pos||'Unknown'}')" style="font-size:.7rem;color:#fff;padding:3px 6px;border-radius:5px;background:${bg};margin-bottom:2px;${esLocal?'':'text-align:right'};cursor:pointer">${content}</div>`;
+        return `<div onclick="abrirFichaCancha(${j.player?.id},'${(j.player?.name||'').replace(/'/g,"\\'")}','${j.player?.photo||''}',${j.player?.age||0},'${j.player?.pos||'Unknown'}')" style="font-size:.7rem;color:var(--texto);padding:3px 6px;border-radius:5px;background:${bg};margin-bottom:2px;${esLocal?'':'text-align:right'};cursor:pointer">${content}</div>`;
       }).join('');
     }
 
@@ -1693,9 +1703,9 @@ async function abrirPartido(id) {
       htmlStats = `
         <div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:12px">
           <span style="width:12px;height:12px;border-radius:50%;background:${colorLocal};display:inline-block"></span>
-          <span style="font-size:.75rem;font-weight:700;color:#fff">${p.local}</span>
+          <span style="font-size:.75rem;font-weight:700;color:var(--texto)">${p.local}</span>
           <span style="font-size:.7rem;color:var(--muted)">vs</span>
-          <span style="font-size:.75rem;font-weight:700;color:#fff">${p.visita}</span>
+          <span style="font-size:.75rem;font-weight:700;color:var(--texto)">${p.visita}</span>
           <span style="width:12px;height:12px;border-radius:50%;background:${colorVisita};display:inline-block"></span>
         </div>
         <div class="stats-grid">
@@ -1762,8 +1772,8 @@ async function abrirPartido(id) {
       const colorV2 = lineups2[1]?.team?.colors?.player?.primary ? `#${lineups2[1].team.colors.player.primary}` : '#E61D25';
       divForm.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:.75rem;font-weight:700;color:#fff">${p.local} <span style="color:var(--verde)">${lineups2[0]?.formation||''}</span></span>
-          <span style="font-size:.75rem;font-weight:700;color:#fff"><span style="color:var(--verde)">${lineups2[1]?.formation||''}</span> ${p.visita}</span>
+          <span style="font-size:.75rem;font-weight:700;color:var(--texto)">${p.local} <span style="color:var(--verde-texto)">${lineups2[0]?.formation||''}</span></span>
+          <span style="font-size:.75rem;font-weight:700;color:var(--texto)"><span style="color:var(--verde-texto)">${lineups2[1]?.formation||''}</span> ${p.visita}</span>
         </div>
         ${lineups2[0]?.startXI?.length >= 2 ? canchaHTML(lineups2[0], lineups2[1], eventos) : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
@@ -1916,7 +1926,7 @@ async function abrirFicha(id, nombre, foto, edad, posicion) {
     document.getElementById('ficha-stats').innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:var(--mid);padding:8px 10px;border-radius:8px">
         ${clubLogo ? `<img src="${clubLogo}" style="width:22px;height:22px;object-fit:contain">` : ''}
-        <span style="font-size:.78rem;color:#fff;font-weight:600">${club}</span>
+        <span style="font-size:.78rem;color:var(--texto);font-weight:600">${club}</span>
         <span style="font-size:.7rem;color:var(--muted)">· ${liga}</span>
       </div>
       <div class="ficha-stats">
@@ -2406,10 +2416,10 @@ async function cargarCompActual() {
           const gL = f.goals.home ?? '';
           const gV = f.goals.away ?? '';
           const horaStr = terminado
-            ? `<span style="font-family:'Inter',sans-serif;font-size:1.1rem;color:#fff">${gL}-${gV}</span>`
+            ? `<span style="font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--texto)">${gL}-${gV}</span>`
             : enVivo
             ? `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--rojo)">${gL}-${gV}</span>`
-            : `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--verde)">${hh}:${mm}</span>`;
+            : `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--verde-texto)">${hh}:${mm}</span>`;
           return `<div class="partido" style="cursor:default">
             <div style="width:50px;flex-shrink:0;text-align:center;">
               ${horaStr}
@@ -2429,7 +2439,7 @@ async function cargarCompActual() {
                   <img src="${f.teams.away.logo}" width="16" height="16" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
                 </span>
               </div>
-              ${enVivo ? '<div class="meta"><span class="tag" style="background:var(--rojo);color:#fff">EN VIVO</span></div>' : ''}
+              ${enVivo ? '<div class="meta"><span class="tag" style="background:var(--verde);color:#fff">EN VIVO</span></div>' : ''}
             </div>
           </div>`;
         }).join('');
@@ -2490,21 +2500,21 @@ async function cargarCompActual() {
             <th style="padding:4px 4px;text-align:center;">E</th>
             <th style="padding:4px 4px;text-align:center;">P</th>
             <th style="padding:4px 4px;text-align:center;">DG</th>
-            <th style="padding:4px 4px;text-align:center;color:#fff;font-weight:700;">Pts</th>
+            <th style="padding:4px 4px;text-align:center;color:var(--texto);font-weight:700;">Pts</th>
           </tr></thead><tbody>`;
         grupo.forEach(eq => {
           html += `<tr style="border-bottom:1px solid var(--borde);">
             <td style="padding:6px 0;color:var(--muted);">${eq.rank}</td>
             <td style="padding:6px 0;"><div style="display:flex;align-items:center;gap:6px;">
               <img src="${eq.team.logo}" width="16" height="16" style="object-fit:contain;" onerror="this.style.display='none'">
-              <span style="color:#fff;font-weight:500;">${eq.team.name}</span>
+              <span style="color:var(--texto);font-weight:500;">${eq.team.name}</span>
             </div></td>
             <td style="text-align:center;color:var(--muted);">${eq.all.played}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.win}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.draw}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.lose}</td>
             <td style="text-align:center;color:var(--muted);">${eq.goalsDiff}</td>
-            <td style="text-align:center;color:#fff;font-weight:700;">${eq.points}</td>
+            <td style="text-align:center;color:var(--texto);font-weight:700;">${eq.points}</td>
           </tr>`;
         });
         html += '</tbody></table>';
@@ -2559,7 +2569,7 @@ async function buscarJugador(query) {
           onclick="abrirFicha(${p.id},'${p.name.replace(/'/g,"&#39;")}','${p.photo}',${p.age||0},'${s?.games?.position||''}')">
           <img src="${p.photo}" width="40" height="40" style="border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect width=%2240%22 height=%2240%22 fill=%22%231c1c38%22/></svg>'">
           <div style="flex:1;min-width:0;">
-            <div style="font-size:.88rem;font-weight:600;color:#fff;">${p.name}</div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--texto);">${p.name}</div>
             <div style="font-size:.72rem;color:var(--muted);">${s?.team?.name||''} · ${s?.games?.position||''} · ${p.nationality||''}</div>
           </div>
           <img src="${s?.team?.logo||''}" width="24" height="24" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
@@ -2802,7 +2812,6 @@ function render() {
           <div class="meta">
             ${p.grupo ? `<span class="tag tag-grupo">Grupo ${p.grupo}</span>` : `<span class="tag tag-fase">${p.fase}</span>`}
             <span class="tag tag-sede">${p.sede}</span>
-            ${p.esMadrugada ? `<span class="tag tag-madrugada">⭐ madrugada</span>` : ''}
           </div>
         </div>
       </div>`;
@@ -2933,7 +2942,7 @@ function renderPosiciones() {
           <tbody>${filas}</tbody>
         </table>
         <div class="leyenda-tabla">
-          <span><span class="leyenda-dot" style="background:var(--verde)"></span>Clasifica 32avos</span>
+          <span><span class="leyenda-dot" style="background:var(--verde)"></span>Clasifica 16avos</span>
           <span><span class="leyenda-dot" style="background:var(--azul)"></span>3° mejor</span>
         </div>
       </div>` : ''}
@@ -2950,7 +2959,7 @@ function toggleGrupo(g) {
 // LLAVES — BRACKET DOS COLUMNAS
 // ═══════════════════════════════════════════════
 const FASES_ELIM = [
-  { nombre:'32avos de Final', fase:'32vos',   icono:'⚽' },
+  { nombre:'16avos de Final', fase:'32vos',   icono:'⚽' },
   { nombre:'Octavos de Final', fase:'Octavos', icono:'🔥' },
   { nombre:'Cuartos de Final', fase:'Cuartos', icono:'⚡' },
   { nombre:'Semifinales',      fase:'Semis',   icono:'🏟' },
