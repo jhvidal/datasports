@@ -243,6 +243,7 @@
   .equipo-nombre.local  { flex-direction:row; justify-content:flex-start; }
   .equipo-nombre.visita { flex-direction:row-reverse; justify-content:flex-start; }
   .eq-flag { font-size:.95rem; flex-shrink:0; }
+  .eq-escudo { width:16px; height:16px; object-fit:contain; flex-shrink:0; }
   .vs-wrap {
     color:var(--muted); font-weight:400; font-size:.72rem;
     text-align:center; flex-shrink:0; padding:0 2px;
@@ -2884,7 +2885,8 @@ function render() {
         if (!fixturesLiga || !fixturesLiga.length) return '';
         const abiertoMenor = diasAbiertos[fecha+'_'+lid] !== false;
         const tieneLiveMenor = fixturesLiga.some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short));
-        const rowsMenor = fixturesLiga.map(f => {
+        const fixturesOrdenados = [...fixturesLiga].sort((a,b) => a.fixture.timestamp - b.fixture.timestamp);
+        const rowsMenor = fixturesOrdenados.map(f => {
           const st = f.fixture.status.short;
           const ft = ['FT','AET','PEN'].includes(st);
           const lv = ['1H','2H','HT','ET','P'].includes(st);
@@ -2892,6 +2894,7 @@ function render() {
           const hh = horaARG.getUTCHours().toString().padStart(2,'0');
           const mm = horaARG.getUTCMinutes().toString().padStart(2,'0');
           const local = f.teams.home.name, visita = f.teams.away.name;
+          const logoL = f.teams.home.logo, logoV = f.teams.away.logo;
           const gL = f.goals.home, gV = f.goals.away;
           let horaHtml;
           if (ft) horaHtml = `<span class="hora-fin">FIN</span>`;
@@ -2904,9 +2907,9 @@ function render() {
             <div style="width:50px;flex-shrink:0">${horaHtml}</div>
             <div class="partido-info">
               <div class="equipos">
-                <span class="equipo-nombre local"><span class="eq-text">${local}</span></span>
+                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<span class="eq-text">${local}</span></span>
                 ${resultadoHtml}
-                <span class="equipo-nombre visita"><span class="eq-text">${visita}</span></span>
+                <span class="equipo-nombre visita"><span class="eq-text">${visita}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}</span>
               </div>
             </div>
           </div>`;
@@ -2985,9 +2988,80 @@ async function abrirPartidoMenor(fixtureId) {
           <div class="po-nombre">${visita}</div>
         </div>
       </div>
-      <div class="po-sin-datos" style="margin-top:16px">Detalles no disponibles para esta competición todavía</div>
+      <div id="po-detalles-menor" style="margin-top:16px"><div class="po-sin-datos">Cargando detalles...</div></div>
     </div>
   `;
+
+  if (!ft && !lv) {
+    document.getElementById('po-detalles-menor').innerHTML = '<div class="po-sin-datos">El partido todavía no comenzó</div>';
+    return;
+  }
+
+  try {
+    const [resEv, resSt, resLi] = await Promise.allSettled([
+      apiFetch(`fixtures/events?fixture=${fixtureId}`),
+      apiFetch(`fixtures/statistics?fixture=${fixtureId}`),
+      apiFetch(`fixtures/lineups?fixture=${fixtureId}`)
+    ]);
+    const eventos = resEv.status === 'fulfilled' ? (resEv.value.response || []) : [];
+    const statsResp = resSt.status === 'fulfilled' ? (resSt.value.response || []) : [];
+    const lineups = resLi.status === 'fulfilled' ? (resLi.value.response || []) : [];
+
+    const goles = eventos.filter(e => e.type === 'Goal');
+    const tarjetas = eventos.filter(e => e.type === 'Card');
+
+    const listaGoles = goles.length
+      ? goles.map(e => `<div style="font-size:.75rem;padding:3px 0;color:var(--texto)">⚽ ${e.time?.elapsed||''}' — ${e.player?.name||''} (${e.team?.name||''})</div>`).join('')
+      : '<div class="po-sin-datos">Sin goles</div>';
+
+    const listaTarjetas = tarjetas.length
+      ? tarjetas.map(e => `<div style="font-size:.75rem;padding:3px 0;color:var(--texto)">${e.detail?.includes('Red')?'🟥':'🟨'} ${e.time?.elapsed||''}' — ${e.player?.name||''} (${e.team?.name||''})</div>`).join('')
+      : '';
+
+    let htmlStats = '<div class="po-sin-datos">Sin estadísticas disponibles</div>';
+    if (statsResp.length >= 2) {
+      const sL = Object.fromEntries((statsResp[0]?.statistics||[]).map(s=>[s.type,s.value]));
+      const sV = Object.fromEntries((statsResp[1]?.statistics||[]).map(s=>[s.type,s.value]));
+      const claves = ['Ball Possession','Total Shots','Shots on Goal','Corner Kicks','Fouls','Yellow Cards','Red Cards'];
+      htmlStats = claves.filter(k => sL[k] != null || sV[k] != null).map(k => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--borde);font-size:.75rem">
+          <span style="font-weight:700;color:var(--texto);min-width:30px">${sL[k] ?? '-'}</span>
+          <span style="color:var(--muted);font-size:.68rem;text-align:center">${k}</span>
+          <span style="font-weight:700;color:var(--texto);min-width:30px;text-align:right">${sV[k] ?? '-'}</span>
+        </div>`).join('');
+    }
+
+    let htmlFormaciones = '<div class="po-sin-datos">Sin formaciones disponibles</div>';
+    if (lineups.length >= 2) {
+      const filaJugadores = (lineup) => (lineup.startXI||[]).map(j =>
+        `<div style="font-size:.72rem;color:var(--texto);padding:2px 0">${j.player?.number||''} ${j.player?.name||''}</div>`
+      ).join('');
+      htmlFormaciones = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">${local} (${lineups[0]?.formation||''})</div>
+            ${filaJugadores(lineups[0])}
+          </div>
+          <div>
+            <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;text-align:right">${visita} (${lineups[1]?.formation||''})</div>
+            ${filaJugadores(lineups[1])}
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('po-detalles-menor').innerHTML = `
+      <div class="po-tabs">
+        <button class="po-tab activa" onclick="switchTab('resumen')">Resumen</button>
+        <button class="po-tab" onclick="switchTab('formaciones')">Formaciones</button>
+        <button class="po-tab" onclick="switchTab('estadisticas')">Estadísticas</button>
+      </div>
+      <div id="tab-resumen">${listaGoles}${listaTarjetas}</div>
+      <div id="tab-formaciones" style="display:none">${htmlFormaciones}</div>
+      <div id="tab-estadisticas" style="display:none">${htmlStats}</div>
+    `;
+  } catch(e) {
+    document.getElementById('po-detalles-menor').innerHTML = '<div class="po-sin-datos">Error cargando detalles</div>';
+  }
 }
 
 function toggleDia(f) {
