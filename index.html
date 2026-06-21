@@ -152,7 +152,7 @@
     transition:all .15s; min-width:44px;
   }
   .fecha-chip:hover { border-color:var(--verde); }
-  .fecha-chip.active { background:var(--verde); border-color:var(--verde); border-width:2px; box-shadow:0 3px 10px rgba(76,175,80,.3); }
+  .fecha-chip.active { background:var(--verde); border-color:var(--verde); box-shadow:0 2px 6px rgba(76,175,80,.3); }
   .fecha-chip.hoy-chip { border-color:var(--verde); }
   .chip-dow { font-size:.58rem; font-weight:700; text-transform:uppercase; color:var(--muted); }
   .fecha-chip.active .chip-dow { color:#fff; }
@@ -2654,9 +2654,13 @@ function agrupar(lista) {
   const yaEnDiaPrev = new Set(); // IDs de partidos ya agregados como madrugada
 
   for (const p of lista) {
-    // Si es madrugada y no ocurrió, agregarlo SOLO en el día anterior
-    if (p.hora.includes('*') && !RESULTADOS[p.id]?.estado) {
-      const fechaPrev = fechaAnterior(p.fecha);
+    // Si es madrugada, no ocurrió, Y el día filtrado activo es el día anterior (o no hay filtro),
+    // mostrarlo en el día anterior. Si el usuario seleccionó explícitamente el día real del partido, mostrarlo ahí.
+    const fechaPrev = fechaAnterior(p.fecha);
+    const debeIrAlDiaAnterior = p.hora.includes('*') && !RESULTADOS[p.id]?.estado &&
+      (!fechaActiva || fechaActiva === fechaPrev);
+
+    if (debeIrAlDiaAnterior) {
       const pPrev = PARTIDOS.find(x => x.fecha === fechaPrev);
       const diaPrev = pPrev?.dia || fechaPrev;
       if (!map[fechaPrev]) map[fechaPrev] = { dia: diaPrev, partidos: [] };
@@ -2667,7 +2671,7 @@ function agrupar(lista) {
       continue; // NO agregar al día real
     }
 
-    // Partido normal o madrugada ya ocurrida — agregar al día real
+    // Partido normal, madrugada ya ocurrida, o usuario viendo el día real — agregar al día real
     if (!map[p.fecha]) map[p.fecha] = { dia: p.dia, partidos: [] };
     map[p.fecha].partidos.push({ ...p, esMadrugada: false });
   }
@@ -2908,7 +2912,7 @@ function render() {
           </div>`;
         }).join('');
         const LOGOS_LIGAS_FIJOS = {
-          129: 'https://assets.football-logos.cc/logos/argentina/256x256/primera-nacional.5ff4a9c9.png',
+          129: 'https://assets.football-logos.cc/logos/argentina/1500x1500/primera-nacional.5ff4a9c9.png',
         };
         const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixturesLiga[0]?.league?.logo || '';
         return `<div class="dia-block dia-block-menor">
@@ -2926,7 +2930,7 @@ function render() {
 
     return `<div class="dia-block">
       <div class="dia-header ${abierto?'':'closed'} ${tieneLive?'tiene-live':''}" onclick="toggleDia('${fecha}')">
-        <img class="liga-logo" src="https://assets.football-logos.cc/logos/tournaments/256x256/fifa-world-cup-2026.31d2489d.png" alt="" onerror="this.style.display='none'">
+        <img class="liga-logo" src="https://assets.football-logos.cc/logos/tournaments/1500x1500/fifa-world-cup-2026.31d2489d.png" alt="" onerror="this.style.display='none'">
         <div class="dia-fecha-wrap">
           <div class="liga-label liga-mundial">Mundial 2026</div>
         </div>
