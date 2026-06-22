@@ -112,6 +112,7 @@
   }
   .sug-item:last-child { border-bottom:none; }
   .sug-item:hover { background:var(--mid); }
+  .sug-header { padding:5px 14px 2px; font-size:.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; background:var(--mid); }
 
   /* ── FORMACIONES ── */
   .po-formacion-wrap { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
@@ -2793,19 +2794,49 @@ function clearSearch() {
 }
 
 // Lista de todos los equipos para sugerencias
-const TODOS_EQUIPOS = [...new Set(PARTIDOS.flatMap(p => [p.local, p.visita]))].sort();
+const PAISES_MUNDIAL = [...new Set(PARTIDOS.flatMap(p => [p.local, p.visita]))].sort();
+
+function getEquiposLigasMenores() {
+  const equipos = new Set();
+  Object.values(LIGAS_MENORES).forEach(ligas => {
+    Object.values(ligas).forEach(fixtures => {
+      fixtures.forEach(f => {
+        equipos.add(f.teams.home.name);
+        equipos.add(f.teams.away.name);
+      });
+    });
+  });
+  return [...equipos].sort();
+}
 
 function mostrarSugerencias(q) {
   const div = document.getElementById('sugerencias');
   if (!q || q.length < 2) { div.classList.remove('visible'); return; }
   const qn = normalize(q);
-  const matches = TODOS_EQUIPOS.filter(e => normalize(e).includes(qn)).slice(0, 6);
-  if (!matches.length) { div.classList.remove('visible'); return; }
-  div.innerHTML = matches.map(e =>
-    `<div class="sug-item" onclick="elegirSugerencia('${e}')">
-      ${flag(e)} <span>${e}</span>
-    </div>`
-  ).join('');
+
+  const matchesPaises = PAISES_MUNDIAL.filter(e => normalize(e).includes(qn)).slice(0, 4);
+  const matchesEquipos = getEquiposLigasMenores().filter(e => normalize(e).includes(qn)).slice(0, 5);
+
+  if (!matchesPaises.length && !matchesEquipos.length) { div.classList.remove('visible'); return; }
+
+  let html = '';
+  if (matchesPaises.length) {
+    html += `<div class="sug-header">🌍 Selecciones</div>`;
+    html += matchesPaises.map(e =>
+      `<div class="sug-item" onclick="elegirSugerencia('${e.replace(/'/g, "\\'")}')">
+        ${flag(e)} <span>${e}</span>
+      </div>`
+    ).join('');
+  }
+  if (matchesEquipos.length) {
+    html += `<div class="sug-header">🏟️ Clubes</div>`;
+    html += matchesEquipos.map(e =>
+      `<div class="sug-item" onclick="elegirSugerencia('${e.replace(/'/g, "\\'")}')">
+        ⚽ <span>${e}</span>
+      </div>`
+    ).join('');
+  }
+  div.innerHTML = html;
   div.classList.add('visible');
 }
 
@@ -2841,10 +2872,13 @@ function render() {
   const hoy       = fechaHoyARG();
   const cal       = document.getElementById('calendario');
   if (!grupos.length) {
-    cal.innerHTML = busqueda
-      ? `<div class="no-result"><div class="nr-icon">🔍</div><p>No se encontró "<strong>${busqueda}</strong>"</p><small>Probá otro nombre</small></div>`
-      : `<div class="no-result"><div class="nr-icon">📅</div><p>No hay partidos en esta selección</p></div>`;
-    return;
+    if (!busqueda) {
+      cal.innerHTML = `<div class="no-result"><div class="nr-icon">📅</div><p>No hay partidos en esta selección</p></div>`;
+      return;
+    }
+    // Si hay búsqueda y el Mundial no encontró nada, dejamos cal vacío y seguimos
+    // para que la búsqueda en ligas menores pueda agregar resultados
+    cal.innerHTML = '';
   }
   if (grupos.length===1) diasAbiertos[grupos[0][0]]=true;
 
@@ -2992,6 +3026,9 @@ function render() {
         <div class="dia-header"><div class="liga-label">Otras ligas</div></div>
         <div class="partidos-list">${filasExtra}</div>
       </div>`;
+    } else if (!cal.innerHTML.trim()) {
+      // No encontró nada en ningún lado
+      cal.innerHTML = `<div class="no-result"><div class="nr-icon">🔍</div><p>No se encontró "<strong>${busqueda}</strong>"</p><small>Probá otro nombre</small></div>`;
     }
   }
 }
