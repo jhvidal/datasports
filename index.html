@@ -474,14 +474,12 @@
   .po-evento-local {
     display:flex; align-items:center; gap:4px;
     padding:4px 6px; border-radius:6px;
-    background:rgba(60,172,59,.08);
     font-size:.68rem; justify-content:flex-start;
     overflow:hidden;
   }
   .po-evento-visita {
     display:flex; align-items:center; gap:4px;
     padding:4px 6px; border-radius:6px;
-    background:rgba(42,57,141,.15);
     font-size:.68rem; justify-content:flex-end; text-align:right;
     overflow:hidden;
   }
@@ -555,6 +553,7 @@
 
   .mundial-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
   .comp-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
+  .mundial-tab { color:var(--muted) !important; border-bottom-color: transparent !important; }
 
   .comp-grupo-header {
     display:flex; justify-content:space-between; align-items:center;
@@ -721,9 +720,9 @@
   <button class="sb-item" id="bn-competiciones" onclick="showMainTab('competiciones')">
     <span class="sb-label">Competiciones</span>
   </button>
-  <button class="sb-item" id="bn-jugadores" onclick="showMainTab('jugadores')">
+  <!-- <button class="sb-item" id="bn-jugadores" onclick="showMainTab('jugadores')">
     <span class="sb-label">Jugadores</span>
-  </button>
+  </button> -->
   <button class="sb-item" id="bn-noticias" onclick="showMainTab('noticias')">
     <span class="sb-label">Noticias</span>
   </button>
@@ -2107,39 +2106,40 @@ const PARTIDOS = [
   // P77: 1I vs 3C/D/F/G/H | P78: 2E vs 2I | P79: 1A vs 3C/E/F/H/I | P80: 1L vs 3E/H/I/J/K
   // P81: 1D vs 3B/E/F/I/J | P82: 1G vs 3A/E/H/I/J | P83: 2K vs 2L | P84: 1H vs 2J
   // P85: 1B vs 3E/F/G/I/J | P86: 1J vs 2H | P87: 1K vs 3D/E/I/J/L | P88: 2D vs 2G
-  {id:"32_1",  fecha:"2026-06-28",dia:"Domingo 28 de junio",    hora:"14:00",local:"2°A",          visita:"2°B",          grupo:"",sede:"SoFi Stadium, Los Ángeles",            fase:"32vos"},
-  {id:"32_2",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"14:00",local:"1°E",          visita:"3°A/B/C/D/F",  grupo:"",sede:"Gillette Stadium, Boston",             fase:"32vos"},
-  {id:"32_3",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"18:00",local:"1°F",          visita:"2°C",          grupo:"",sede:"Estadio BBVA, Monterrey",              fase:"32vos"},
-  {id:"32_4",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"20:00",local:"1°C",          visita:"2°F",          grupo:"",sede:"NRG Stadium, Houston",                 fase:"32vos"},
-  {id:"32_5",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"14:00",local:"1°I",          visita:"3°C/D/F/G/H",  grupo:"",sede:"MetLife Stadium, Nueva Jersey",        fase:"32vos"},
-  {id:"32_6",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"18:00",local:"2°E",          visita:"2°I",          grupo:"",sede:"AT&T Stadium, Dallas",                 fase:"32vos"},
-  {id:"32_7",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"20:00",local:"1°A",          visita:"3°C/E/F/H/I",  grupo:"",sede:"Estadio Azteca, Ciudad de México",    fase:"32vos"},
-  {id:"32_8",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"14:00",local:"1°L",          visita:"3°E/H/I/J/K",  grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",       fase:"32vos"},
-  {id:"32_9",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"18:00",local:"1°D",          visita:"3°B/E/F/I/J",  grupo:"",sede:"Levi's Stadium, Santa Clara",          fase:"32vos"},
-  {id:"32_10", fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"20:00",local:"1°G",          visita:"3°A/E/H/I/J",  grupo:"",sede:"Lumen Field, Seattle",                 fase:"32vos"},
-  {id:"32_11", fecha:"2026-07-02",dia:"Jueves 2 de julio",      hora:"14:00",local:"2°K",          visita:"2°L",          grupo:"",sede:"BMO Field, Toronto",                   fase:"32vos"},
-  {id:"32_12", fecha:"2026-07-02",dia:"Jueves 2 de julio",      hora:"18:00",local:"1°H",          visita:"2°J",          grupo:"",sede:"SoFi Stadium, Los Ángeles",            fase:"32vos"},
-  {id:"32_13", fecha:"2026-07-02",dia:"Jueves 2 de julio",      hora:"20:00",local:"1°B",          visita:"3°E/F/G/I/J",  grupo:"",sede:"BC Place, Vancouver",                  fase:"32vos"},
-  {id:"32_14", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"14:00",local:"1°J",          visita:"2°H",          grupo:"",sede:"Hard Rock Stadium, Miami",             fase:"32vos"},
-  {id:"32_15", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"18:00",local:"1°K",          visita:"3°D/E/I/J/L",  grupo:"",sede:"Arrowhead Stadium, Kansas City",       fase:"32vos"},
-  {id:"32_16", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"20:00",local:"2°D",          visita:"2°G",          grupo:"",sede:"AT&T Stadium, Dallas",                 fase:"32vos"},
-  // ── OCTAVOS DE FINAL (4–7 jul) ──
-  {id:"oct_1",fecha:"2026-07-04",dia:"Sábado 4 de julio",     hora:"14:00",local:"G.16 1", visita:"G.16 2",  grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_2",fecha:"2026-07-04",dia:"Sábado 4 de julio",     hora:"18:00",local:"G.16 3", visita:"G.16 4",  grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_3",fecha:"2026-07-05",dia:"Domingo 5 de julio",    hora:"14:00",local:"G.16 5", visita:"G.16 6",  grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_4",fecha:"2026-07-05",dia:"Domingo 5 de julio",    hora:"18:00",local:"G.16 7", visita:"G.16 8",  grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_5",fecha:"2026-07-06",dia:"Lunes 6 de julio",      hora:"14:00",local:"G.16 9", visita:"G.16 10", grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_6",fecha:"2026-07-06",dia:"Lunes 6 de julio",      hora:"18:00",local:"G.16 11",visita:"G.16 12", grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_7",fecha:"2026-07-07",dia:"Martes 7 de julio",     hora:"14:00",local:"G.16 13",visita:"G.16 14", grupo:"",sede:"Por confirmar",fase:"Octavos"},
-  {id:"oct_8",fecha:"2026-07-07",dia:"Martes 7 de julio",     hora:"18:00",local:"G.16 15",visita:"G.16 16", grupo:"",sede:"Por confirmar",fase:"Octavos"},
+  // Horarios en ARG (UTC-3). Fuente: FIFA oficial + CBS/ESPN verificado jun 2026
+  {id:"32_1",  fecha:"2026-06-28",dia:"Domingo 28 de junio",    hora:"16:00",local:"2°A",          visita:"2°B",          grupo:"",sede:"SoFi Stadium, Los Ángeles",            fase:"32vos"},
+  {id:"32_2",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"14:00",local:"1°C",          visita:"2°F",          grupo:"",sede:"NRG Stadium, Houston",                 fase:"32vos"},
+  {id:"32_3",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"17:30",local:"1°E",          visita:"3°A/B/C/D/F",  grupo:"",sede:"Gillette Stadium, Boston",             fase:"32vos"},
+  {id:"32_4",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"22:00*",local:"1°F",         visita:"2°C",          grupo:"",sede:"Estadio BBVA, Monterrey",              fase:"32vos"},
+  {id:"32_5",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"14:00",local:"2°E",          visita:"2°I",          grupo:"",sede:"AT&T Stadium, Dallas",                 fase:"32vos"},
+  {id:"32_6",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"18:00",local:"1°I",          visita:"3°C/D/F/G/H",  grupo:"",sede:"MetLife Stadium, Nueva Jersey",        fase:"32vos"},
+  {id:"32_7",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"22:00*",local:"1°A",         visita:"3°C/E/F/H/I",  grupo:"",sede:"Estadio Azteca, Ciudad de México",    fase:"32vos"},
+  {id:"32_8",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"13:00",local:"1°L",          visita:"3°E/H/I/J/K",  grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",       fase:"32vos"},
+  {id:"32_9",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"17:00",local:"1°G",          visita:"3°A/E/H/I/J",  grupo:"",sede:"Lumen Field, Seattle",                 fase:"32vos"},
+  {id:"32_10", fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"21:00",local:"1°D",          visita:"3°B/E/F/I/J",  grupo:"",sede:"Levi's Stadium, Santa Clara",          fase:"32vos"},
+  {id:"32_11", fecha:"2026-07-02",dia:"Jueves 2 de julio",      hora:"20:00",local:"2°K",          visita:"2°L",          grupo:"",sede:"BMO Field, Toronto",                   fase:"32vos"},
+  {id:"32_12", fecha:"2026-07-02",dia:"Jueves 2 de julio",      hora:"16:00",local:"1°H",          visita:"2°J",          grupo:"",sede:"SoFi Stadium, Los Ángeles",             fase:"32vos"},
+  {id:"32_13", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"15:00",local:"2°D",          visita:"2°G",          grupo:"",sede:"AT&T Stadium, Dallas",                 fase:"32vos"},
+  {id:"32_14", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"19:00",local:"1°J",          visita:"2°H",          grupo:"",sede:"Hard Rock Stadium, Miami",              fase:"32vos"},
+  {id:"32_15", fecha:"2026-07-03",dia:"Viernes 3 de julio",     hora:"22:30",local:"1°K",          visita:"3°D/E/I/J/L",  grupo:"",sede:"Arrowhead Stadium, Kansas City",       fase:"32vos"},
+  {id:"32_16", fecha:"2026-07-04",dia:"Sábado 4 de julio",      hora:"00:30*",local:"1°B",         visita:"3°E/F/G/I/J",  grupo:"",sede:"BC Place, Vancouver",                  fase:"32vos"},
+  // ── OCTAVOS DE FINAL (4–7 jul) — horarios ARG (ET+1) ──
+  {id:"oct_1",fecha:"2026-07-04",dia:"Sábado 4 de julio",     hora:"14:00",local:"G.16 1", visita:"G.16 2",  grupo:"",sede:"NRG Stadium, Houston",            fase:"Octavos"},
+  {id:"oct_2",fecha:"2026-07-04",dia:"Sábado 4 de julio",     hora:"18:00",local:"G.16 3", visita:"G.16 4",  grupo:"",sede:"Lincoln Financial Field, Philadelphia",fase:"Octavos"},
+  {id:"oct_3",fecha:"2026-07-05",dia:"Domingo 5 de julio",    hora:"17:00",local:"G.16 5", visita:"G.16 6",  grupo:"",sede:"MetLife Stadium, Nueva Jersey",    fase:"Octavos"},
+  {id:"oct_4",fecha:"2026-07-05",dia:"Domingo 5 de julio",    hora:"21:00",local:"G.16 7", visita:"G.16 8",  grupo:"",sede:"Estadio Azteca, Ciudad de México", fase:"Octavos"},
+  {id:"oct_5",fecha:"2026-07-06",dia:"Lunes 6 de julio",      hora:"16:00",local:"G.16 9", visita:"G.16 10", grupo:"",sede:"AT&T Stadium, Dallas",              fase:"Octavos"},
+  {id:"oct_6",fecha:"2026-07-06",dia:"Lunes 6 de julio",      hora:"18:00",local:"G.16 11",visita:"G.16 12", grupo:"",sede:"Lumen Field, Seattle",              fase:"Octavos"},
+  {id:"oct_7",fecha:"2026-07-07",dia:"Martes 7 de julio",     hora:"13:00",local:"G.16 13",visita:"G.16 14", grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",    fase:"Octavos"},
+  {id:"oct_8",fecha:"2026-07-07",dia:"Martes 7 de julio",     hora:"17:00",local:"G.16 15",visita:"G.16 16", grupo:"",sede:"BC Place, Vancouver",               fase:"Octavos"},
   // ── CUARTOS DE FINAL (9–11 jul) ──
-  {id:"crt_1",fecha:"2026-07-09",dia:"Jueves 9 de julio",     hora:"18:00",local:"G.Oct 1",visita:"G.Oct 2",grupo:"",sede:"Por confirmar",fase:"Cuartos"},
-  {id:"crt_2",fecha:"2026-07-10",dia:"Viernes 10 de julio",   hora:"18:00",local:"G.Oct 3",visita:"G.Oct 4",grupo:"",sede:"Por confirmar",fase:"Cuartos"},
-  {id:"crt_3",fecha:"2026-07-11",dia:"Sábado 11 de julio",    hora:"14:00",local:"G.Oct 5",visita:"G.Oct 6",grupo:"",sede:"Por confirmar",fase:"Cuartos"},
-  {id:"crt_4",fecha:"2026-07-11",dia:"Sábado 11 de julio",    hora:"18:00",local:"G.Oct 7",visita:"G.Oct 8",grupo:"",sede:"Por confirmar",fase:"Cuartos"},
+  {id:"crt_1",fecha:"2026-07-09",dia:"Jueves 9 de julio",     hora:"17:30",local:"G.Oct 1",visita:"G.Oct 2",grupo:"",sede:"Gillette Stadium, Boston",           fase:"Cuartos"},
+  {id:"crt_2",fecha:"2026-07-10",dia:"Viernes 10 de julio",   hora:"16:00",local:"G.Oct 3",visita:"G.Oct 4",grupo:"",sede:"SoFi Stadium, Los Ángeles",          fase:"Cuartos"},
+  {id:"crt_3",fecha:"2026-07-11",dia:"Sábado 11 de julio",    hora:"18:00",local:"G.Oct 5",visita:"G.Oct 6",grupo:"",sede:"Hard Rock Stadium, Miami",            fase:"Cuartos"},
+  {id:"crt_4",fecha:"2026-07-11",dia:"Sábado 11 de julio",    hora:"22:00",local:"G.Oct 7",visita:"G.Oct 8",grupo:"",sede:"Arrowhead Stadium, Kansas City",      fase:"Cuartos"},
   // ── SEMIFINALES (14–15 jul) ──
-  {id:"semi_1",fecha:"2026-07-14",dia:"Martes 14 de julio",   hora:"18:00",local:"G.Crt 1",visita:"G.Crt 2",grupo:"",sede:"AT&T Stadium, Dallas",              fase:"Semis"},
-  {id:"semi_2",fecha:"2026-07-15",dia:"Miércoles 15 de julio",hora:"18:00",local:"G.Crt 3",visita:"G.Crt 4",grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",     fase:"Semis"},
+  {id:"semi_1",fecha:"2026-07-14",dia:"Martes 14 de julio",   hora:"16:00",local:"G.Crt 1",visita:"G.Crt 2",grupo:"",sede:"AT&T Stadium, Dallas",              fase:"Semis"},
+  {id:"semi_2",fecha:"2026-07-15",dia:"Miércoles 15 de julio",hora:"16:00",local:"G.Crt 3",visita:"G.Crt 4",grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",     fase:"Semis"},
   // ── TERCER PUESTO (18 jul) ──
   {id:"3er",   fecha:"2026-07-18",dia:"Sábado 18 de julio",   hora:"18:00",local:"Semi 3°",visita:"Semi 4°", grupo:"",sede:"Hard Rock Stadium, Miami",           fase:"Semis"},
   // ── FINAL (19 jul) ──
@@ -2284,7 +2284,7 @@ function showTab(t) {
   });
   document.querySelectorAll('.mundial-tab').forEach(b=>{ b.style.color='var(--muted)'; b.style.borderBottomColor='transparent'; });
   const wt = document.getElementById('wt-'+t);
-  if (wt) { wt.style.color='#fff'; wt.style.borderBottomColor='var(--verde)'; }
+  if (wt) { wt.style.color='var(--texto)'; wt.style.borderBottomColor='var(--verde-texto)'; }
   if (t==='posiciones')    { buildGruposChips(); renderPosiciones(); }
   if (t==='fase-final') renderLlaves();
 }
@@ -3097,29 +3097,44 @@ async function abrirPartidoMenor(fixtureId) {
     const tarjetas = eventos.filter(e => e.type === 'Card');
 
     // Resumen por columna: local a la izquierda, visita a la derecha
-    const renderColumna = (equipo, esLocal) => {
-      const golesEq = goles.filter(e => e.team?.name === equipo);
-      const tarjetasEq = tarjetas.filter(e => e.team?.name === equipo);
-      const todos = [...golesEq, ...tarjetasEq].sort((a,b) => (a.time?.elapsed||0)-(b.time?.elapsed||0));
-      if (!todos.length) return `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
-      return todos.map(e => {
-        const icono = e.type === 'Goal' ? '⚽' : (e.detail?.includes('Red') ? '🟥' : '🟨');
-        const txt = `${icono} ${e.time?.elapsed||''}' ${e.player?.name||''}`;
+    const amarillas = eventos.filter(e => e.type === 'Card' && e.detail === 'Yellow Card');
+    const rojas = eventos.filter(e => e.type === 'Card' && (e.detail === 'Red Card' || e.detail === 'Yellow Red Card'));
+    const cambios = eventos.filter(e => e.type === 'subst');
+
+    const renderSeccion = (lista, esLocal) => {
+      if (!lista.length) return `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
+      return lista.filter(e => e.team?.name === (esLocal ? local : visita)).map(e => {
+        const icono = e.type === 'Goal' ? '⚽' : e.type === 'subst' ? '🔄' : (e.detail?.includes('Red') ? '🟥' : '🟨');
+        const nombre = e.type === 'subst'
+          ? `▲ ${e.assist?.name?.split(' ').pop()||''} ▼ ${e.player?.name?.split(' ').pop()||''}`
+          : (e.player?.name?.split(' ').pop()||'');
+        const txt = `${icono} ${e.time?.elapsed||''}' ${nombre}`;
         return `<div style="font-size:.72rem;color:var(--texto);padding:2px 0;${esLocal?'':'text-align:right'}">${txt}</div>`;
-      }).join('');
+      }).join('') || `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
+    };
+
+    const mkSeccion = (titulo, lista) => {
+      if (!lista.length) return '';
+      return `<div style="margin-bottom:10px">
+        <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${titulo}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>${renderSeccion(lista, true)}</div>
+          <div>${renderSeccion(lista, false)}</div>
+        </div>
+      </div>`;
     };
 
     const listaGoles = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <div>
-          <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px">${local}</div>
-          ${renderColumna(local, true)}
-        </div>
-        <div>
-          <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px;text-align:right">${visita}</div>
-          ${renderColumna(visita, false)}
-        </div>
-      </div>`;
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
+        <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase">${local}</div>
+        <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;text-align:right">${visita}</div>
+      </div>
+      ${mkSeccion('⚽ Goles', goles)}
+      ${mkSeccion('🟨 Amarillas', amarillas)}
+      ${mkSeccion('🟥 Rojas', rojas)}
+      ${mkSeccion('🔄 Cambios', cambios)}
+      ${!goles.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
+    `;
 
     const listaTarjetas = '';
 
