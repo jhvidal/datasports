@@ -2916,6 +2916,7 @@ function render() {
         }).join('');
         const LOGOS_LIGAS_FIJOS = {
           129: 'https://assets.football-logos.cc/logos/argentina/1500x1500/primera-nacional.5ff4a9c9.png',
+          131: 'https://www.vermouth-deportivo.com.ar/wp-content/uploads/2025/01/logo-b-metro-nuevo.png',
         };
         const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixturesLiga[0]?.league?.logo || '';
         return `<div class="dia-block dia-block-menor">
@@ -2945,6 +2946,54 @@ function render() {
     </div>
     <div class="bloques-menores-sep">${bloquesMenores}</div>`;
   }).join('');
+
+  // Búsqueda extendida: buscar en B Nacional y B Metro ya cargadas en memoria
+  if (busqueda) {
+    const q = normalize(busqueda);
+    const resultadosExtra = [];
+    Object.entries(LIGAS_MENORES).forEach(([fecha, ligas]) => {
+      Object.entries(ligas).forEach(([lid, fixtures]) => {
+        fixtures.forEach(f => {
+          const nL = f.teams.home.name, nV = f.teams.away.name;
+          if (normalize(nL).includes(q) || normalize(nV).includes(q)) {
+            resultadosExtra.push({ lid: parseInt(lid), f });
+          }
+        });
+      });
+    });
+    if (resultadosExtra.length) {
+      const filasExtra = resultadosExtra.map(({lid, f}) => {
+        const st = f.fixture.status.short;
+        const ft = ['FT','AET','PEN'].includes(st);
+        const lv = ['1H','2H','HT','ET','P'].includes(st);
+        const gL = f.goals.home, gV = f.goals.away;
+        const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
+        const hh = d.getUTCHours().toString().padStart(2,'0');
+        const mm = d.getUTCMinutes().toString().padStart(2,'0');
+        const horaHtml = ft ? `<span class="hora-fin">FIN</span>`
+          : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
+          : `<span class="hora">${hh}:${mm}</span>`;
+        const resHtml = (ft||lv)
+          ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
+          : `<span class="vs-wrap">vs</span>`;
+        return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
+          <div style="width:50px;flex-shrink:0">${horaHtml}</div>
+          <div class="partido-info">
+            <div class="equipos">
+              <span class="equipo-nombre local"><span class="eq-text">${f.teams.home.name}</span></span>
+              ${resHtml}
+              <span class="equipo-nombre visita"><span class="eq-text">${f.teams.away.name}</span></span>
+            </div>
+            <div class="meta"><span class="tag tag-sede">${LIGAS_MENORES_INFO[lid]?.nombre||''}</span></div>
+          </div>
+        </div>`;
+      }).join('');
+      cal.innerHTML += `<div class="dia-block dia-block-menor" style="margin-top:10px">
+        <div class="dia-header"><div class="liga-label">Otras ligas</div></div>
+        <div class="partidos-list">${filasExtra}</div>
+      </div>`;
+    }
+  }
 }
 
 function toggleDiaMenor(fecha, lid) {
@@ -3010,13 +3059,32 @@ async function abrirPartidoMenor(fixtureId) {
     const goles = eventos.filter(e => e.type === 'Goal');
     const tarjetas = eventos.filter(e => e.type === 'Card');
 
-    const listaGoles = goles.length
-      ? goles.map(e => `<div style="font-size:.75rem;padding:3px 0;color:var(--texto)">⚽ ${e.time?.elapsed||''}' — ${e.player?.name||''} (${e.team?.name||''})</div>`).join('')
-      : '<div class="po-sin-datos">Sin goles</div>';
+    // Resumen por columna: local a la izquierda, visita a la derecha
+    const renderColumna = (equipo, esLocal) => {
+      const golesEq = goles.filter(e => e.team?.name === equipo);
+      const tarjetasEq = tarjetas.filter(e => e.team?.name === equipo);
+      const todos = [...golesEq, ...tarjetasEq].sort((a,b) => (a.time?.elapsed||0)-(b.time?.elapsed||0));
+      if (!todos.length) return `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
+      return todos.map(e => {
+        const icono = e.type === 'Goal' ? '⚽' : (e.detail?.includes('Red') ? '🟥' : '🟨');
+        const txt = `${icono} ${e.time?.elapsed||''}' ${e.player?.name||''}`;
+        return `<div style="font-size:.72rem;color:var(--texto);padding:2px 0;${esLocal?'':'text-align:right'}">${txt}</div>`;
+      }).join('');
+    };
 
-    const listaTarjetas = tarjetas.length
-      ? tarjetas.map(e => `<div style="font-size:.75rem;padding:3px 0;color:var(--texto)">${e.detail?.includes('Red')?'🟥':'🟨'} ${e.time?.elapsed||''}' — ${e.player?.name||''} (${e.team?.name||''})</div>`).join('')
-      : '';
+    const listaGoles = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px">${local}</div>
+          ${renderColumna(local, true)}
+        </div>
+        <div>
+          <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px;text-align:right">${visita}</div>
+          ${renderColumna(visita, false)}
+        </div>
+      </div>`;
+
+    const listaTarjetas = '';
 
     let htmlStats = '<div class="po-sin-datos">Sin estadísticas disponibles</div>';
     if (statsResp.length >= 2) {
@@ -3033,20 +3101,46 @@ async function abrirPartidoMenor(fixtureId) {
 
     let htmlFormaciones = '<div class="po-sin-datos">Sin formaciones disponibles</div>';
     if (lineups.length >= 2) {
-      const filaJugadores = (lineup) => (lineup.startXI||[]).map(j =>
-        `<div style="font-size:.72rem;color:var(--texto);padding:2px 0">${j.player?.number||''} ${j.player?.name||''}</div>`
-      ).join('');
-      htmlFormaciones = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div>
-            <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">${local} (${lineups[0]?.formation||''})</div>
-            ${filaJugadores(lineups[0])}
+      const tieneJugadores = (lineups[0]?.startXI||[]).length > 0 || (lineups[1]?.startXI||[]).length > 0;
+      if (!tieneJugadores) {
+        const dt0 = lineups[0]?.coach?.name ? `<div style="font-size:.72rem;color:var(--muted)">DT: ${lineups[0].coach.name}</div>` : '';
+        const dt1 = lineups[1]?.coach?.name ? `<div style="font-size:.72rem;color:var(--muted);text-align:right">DT: ${lineups[1].coach.name}</div>` : '';
+        htmlFormaciones = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+            <div><div style="font-size:.68rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px">${local}</div>${dt0}</div>
+            <div><div style="font-size:.68rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:4px;text-align:right">${visita}</div>${dt1}</div>
           </div>
-          <div>
-            <div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;text-align:right">${visita} (${lineups[1]?.formation||''})</div>
-            ${filaJugadores(lineups[1])}
-          </div>
-        </div>`;
+          <div class="po-sin-datos">Formaciones en proceso, intentá más tarde</div>`;
+      } else {
+        const filaJug = (lineup, rtl) => (lineup.startXI||[]).map(j =>
+          `<div style="font-size:.72rem;color:var(--texto);padding:2px 0;border-bottom:1px solid var(--borde);${rtl?'text-align:right':''}">
+            ${rtl ? (j.player?.name||'') + ' <span style="color:var(--muted)">' + (j.player?.number||'') + '</span>' 
+                  : '<span style="color:var(--muted)">' + (j.player?.number||'') + '</span> ' + (j.player?.name||'')}
+          </div>`
+        ).join('');
+        const filaSub = (lineup, rtl) => (lineup.substitutes||[]).map(j =>
+          `<div style="font-size:.68rem;color:var(--muted);padding:2px 0;${rtl?'text-align:right':''}">
+            ${rtl ? (j.player?.name||'') + ' ' + (j.player?.number||'') : (j.player?.number||'') + ' ' + (j.player?.name||'')}
+          </div>`
+        ).join('');
+        const coach0 = lineups[0]?.coach?.name ? `<div style="font-size:.65rem;color:var(--muted);margin-top:4px;font-style:italic">DT: ${lineups[0].coach.name}</div>` : '';
+        const coach1 = lineups[1]?.coach?.name ? `<div style="font-size:.65rem;color:var(--muted);margin-top:4px;font-style:italic;text-align:right">DT: ${lineups[1].coach.name}</div>` : '';
+        htmlFormaciones = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:6px">${local}${lineups[0]?.formation?' ('+lineups[0].formation+')':''}</div>
+              ${filaJug(lineups[0], false)}
+              ${(lineups[0]?.substitutes||[]).length ? '<div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin:5px 0 2px">Suplentes</div>' + filaSub(lineups[0], false) : ''}
+              ${coach0}
+            </div>
+            <div>
+              <div style="font-size:.68rem;font-weight:700;color:var(--azul);text-transform:uppercase;margin-bottom:6px;text-align:right">${visita}${lineups[1]?.formation?' ('+lineups[1].formation+')':''}</div>
+              ${filaJug(lineups[1], true)}
+              ${(lineups[1]?.substitutes||[]).length ? '<div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin:5px 0 2px;text-align:right">Suplentes</div>' + filaSub(lineups[1], true) : ''}
+              ${coach1}
+            </div>
+          </div>`;
+      }
     }
 
     document.getElementById('po-detalles-menor').innerHTML = `
