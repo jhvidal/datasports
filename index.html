@@ -2345,7 +2345,7 @@ function showCompTab(tab) {
   document.getElementById('comp-posiciones-wrap').style.display = tab==='posiciones' ? '' : 'none';
   document.querySelectorAll('.comp-tab').forEach(b=>{ b.style.color='var(--muted)'; b.style.borderBottomColor='transparent'; });
   const ct = document.getElementById('ct-'+tab);
-  if (ct) { ct.style.color='#fff'; ct.style.borderBottomColor='var(--verde)'; }
+  if (ct) { ct.style.color='var(--texto)'; ct.style.borderBottomColor='var(--verde-texto)'; }
 }
 
 async function cargarCompActual() {
@@ -2411,6 +2411,8 @@ async function cargarCompActual() {
     if (fixtures.length === 0) {
       document.getElementById('comp-fixture-wrap').innerHTML = '<div class="po-sin-datos">Sin partidos disponibles</div>';
     } else {
+      // Ordenar por fecha primero
+      fixtures.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
       // Orden de rondas
       const ordenRondas = [
         'group stage','grupo','groups',
@@ -2539,7 +2541,19 @@ async function cargarCompActual() {
     }
 
     // POSICIONES
-    const stands = standData.response?.[0]?.league?.standings || [];
+    let stands = standData.response?.[0]?.league?.standings || [];
+    // Sin posiciones → intentar temporada anterior para ligas ARG
+    if (stands.length === 0 && ['128','129','131'].includes(compActual.league)) {
+      try {
+        const prevSeason = compActual.season === '2026' ? '2025' : String(parseInt(compActual.season)-1);
+        const standPrev = await apiFetch(`standings?league=${compActual.league}&season=${prevSeason}`);
+        stands = standPrev.response?.[0]?.league?.standings || [];
+        if (stands.length > 0) {
+          document.getElementById('comp-posiciones-wrap').innerHTML =
+            `<div style="font-size:.65rem;color:var(--muted);padding:6px 0 4px;text-align:center">Posiciones ${prevSeason} · Temporada ${compActual.season} próximamente</div>`;
+        }
+      } catch(e) {}
+    }
     if (stands.length === 0) {
       document.getElementById('comp-posiciones-wrap').innerHTML = '<div class="po-sin-datos">Sin posiciones disponibles</div>';
     } else {
@@ -3001,36 +3015,73 @@ function render() {
       });
     });
     if (resultadosExtra.length) {
-      const filasExtra = resultadosExtra.map(({lid, f}) => {
+      // Ordenar por fecha ASC y agrupar por liga
+      resultadosExtra.sort((a, b) => a.f.fixture.timestamp - b.f.fixture.timestamp);
+      // Agrupar por liga
+      const porLiga = {};
+      resultadosExtra.forEach(({lid, f}) => {
+        if (!porLiga[lid]) porLiga[lid] = [];
+        porLiga[lid].push(f);
+      });
+      // Detectar el partido activo o próximo para hacer scroll
+      const ahora = Date.now() / 1000;
+      let idxActivo = -1;
+      resultadosExtra.forEach(({f}, i) => {
         const st = f.fixture.status.short;
-        const ft = ['FT','AET','PEN'].includes(st);
         const lv = ['1H','2H','HT','ET','P'].includes(st);
-        const gL = f.goals.home, gV = f.goals.away;
-        const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
-        const hh = d.getUTCHours().toString().padStart(2,'0');
-        const mm = d.getUTCMinutes().toString().padStart(2,'0');
-        const horaHtml = ft ? `<span class="hora-fin">FIN</span>`
-          : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
-          : `<span class="hora">${hh}:${mm}</span>`;
-        const resHtml = (ft||lv)
-          ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
-          : `<span class="vs-wrap">vs</span>`;
-        return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
-          <div style="width:50px;flex-shrink:0">${horaHtml}</div>
-          <div class="partido-info">
-            <div class="equipos">
-              <span class="equipo-nombre local"><span class="eq-text">${f.teams.home.name}</span></span>
-              ${resHtml}
-              <span class="equipo-nombre visita"><span class="eq-text">${f.teams.away.name}</span></span>
+        const ft = ['FT','AET','PEN'].includes(st);
+        if (lv && idxActivo < 0) idxActivo = i;
+        if (!ft && !lv && idxActivo < 0 && f.fixture.timestamp > ahora - 3600) idxActivo = i;
+      });
+
+      const bloquesLiga = Object.entries(porLiga).map(([lid, fixtures]) => {
+        const infoL = LIGAS_MENORES_INFO[lid];
+        const LOGOS_LIGAS_FIJOS = {
+          129: 'https://assets.football-logos.cc/logos/argentina/1500x1500/primera-nacional.5ff4a9c9.png',
+          131: 'https://www.vermouth-deportivo.com.ar/wp-content/uploads/2025/01/logo-b-metro-nuevo.png',
+        };
+        const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixtures[0]?.league?.logo || '';
+        const filas = fixtures.map((f, i) => {
+          const st = f.fixture.status.short;
+          const ft = ['FT','AET','PEN'].includes(st);
+          const lv = ['1H','2H','HT','ET','P'].includes(st);
+          const gL = f.goals.home, gV = f.goals.away;
+          const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
+          const hh = d.getUTCHours().toString().padStart(2,'0');
+          const mm = d.getUTCMinutes().toString().padStart(2,'0');
+          // Fecha corta: "21 jun"
+          const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+          const fechaCorta = `${d.getUTCDate()} ${meses[d.getUTCMonth()]}`;
+          const horaHtml = ft ? `<span class="hora-fin">FIN</span>`
+            : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
+            : `<span class="hora">${hh}:${mm}</span>`;
+          const resHtml = (ft||lv)
+            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
+            : `<span class="vs-wrap">vs</span>`;
+          const logoL = f.teams.home.logo, logoV = f.teams.away.logo;
+          return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
+            <div style="width:50px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px">
+              ${horaHtml}
+              <span style="font-size:.6rem;color:var(--muted)">${fechaCorta}</span>
             </div>
-            <div class="meta"><span class="tag tag-sede">${LIGAS_MENORES_INFO[lid]?.nombre||''}</span></div>
+            <div class="partido-info">
+              <div class="equipos">
+                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<span class="eq-text">${f.teams.home.name}</span></span>
+                ${resHtml}
+                <span class="equipo-nombre visita"><span class="eq-text">${f.teams.away.name}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+        return `<div class="dia-block dia-block-menor" style="margin-top:10px">
+          <div class="dia-header">
+            ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display='none'">` : ''}
+            <div class="liga-label">${infoL?.nombre || 'Liga'}</div>
           </div>
+          <div class="partidos-list">${filas}</div>
         </div>`;
       }).join('');
-      cal.innerHTML += `<div class="dia-block dia-block-menor" style="margin-top:10px">
-        <div class="dia-header"><div class="liga-label">Otras ligas</div></div>
-        <div class="partidos-list">${filasExtra}</div>
-      </div>`;
+      cal.innerHTML += bloquesLiga;
     } else if (!cal.innerHTML.trim()) {
       // No encontró nada en ningún lado
       cal.innerHTML = `<div class="no-result"><div class="nr-icon">🔍</div><p>No se encontró "<strong>${busqueda}</strong>"</p><small>Probá otro nombre</small></div>`;
