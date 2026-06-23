@@ -1707,9 +1707,8 @@ async function abrirPartido(id) {
     const colorVisita = lineups[1]?.team?.colors?.player?.primary ? `#${lineups[1].team.colors.player.primary}` : '#E61D25';
 
     const htmlResumen = `
-      ${renderEventos('⚽ Goles', goles)}
-      ${renderEventos('🟨 Amarillas', amarillas)}
-      ${renderEventos('🟥 Rojas', rojas)}
+      ${renderEventos('', goles)}
+      ${renderEventos('🟨🟥 Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
       ${renderEventos('🔄 Cambios', cambios)}
       ${lineups.length >= 2 ? `
         <div class="po-seccion-titulo" style="margin-top:10px">👕 Formaciones</div>
@@ -1844,13 +1843,16 @@ async function abrirPartido(id) {
     function eventoItem(ev) {
       const equipoNombre = mapTeam(ev.team?.name || '');
       const esLocal = equipoNombre === p.local;
-      const icon = ev.type === 'Goal' ? '⚽' : ev.detail === 'Yellow Card' ? '🟨' : ev.detail === 'Red Card' ? '🟥' : '';
+      const esPenErrado = ev.type === 'Goal' && ev.detail === 'Missed Penalty';
+      const icon = esPenErrado ? '' : ev.type === 'Goal' ? '⚽' : ev.detail === 'Yellow Card' ? '🟨' : ev.detail === 'Red Card' ? '🟥' : '';
       const nombre = ev.type === 'subst'
         ? `▲ ${ev.assist?.name?.split(' ').pop()||''} / ▼ ${ev.player?.name?.split(' ').pop()||''}`
         : (ev.player?.name?.split(' ').pop() || '');
-      const asist = ev.type === 'Goal' && ev.assist?.name
+      const asist = ev.type === 'Goal' && !esPenErrado && ev.assist?.name
         ? ` (${ev.assist.name.split(' ').pop()})` : '';
-      return { esLocal, icon, nombre: nombre + asist, min: ev.time?.elapsed };
+      const sufijo = esPenErrado ? ` · Pen. errado (${nombre})` : nombre + asist;
+      const nombreFinal = esPenErrado ? sufijo : sufijo;
+      return { esLocal, icon, nombre: esPenErrado ? `Pen. errado (${nombre})` : nombre + asist, min: ev.time?.elapsed, esPenErrado };
     }
 
     function renderEventos(titulo, lista) {
@@ -1873,7 +1875,7 @@ async function abrirPartido(id) {
           <div class="ev-col-header">${p.local}</div>
           <div class="ev-col-header" style="text-align:right">${p.visita}</div>
         </div>
-        <div class="po-seccion-titulo">${titulo}</div>
+        ${titulo ? `<div class="po-seccion-titulo">${titulo}</div>` : ''}
         ${rows}
       </div>`;
     }
@@ -2797,16 +2799,16 @@ function clearSearch() {
 const PAISES_MUNDIAL = [...new Set(PARTIDOS.flatMap(p => [p.local, p.visita]))].sort();
 
 function getEquiposLigasMenores() {
-  const equipos = new Set();
+  const mapa = new Map();
   Object.values(LIGAS_MENORES).forEach(ligas => {
     Object.values(ligas).forEach(fixtures => {
       fixtures.forEach(f => {
-        equipos.add(f.teams.home.name);
-        equipos.add(f.teams.away.name);
+        if (!mapa.has(f.teams.home.name)) mapa.set(f.teams.home.name, f.teams.home.logo || '');
+        if (!mapa.has(f.teams.away.name)) mapa.set(f.teams.away.name, f.teams.away.logo || '');
       });
     });
   });
-  return [...equipos].sort();
+  return [...mapa.entries()].map(([name, logo]) => ({name, logo})).sort((a,b) => a.name.localeCompare(b.name));
 }
 
 function mostrarSugerencias(q) {
@@ -2815,7 +2817,7 @@ function mostrarSugerencias(q) {
   const qn = normalize(q);
 
   const matchesPaises = PAISES_MUNDIAL.filter(e => normalize(e).includes(qn)).slice(0, 4);
-  const matchesEquipos = getEquiposLigasMenores().filter(e => normalize(e).includes(qn)).slice(0, 5);
+  const matchesEquipos = getEquiposLigasMenores().filter(e => normalize(e.name).includes(qn)).slice(0, 5);
 
   if (!matchesPaises.length && !matchesEquipos.length) { div.classList.remove('visible'); return; }
 
@@ -2830,11 +2832,14 @@ function mostrarSugerencias(q) {
   }
   if (matchesEquipos.length) {
     html += `<div class="sug-header">🏟️ Clubes</div>`;
-    html += matchesEquipos.map(e =>
-      `<div class="sug-item" onclick="elegirSugerencia('${e.replace(/'/g, "\\'")}')">
-        ⚽ <span>${e}</span>
-      </div>`
-    ).join('');
+    html += matchesEquipos.map(e => {
+      const logoHtml = e.logo
+        ? `<img src="${e.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.src='';this.style.display='none'">`
+        : `<span style="font-size:12px">⚽</span>`;
+      return `<div class="sug-item" onclick="elegirSugerencia('${e.name.replace(/'/g, "\\'")}')">
+        ${logoHtml} <span>${e.name}</span>
+      </div>`;
+    }).join('');
   }
   div.innerHTML = html;
   div.classList.add('visible');
@@ -3104,11 +3109,13 @@ async function abrirPartidoMenor(fixtureId) {
     const renderSeccion = (lista, esLocal) => {
       if (!lista.length) return `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
       return lista.filter(e => e.team?.name === (esLocal ? local : visita)).map(e => {
-        const icono = e.type === 'Goal' ? '⚽' : e.type === 'subst' ? '🔄' : (e.detail?.includes('Red') ? '🟥' : '🟨');
-        const nombre = e.type === 'subst'
+        const esPenErrado = e.type === 'Goal' && e.detail === 'Missed Penalty';
+        const icono = esPenErrado ? '' : e.type === 'Goal' ? '⚽' : e.type === 'subst' ? '🔄' : (e.detail?.includes('Red') ? '🟥' : '🟨');
+        const jugador = e.type === 'subst'
           ? `▲ ${e.assist?.name?.split(' ').pop()||''} ▼ ${e.player?.name?.split(' ').pop()||''}`
           : (e.player?.name?.split(' ').pop()||'');
-        const txt = `${icono} ${e.time?.elapsed||''}' ${nombre}`;
+        const nombre = esPenErrado ? `Pen. errado (${jugador})` : jugador;
+        const txt = `${icono}${icono?' ':''}${e.time?.elapsed||''}' ${nombre}`;
         return `<div style="font-size:.72rem;color:var(--texto);padding:2px 0;${esLocal?'':'text-align:right'}">${txt}</div>`;
       }).join('') || `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
     };
@@ -3116,7 +3123,7 @@ async function abrirPartidoMenor(fixtureId) {
     const mkSeccion = (titulo, lista) => {
       if (!lista.length) return '';
       return `<div style="margin-bottom:10px">
-        <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${titulo}</div>
+        ${titulo ? `<div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${titulo}</div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div>${renderSeccion(lista, true)}</div>
           <div>${renderSeccion(lista, false)}</div>
@@ -3129,9 +3136,8 @@ async function abrirPartidoMenor(fixtureId) {
         <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase">${local}</div>
         <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;text-align:right">${visita}</div>
       </div>
-      ${mkSeccion('⚽ Goles', goles)}
-      ${mkSeccion('🟨 Amarillas', amarillas)}
-      ${mkSeccion('🟥 Rojas', rojas)}
+      ${mkSeccion('', goles)}
+      ${mkSeccion('🟨🟥 Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
       ${mkSeccion('🔄 Cambios', cambios)}
       ${!goles.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
     `;
