@@ -65,11 +65,12 @@
 
   /* ── SIDEBAR FIJO EN DESKTOP ── */
   @media (min-width:768px) {
-    .drawer-overlay { display:block !important; position:fixed; top:0; left:0; width:210px; height:100vh; background:none; z-index:29; }
+    .drawer-overlay { display:block !important; position:fixed; top:0; left:0; width:210px; height:100vh; background:none !important; z-index:29; pointer-events:none; }
     .drawer-overlay .drawer {
       width:210px; height:100vh; border-left:none;
       border-right:1px solid var(--borde);
       padding-top:90px; background:var(--fondo);
+      pointer-events:all;
     }
     .drawer-overlay .drawer-top { display:none; }
     .drawer-close { display:none; }
@@ -791,14 +792,11 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-      <button onclick="if(partidoAbierto===null){cargarResultados()}else if(typeof partidoAbierto==='string'&&partidoAbierto.startsWith('menor_')){abrirPartidoMenor(parseInt(partidoAbierto.replace('menor_','')))}else{abrirPartido(partidoAbierto)}" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
-      <button onclick="toggleMenu()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center" aria-label="Menú">
-        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-      </button>
-    </div>
+    <button onclick="toggleMenu()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0" aria-label="Menú">
+      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+    </button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
