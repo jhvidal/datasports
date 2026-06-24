@@ -794,33 +794,33 @@
       <span class="drawer-item-label">Fase Final</span>
     </div>
     <div class="drawer-sec-title">Argentina</div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('129','2026','Primera Nacional');closeMenu()">
       <span class="drawer-item-label">Primera Nacional</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('131','2026','Primera B Metro');closeMenu()">
       <span class="drawer-item-label">Primera B Metro</span>
     </div>
     <div class="drawer-sec-title">Sudamérica</div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('13','2026','Copa Libertadores');closeMenu()">
       <span class="drawer-item-label">Copa Libertadores</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('11','2026','Copa Sudamericana');closeMenu()">
       <span class="drawer-item-label">Copa Sudamericana</span>
     </div>
     <div class="drawer-sec-title">Europa</div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('2','2025','Champions League');closeMenu()">
       <span class="drawer-item-label">Champions League</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('140','2025','La Liga');closeMenu()">
       <span class="drawer-item-label">La Liga</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('39','2025','Premier League');closeMenu()">
       <span class="drawer-item-label">Premier League</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('135','2025','Serie A');closeMenu()">
       <span class="drawer-item-label">Serie A</span>
     </div>
-    <div class="drawer-item">
+    <div class="drawer-item" onclick="abrirDesdeDrawer('78','2025','Bundesliga');closeMenu()">
       <span class="drawer-item-label">Bundesliga</span>
     </div>
     <div class="drawer-item">
@@ -856,7 +856,7 @@
 </div>
 
 <!-- ══════════ PARTIDO OVERLAY ══════════ -->
-<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-bottom:20px;"></div>
+<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-top:90px; padding-bottom:20px;"></div>
 
 <!-- NAV LATERAL (desktop) / BOTTOM NAV (mobile) -->
 <nav class="sidebar" id="sidebar">
@@ -1098,24 +1098,31 @@ async function apiFetch(endpoint) {
 
   // TTL según tipo de llamada
   let ttlSeg = 120;
-  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 60;
+  const esEventoOStat = path.includes('fixtures/events') || path.includes('fixtures/statistics');
+  if (esEventoOStat) ttlSeg = 60;
   else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
   // Lista de partidos FT (cambia cada vez que termina un partido nuevo) — TTL corto
   else if (path === 'fixtures' && (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN'))) ttlSeg = 30;
   else if (path.includes('predictions')) ttlSeg = 86400;
   else if (endpoint.includes('status=NS') || path.includes('standings') || path.includes('squads') || path.includes('players')) ttlSeg = 300;
-  else if (path.includes('lineups')) ttlSeg = 86400; // lineups de un fixture puntual no cambian
-  else if (path === 'fixtures' && endpoint.includes('id=')) ttlSeg = 86400; // fixture individual FT
+  else if (path.includes('lineups')) ttlSeg = 86400;
+  else if (path === 'fixtures' && endpoint.includes('id=')) ttlSeg = 86400;
 
-  // Intentar desde caché local
+  // Para eventos/stats: si hay partido en vivo, saltear localStorage y ir directo al Worker
+  const hayPartidoVivo = Object.values(RESULTADOS).some(r => r.estado === 'live');
+  const saltearCache = esEventoOStat && hayPartidoVivo;
+
+  // Intentar desde caché local (excepto eventos/stats en vivo)
   const cacheKey = 'ds_' + endpoint;
-  try {
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      const { ts, data } = JSON.parse(cached);
-      if (Date.now() - ts < ttlSeg * 1000) return data;
-    }
-  } catch(e) {}
+  if (!saltearCache) {
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { ts, data } = JSON.parse(cached);
+        if (Date.now() - ts < ttlSeg * 1000) return data;
+      }
+    } catch(e) {}
+  }
 
   // Llamar al Worker
   const res = await fetch(`https://datasports-api.vidaljonathanh.workers.dev?${params.toString()}`);
@@ -3963,6 +3970,20 @@ try {
 } catch(e) {}
 showTab('fixture');
 // ── DRAWER ──
+function abrirDesdeDrawer(league, season, name) {
+  // Ir a la pestaña Competiciones y abrir esa liga
+  showMainTab('competiciones');
+  compActual = { league, season, name };
+  document.getElementById('comp-panel-titulo').textContent = name;
+  document.getElementById('comp-panel').style.display = 'block';
+  showCompTab('fixture');
+  cargarCompActual();
+  // Marcar btn activo si existe
+  document.querySelectorAll('.comp-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.league === league);
+  });
+}
+
 function setDrawerActive(tab) {
   document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
   const el = document.getElementById('dmenu-' + tab);
