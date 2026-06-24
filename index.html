@@ -70,6 +70,7 @@
     height:100%; overflow-y:auto;
     border-left:1px solid var(--borde);
     padding:16px; display:flex; flex-direction:column;
+    box-shadow:-4px 0 20px rgba(0,0,0,0.15);
   }
   .drawer-top { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:4px; border-bottom:1px solid var(--borde); }
   .drawer-titulo { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
@@ -783,13 +784,13 @@
       <button class="drawer-close" onclick="toggleMenu()">✕</button>
     </div>
     <div class="drawer-sec-title">Mundial 2026</div>
-    <div class="drawer-item active" onclick="showTab('fixture');closeMenu()">
+    <div class="drawer-item" id="dmenu-fixture" onclick="showTab('fixture');setDrawerActive('fixture');closeMenu()">
       <span class="drawer-item-label">Fixture</span>
     </div>
-    <div class="drawer-item" onclick="showTab('posiciones');closeMenu()">
+    <div class="drawer-item" id="dmenu-posiciones" onclick="showTab('posiciones');setDrawerActive('posiciones');closeMenu()">
       <span class="drawer-item-label">Grupos</span>
     </div>
-    <div class="drawer-item" onclick="showTab('fase-final');closeMenu()">
+    <div class="drawer-item" id="dmenu-fase-final" onclick="showTab('fase-final');setDrawerActive('fase-final');closeMenu()">
       <span class="drawer-item-label">Fase Final</span>
     </div>
     <div class="drawer-sec-title">Argentina</div>
@@ -1097,7 +1098,7 @@ async function apiFetch(endpoint) {
 
   // TTL según tipo de llamada
   let ttlSeg = 120;
-  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 20;
+  if (path.includes('fixtures/events') || path.includes('fixtures/statistics')) ttlSeg = 60;
   else if (endpoint.includes('status=1H') || endpoint.includes('status=2H') || endpoint.includes('status=HT') || endpoint.includes('status=ET') || endpoint.includes('status=P')) ttlSeg = 30;
   // Lista de partidos FT (cambia cada vez que termina un partido nuevo) — TTL corto
   else if (path === 'fixtures' && (endpoint.includes('status=FT') || endpoint.includes('status=AET') || endpoint.includes('status=PEN'))) ttlSeg = 30;
@@ -3955,8 +3956,21 @@ function ajustarHeader() {
 ajustarHeader();
 window.addEventListener('resize', ajustarHeader);
 
+// Cargar cache de resultados inmediatamente para evitar flash de NS
+try {
+  const cached = localStorage.getItem('ds_resultados_cache');
+  if (cached) Object.assign(RESULTADOS, JSON.parse(cached));
+} catch(e) {}
 showTab('fixture');
 // ── DRAWER ──
+function setDrawerActive(tab) {
+  document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('dmenu-' + tab);
+  if (el) el.classList.add('active');
+}
+// Inicializar fixture como activo
+document.addEventListener('DOMContentLoaded', () => setDrawerActive('fixture'));
+
 function toggleMenu() {
   document.getElementById('drawerOverlay').classList.toggle('open');
 }
@@ -3969,8 +3983,17 @@ function closeDrawerOutside(e) {
 
 render();
 cargarResultados().then(() => {
+  try { localStorage.setItem('ds_resultados_cache', JSON.stringify(RESULTADOS)); } catch(e) {}
   iniciarPolling();
   setInterval(() => { iniciarPolling(); }, 300000);
+  // Auto-refresh cada 45s si hay partido en vivo
+  setInterval(() => {
+    if (Object.values(RESULTADOS).some(r => r.estado === 'live')) {
+      cargarResultados().then(() => {
+        try { localStorage.setItem('ds_resultados_cache', JSON.stringify(RESULTADOS)); } catch(e) {}
+      });
+    }
+  }, 45000);
   // Pre-cachear en background detalles de partidos FT y en vivo de hoy
   preCachearPartidos();
   // Cargar ligas menores (B Nacional, B Metro) y refrescar cada 5 min
