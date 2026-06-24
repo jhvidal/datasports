@@ -631,28 +631,21 @@
   /* ── LLAVES ELIMINATORIAS — BRACKET ── */
   #tab-fase-final { padding:10px 12px 0; overflow-x:auto; }
 
-  /* ── BRACKET MOBILE ── */
-  #tab-fase-final { padding:0; }
-  .bracket-scroll { padding:12px 8px 24px; }
-  .bracket-ronda-titulo {
-    font-size:.65rem; font-weight:700; text-transform:uppercase;
-    letter-spacing:1px; color:var(--verde-texto); padding:12px 4px 6px;
-    display:flex; align-items:center; gap:8px;
+  /* ── BRACKET HORIZONTAL ── */
+  #tab-fase-final { overflow-x:auto; padding:0; }
+  .bracket-scroll { padding:8px; min-width:780px; display:inline-block; min-width:100%; }
+  .bk-slot { flex:1; padding:2px 0; min-height:60px; display:flex; flex-direction:column; justify-content:center; }
+  /* conectores horizontales */
+  .bk-right-top    { flex:1; border-right:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 5px 0; }
+  .bk-right-bottom { flex:1; border-right:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:0 5px 0 0; }
+  .bk-left-top     { flex:1; border-left:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 0 5px; }
+  .bk-left-bottom  { flex:1; border-left:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:5px 0 0 0; }
+  .bk-hline { flex:1; border-top:2px solid var(--borde); }
+  .bracket-col-title {
+    font-size:.58rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.8px; color:var(--verde-texto); text-align:center;
+    padding:0 0 6px; white-space:nowrap;
   }
-  .bracket-ronda-titulo::before,.bracket-ronda-titulo::after {
-    content:''; flex:1; height:1px; background:var(--borde);
-  }
-  .bracket-dos-col {
-    display:grid; grid-template-columns:1fr 12px 1fr; gap:0; align-items:stretch;
-  }
-  .bracket-col-izq { display:flex; flex-direction:column; gap:4px; }
-  .bracket-col-der { display:flex; flex-direction:column; gap:4px; }
-  .bracket-centro { display:flex; flex-direction:column; justify-content:space-around; }
-  .bk-slot { display:flex; flex-direction:column; }
-  .bk-conn-izq-top    { flex:1; border-right:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 4px 0; }
-  .bk-conn-izq-bottom { flex:1; border-right:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:0 4px 0 0; }
-  .bk-conn-der-top    { flex:1; border-left:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 0 4px; }
-  .bk-conn-der-bottom { flex:1; border-left:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:4px 0 0 0; }
   /* Partido */
   .bk-partido {
     background:var(--card); border-radius:8px;
@@ -3524,13 +3517,14 @@ function actualizarTablaGrupos() {
 
 function resolverEquipo(slot) {
   if (!slot || !slot.includes('°')) return slot;
-  const m = slot.match(/^([123])°([A-L])(?:\/|$)/);
+  // Si tiene / es un tercero indeterminado ("3°A/B/C/D/F") — no proyectar
+  if (slot.includes('/')) return slot;
+  const m = slot.match(/^([12])°([A-L])$/);
   if (!m) return slot;
   const pos = parseInt(m[1]);
   const grupo = m[2];
   const tabla = TABLA_GRUPOS[grupo];
   if (!tabla || tabla.length < pos) return slot;
-  // Solo proyectar si el equipo ya jugó al menos 1 partido
   if (tabla[pos-1]?.pj === 0) return slot;
   return tabla[pos-1]?.equipo || slot;
 }
@@ -3582,122 +3576,214 @@ function renderLlaves() {
   actualizarTablaGrupos();
   const div = document.getElementById('llaves');
 
-  const p32 = PARTIDOS.filter(p => p.fase === '32vos');
+  // Mapa de partidos por ID
+  const pp = {};
+  PARTIDOS.filter(p => p.fase === '32vos' || p.fase === 'Octavos' || p.fase === 'Cuartos' || p.fase === 'Semis' || p.fase === 'Final')
+    .forEach(p => pp[p.id] = p);
+
+  // Slot vacío
+  const empty = () => `<div style="background:var(--mid);border-radius:8px;border:1px dashed var(--borde);padding:6px 8px">
+    <div style="height:12px;background:var(--borde);border-radius:3px;margin:3px 0;opacity:.5"></div>
+    <div style="height:12px;background:var(--borde);border-radius:3px;margin:3px 0;opacity:.5"></div>
+  </div>`;
+
+  const slot = (id) => `<div class="bk-slot">${pp[id] ? mkBkPartido(pp[id], null) : empty()}</div>`;
+
+  // Conectores
+  const connR = (n) => `<div style="display:flex;flex-direction:column;width:14px">${
+    Array.from({length:n}).map((_,i) => i%2===0
+      ? `<div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>`
+      : ''
+    ).filter(Boolean).join('')
+  }</div>`;
+
+  const connL = (n) => `<div style="display:flex;flex-direction:column;width:14px">${
+    Array.from({length:n}).map((_,i) => i%2===0
+      ? `<div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>`
+      : ''
+    ).filter(Boolean).join('')
+  }</div>`;
+
+  const hline = () => `<div style="display:flex;align-items:center;width:10px"><div class="bk-hline"></div></div>`;
+
+  // Columna de slots
+  const col = (ids, title='') => `<div style="display:flex;flex-direction:column;min-width:120px">
+    <div class="bracket-col-title">${title}</div>
+    ${ids.map(id => slot(id)).join('')}
+  </div>`;
+
+  const colEmpty = (n, title='') => `<div style="display:flex;flex-direction:column;min-width:120px">
+    <div class="bracket-col-title">${title}</div>
+    ${Array.from({length:n}).map(() => `<div class="bk-slot">${empty()}</div>`).join('')}
+  </div>`;
+
+  // Bracket del Mundial 2026 — orden oficial FIFA
+  // Llave izq-sup:  M73(32_1), M75(32_4), M74(32_3), M77(32_6)  → 8vos M90, M89 → Cuartos M97 → Semi M101
+  // Llave izq-inf:  M76(32_2), M78(32_5), M79(32_7), M80(32_8)  → 8vos M91, M92 → Cuartos M99 → Semi M101
+  // Llave der-sup:  M81(32_10),M84(32_11),M83(32_16),M87(32_15) → 8vos M93, M94 → Cuartos M98 → Semi M102
+  // Llave der-inf:  M82(32_9), M88(32_13),M85(32_12),M86(32_14) → 8vos M95, M96 → Cuartos M100 → Semi M102
+
   const p8v = PARTIDOS.filter(p => p.fase === 'Octavos');
   const pCu = PARTIDOS.filter(p => p.fase === 'Cuartos');
   const pSe = PARTIDOS.filter(p => p.fase === 'Semis');
   const pFi = PARTIDOS.filter(p => p.fase === 'Final');
 
-  const empty = () => `<div class="bk-empty"><div class="bk-empty-slot"></div><div class="bk-empty-slot"></div></div>`;
-  const slot  = (p, num) => `<div class="bk-slot">${p ? mkBkPartido(p, num) : empty()}</div>`;
+  const get8v  = (i) => p8v[i]?.id  || '__empty__';
+  const getCu  = (i) => pCu[i]?.id  || '__empty__';
+  const getSe  = (i) => pSe[i]?.id  || '__empty__';
+  const getFi  = ()  => pFi[0]?.id  || '__empty__';
 
-  // Conectores: dado N partidos en columna izq, genera N/2 conectores
-  const connIzq = (n) => Array.from({length:n/2}).map(() =>
-    `<div style="flex:1;display:flex;flex-direction:column">
-      <div class="bk-conn-izq-top"></div>
-      <div class="bk-conn-izq-bottom"></div>
-    </div>`
-  ).join('');
+  // Helper para slot de rondas posteriores
+  const slotR = (p) => `<div class="bk-slot">${p ? mkBkPartido(p, null) : empty()}</div>`;
 
-  const connDer = (n) => Array.from({length:n/2}).map(() =>
-    `<div style="flex:1;display:flex;flex-direction:column">
-      <div class="bk-conn-der-top"></div>
-      <div class="bk-conn-der-bottom"></div>
-    </div>`
-  ).join('');
+  // 4 slots vacíos para rondas sin datos
+  const emptySlots = (n) => Array.from({length:n}).map(() => `<div class="bk-slot">${empty()}</div>`).join('');
 
-  // Mitades del bracket
-  const izq32 = p32.slice(0, 8);
-  const der32 = p32.slice(8, 16);
-  const izq8v = p8v.slice(0, 4);
-  const der8v = p8v.slice(4, 8);
-  const izqCu = pCu.slice(0, 2);
-  const derCu = pCu.slice(2, 4);
-  const izqSe = pSe.slice(0, 1);
-  const derSe = pSe.slice(1, 2);
+  div.innerHTML = `<div class="bracket-scroll">
+    <!-- Títulos -->
+    <div style="display:flex;align-items:flex-end;gap:0;margin-bottom:4px;padding-left:0">
+      <div style="min-width:120px" class="bracket-col-title">16avos</div>
+      <div style="width:14px"></div>
+      <div style="min-width:120px" class="bracket-col-title">8vos</div>
+      <div style="width:14px"></div>
+      <div style="min-width:110px" class="bracket-col-title">Cuartos</div>
+      <div style="width:14px"></div>
+      <div style="min-width:110px" class="bracket-col-title">Semis</div>
+      <div style="width:10px"></div>
+      <div style="min-width:120px" class="bracket-col-title">🏆 Final</div>
+      <div style="width:10px"></div>
+      <div style="min-width:110px" class="bracket-col-title">Semis</div>
+      <div style="width:14px"></div>
+      <div style="min-width:110px" class="bracket-col-title">Cuartos</div>
+      <div style="width:14px"></div>
+      <div style="min-width:120px" class="bracket-col-title">8vos</div>
+      <div style="width:14px"></div>
+      <div style="min-width:120px" class="bracket-col-title">16avos</div>
+    </div>
 
-  const mkRonda = (titulo, izqSlots, derSlots, connN) => {
-    const izqHtml = izqSlots.map((p,i) => slot(p, i+1)).join('');
-    const derHtml = derSlots.map((p,i) => slot(p, izqSlots.length+i+1)).join('');
-    return `
-      <div class="bracket-ronda-titulo">${titulo}</div>
-      <div class="bracket-dos-col">
-        <div class="bracket-col-izq">${izqHtml}</div>
-        <div class="bracket-centro" style="display:flex;flex-direction:column">
-          ${connN > 0 ? connIzq(connN) : ''}
-        </div>
-        <div class="bracket-col-der">${derHtml}</div>
-      </div>`;
-  };
+    <!-- Bracket principal -->
+    <div style="display:flex;align-items:stretch;gap:0">
 
-  // Para rondas donde hay conectores hacia la siguiente ronda
-  const mkRondaConn = (titulo, izqSlots, derSlots, connNizq, connNder) => {
-    const izqHtml = izqSlots.map((p,i) => slot(p, i+1)).join('');
-    const derHtml = derSlots.map((p,i) => slot(p, izqSlots.length+i+1)).join('');
-    return `
-      <div class="bracket-ronda-titulo">${titulo}</div>
-      <div style="display:grid;grid-template-columns:12px 1fr 12px 1fr 12px;gap:0;align-items:stretch">
-        <div style="display:flex;flex-direction:column">${connNizq>0?connDer(connNizq):''}</div>
-        <div class="bracket-col-izq">${izqHtml}</div>
-        <div style="display:flex;flex-direction:column">${connNizq>0?connIzq(connNizq):''}</div>
-        <div class="bracket-col-der">${derHtml}</div>
-        <div style="display:flex;flex-direction:column">${connNder>0?connDer(connNder):''}</div>
-      </div>`;
-  };
+      <!-- LLAVE IZQ-SUP: M73,M75 | M74,M77 -->
+      <div style="display:flex;flex-direction:column;min-width:120px">
+        <div class="bracket-col-title"></div>
+        ${slot('32_1')}
+        ${slot('32_4')}
+        ${slot('32_3')}
+        ${slot('32_6')}
+        ${slot('32_7')}
+        ${slot('32_8')}
+        ${slot('32_2')}
+        ${slot('32_5')}
+      </div>
 
-  let html = '<div class="bracket-scroll">';
+      <!-- Conector 16→8 izq -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+      </div>
 
-  // 16avos
-  html += mkRonda('16avos de Final', izq32, der32, 0);
+      <!-- 8VOS IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:120px;justify-content:space-around;padding-top:20px">
+        ${p8v[0] ? slotR(p8v[0]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[1] ? slotR(p8v[1]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[2] ? slotR(p8v[2]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[3] ? slotR(p8v[3]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
 
-  // 8vos con conectores desde 16avos
-  html += `
-    <div class="bracket-ronda-titulo">8vos de Final</div>
-    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
-      <div style="display:flex;flex-direction:column">${connDer(8)}</div>
-      <div class="bracket-col-izq">${izq8v.map((p,i)=>slot(p,i+1)).join('')||Array(4).fill(slot(null,0)).join('')}</div>
-      <div class="bracket-col-der">${der8v.map((p,i)=>slot(p,i+5)).join('')||Array(4).fill(slot(null,0)).join('')}</div>
-      <div style="display:flex;flex-direction:column">${connIzq(8)}</div>
-    </div>`;
+      <!-- Conector 8→Cuartos izq -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+      </div>
 
-  // Cuartos
-  html += `
-    <div class="bracket-ronda-titulo">Cuartos de Final</div>
-    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
-      <div style="display:flex;flex-direction:column">${connDer(4)}</div>
-      <div class="bracket-col-izq">${izqCu.map((p,i)=>slot(p,i+1)).join('')||Array(2).fill(slot(null,0)).join('')}</div>
-      <div class="bracket-col-der">${derCu.map((p,i)=>slot(p,i+3)).join('')||Array(2).fill(slot(null,0)).join('')}</div>
-      <div style="display:flex;flex-direction:column">${connIzq(4)}</div>
-    </div>`;
+      <!-- CUARTOS IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:110px;justify-content:space-around;padding-top:20px">
+        ${pCu[0] ? slotR(pCu[0]) : `<div class="bk-slot">${empty()}</div>`}
+        ${pCu[1] ? slotR(pCu[1]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
 
-  // Semis
-  html += `
-    <div class="bracket-ronda-titulo">Semifinales</div>
-    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
-      <div style="display:flex;flex-direction:column">${connDer(2)}</div>
-      <div class="bracket-col-izq">${izqSe.map((p,i)=>slot(p,i+1)).join('')||slot(null,0)}</div>
-      <div class="bracket-col-der">${derSe.map((p,i)=>slot(p,i+2)).join('')||slot(null,0)}</div>
-      <div style="display:flex;flex-direction:column">${connIzq(2)}</div>
-    </div>`;
+      <!-- Conector Cuartos→Semi izq -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-right-top"></div><div class="bk-right-bottom"></div></div>
+      </div>
 
-  // Final
-  const finalCard = pFi.length
-    ? mkBkPartido(pFi[0], null)
-    : `<div class="bk-empty" style="border-color:var(--verde);border-style:solid;border-width:1px">
-        <div style="text-align:center;font-size:.65rem;font-weight:700;color:var(--verde-texto);padding:6px">🏆 GRAN FINAL</div>
-        <div class="bk-empty-slot"></div><div class="bk-empty-slot"></div>
-      </div>`;
+      <!-- SEMI IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:110px;justify-content:space-around;padding-top:20px">
+        ${pSe[0] ? slotR(pSe[0]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
 
-  html += `
-    <div class="bracket-ronda-titulo">🏆 Gran Final</div>
-    <div style="display:grid;grid-template-columns:12px 1fr 12px;gap:0;align-items:stretch">
-      <div style="display:flex;flex-direction:column">${connDer(2)}</div>
-      <div>${finalCard}</div>
-      <div style="display:flex;flex-direction:column">${connIzq(2)}</div>
-    </div>`;
+      <!-- Conector Semi→Final izq -->
+      <div style="display:flex;align-items:center;width:10px;padding-top:20px">
+        <div class="bk-hline" style="width:10px"></div>
+      </div>
 
-  html += '</div>';
-  div.innerHTML = html;
+      <!-- FINAL -->
+      <div style="display:flex;flex-direction:column;min-width:120px;justify-content:center;padding-top:20px">
+        ${pFi[0] ? `<div style="text-align:center;font-size:.55rem;font-weight:700;color:var(--verde-texto);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">🏆 Gran Final</div>${mkBkPartido(pFi[0], null)}`
+          : `<div style="text-align:center;font-size:.6rem;font-weight:700;color:var(--verde-texto);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">🏆 Gran Final</div><div class="bk-slot" style="min-height:80px">${empty()}</div>`}
+      </div>
+
+      <!-- Conector Final→Semi der -->
+      <div style="display:flex;align-items:center;width:10px;padding-top:20px">
+        <div class="bk-hline" style="width:10px"></div>
+      </div>
+
+      <!-- SEMI DER -->
+      <div style="display:flex;flex-direction:column;min-width:110px;justify-content:space-around;padding-top:20px">
+        ${pSe[1] ? slotR(pSe[1]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
+
+      <!-- Conector Semi→Cuartos der -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+      </div>
+
+      <!-- CUARTOS DER -->
+      <div style="display:flex;flex-direction:column;min-width:110px;justify-content:space-around;padding-top:20px">
+        ${pCu[2] ? slotR(pCu[2]) : `<div class="bk-slot">${empty()}</div>`}
+        ${pCu[3] ? slotR(pCu[3]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
+
+      <!-- Conector Cuartos→8vos der -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+      </div>
+
+      <!-- 8VOS DER -->
+      <div style="display:flex;flex-direction:column;min-width:120px;justify-content:space-around;padding-top:20px">
+        ${p8v[4] ? slotR(p8v[4]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[5] ? slotR(p8v[5]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[6] ? slotR(p8v[6]) : `<div class="bk-slot">${empty()}</div>`}
+        ${p8v[7] ? slotR(p8v[7]) : `<div class="bk-slot">${empty()}</div>`}
+      </div>
+
+      <!-- Conector 8→16 der -->
+      <div style="display:flex;flex-direction:column;width:14px;padding-top:20px">
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column"><div class="bk-left-top"></div><div class="bk-left-bottom"></div></div>
+      </div>
+
+      <!-- LLAVE DER: M81,M84 | M83,M87 | M82,M88 | M85,M86 -->
+      <div style="display:flex;flex-direction:column;min-width:120px">
+        <div class="bracket-col-title"></div>
+        ${slot('32_10')}
+        ${slot('32_11')}
+        ${slot('32_16')}
+        ${slot('32_15')}
+        ${slot('32_9')}
+        ${slot('32_13')}
+        ${slot('32_12')}
+        ${slot('32_14')}
+      </div>
+
+    </div>
+  </div>`;
 }
 
 // ── PRE-CACHE EN BACKGROUND ──
