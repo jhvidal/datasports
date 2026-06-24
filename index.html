@@ -3576,11 +3576,9 @@ function renderLlaves() {
   actualizarTablaGrupos();
   const div = document.getElementById('llaves');
 
-  // Mapa de partidos por ID
   const pp = {};
   PARTIDOS.forEach(p => pp[p.id] = p);
 
-  // Slot vacío
   const empty = () => `<div style="background:var(--mid);border-radius:8px;border:1px dashed var(--borde);padding:6px 8px;min-height:58px;display:flex;flex-direction:column;justify-content:center">
     <div style="height:11px;background:var(--borde);border-radius:3px;margin:3px 0;opacity:.4"></div>
     <div style="height:11px;background:var(--borde);border-radius:3px;margin:3px 0;opacity:.4"></div>
@@ -3588,30 +3586,18 @@ function renderLlaves() {
 
   const slot = (id) => pp[id] ? mkBkPartido(pp[id], null) : empty();
 
-  // Conectores: derecha une 2→1
-  const connR2to1 = () => `
-    <div style="display:flex;flex-direction:column;width:12px;flex:1">
-      <div style="flex:1;border-right:2px solid var(--borde);border-bottom:2px solid var(--borde);border-radius:0 0 4px 0"></div>
-      <div style="flex:1;border-right:2px solid var(--borde);border-top:2px solid var(--borde);border-radius:0 4px 0 0"></div>
-    </div>`;
+  const connR = () => `<div style="display:flex;flex-direction:column;width:12px;flex:1">
+    <div style="flex:1;border-right:2px solid var(--borde);border-bottom:2px solid var(--borde);border-radius:0 0 4px 0"></div>
+    <div style="flex:1;border-right:2px solid var(--borde);border-top:2px solid var(--borde);border-radius:0 4px 0 0"></div>
+  </div>`;
 
-  // Conector izquierda une 2→1
-  const connL2to1 = () => `
-    <div style="display:flex;flex-direction:column;width:12px;flex:1">
-      <div style="flex:1;border-left:2px solid var(--borde);border-bottom:2px solid var(--borde);border-radius:0 0 0 4px"></div>
-      <div style="flex:1;border-left:2px solid var(--borde);border-top:2px solid var(--borde);border-radius:4px 0 0 0"></div>
-    </div>`;
+  const connL = () => `<div style="display:flex;flex-direction:column;width:12px;flex:1">
+    <div style="flex:1;border-left:2px solid var(--borde);border-bottom:2px solid var(--borde);border-radius:0 0 0 4px"></div>
+    <div style="flex:1;border-left:2px solid var(--borde);border-top:2px solid var(--borde);border-radius:4px 0 0 0"></div>
+  </div>`;
 
-  // Linea horizontal
   const hline = `<div style="width:10px;border-top:2px solid var(--borde);align-self:center;flex-shrink:0"></div>`;
 
-  // Columna de slots con espaciado igual
-  const colSlots = (ids) => ids.map(id => `
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3px 0">
-      ${slot(id)}
-    </div>`).join('');
-
-  // Columna de slots para rondas posteriores
   const p8v = PARTIDOS.filter(p => p.fase === 'Octavos');
   const pCu = PARTIDOS.filter(p => p.fase === 'Cuartos');
   const pSe = PARTIDOS.filter(p => p.fase === 'Semis');
@@ -3619,44 +3605,46 @@ function renderLlaves() {
 
   const slotPost = (p) => `<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3px 0">${p ? mkBkPartido(p, null) : empty()}</div>`;
 
-  // Orden oficial FIFA:
-  // Llave IZQ-SUP: M73(32_1), M75(32_4), M74(32_3), M77(32_6) → 8vos[0,1] → Cu[0] → Se[0]
-  // Llave IZQ-INF: M76(32_2), M78(32_5), M79(32_7), M80(32_8) → 8vos[2,3] → Cu[1] → Se[0]
-  // Llave DER-SUP: M83(32_11),M84(32_12),M81(32_10),M82(32_9) → 8vos[4,5] → Cu[2] → Se[1]
-  // Llave DER-INF: M88(32_13),M86(32_14),M87(32_15),M85(32_16)→ 8vos[6,7] → Cu[3] → Se[1]
+  // Orden oficial FIFA (según imagen oficial):
+  // LLAVE IZQ (arriba→abajo): P74, P77, P73, P75, P83, P84, P81, P82
+  // IDs: 32_3(P74), 32_6(P77), 32_1(P73), 32_4(P75), 32_11(P83), 32_12(P84), 32_10(P81), 32_9(P82)
+  const LIZ = ['32_3','32_6','32_1','32_4','32_11','32_12','32_10','32_9'];
 
-  const L1 = ['32_1','32_4','32_3','32_6'];
-  const L2 = ['32_2','32_5','32_7','32_8'];
-  const L3 = ['32_11','32_12','32_10','32_9'];
-  const L4 = ['32_13','32_14','32_15','32_16'];
+  // LLAVE DER (arriba→abajo): P76, P78, P79, P80, P86, P88, P85, P87
+  // IDs: 32_2(P76), 32_5(P78), 32_7(P79), 32_8(P80), 32_14(P86), 32_13(P88), 32_16(P85), 32_15(P87)
+  const LDER = ['32_2','32_5','32_7','32_8','32_14','32_13','32_16','32_15'];
 
-  // Conectores para 4 slots → 2 slots
-  const conn4to2 = (side) => {
-    const fn = side === 'R' ? connR2to1 : connL2to1;
-    return `<div style="display:flex;flex-direction:column;width:12px">
-      ${fn()}${fn()}
-    </div>`;
-  };
+  // 8vos según imagen: izq→ W89=P74+P77, W90=P73+P75, W93=P83+P84, W94=P81+P82
+  //                   der→ W91=P76+P78 (wait P91=W76+W78? ver imagen)
+  // Imagen: izq col: W89,W90 | W93,W94  der col: W91,W92 | W95,W96
+  // Cuartos: izq: W97=W89+W90, W98=W93+W94   der: W99=W91+W92, W100=W95+W96
+  // Semis: W101=W97+W98  W102=W99+W100
 
-  // Conectores para 2 slots → 1 slot
-  const conn2to1 = (side) => {
-    const fn = side === 'R' ? connR2to1 : connL2to1;
-    return `<div style="display:flex;flex-direction:column;width:12px">${fn()}</div>`;
-  };
+  // Ordenamos 8vos según imagen (izq arriba→abajo: P89,P90,P93,P94 / der: P91,P92,P95,P96)
+  // Como no tenemos los IDs de 8vos todavía, usamos el array en orden
+  const iz8v = [p8v[0], p8v[1], p8v[2], p8v[3]];
+  const de8v = [p8v[4], p8v[5], p8v[6], p8v[7]];
+  const izCu = [pCu[0], pCu[1]];
+  const deCu = [pCu[2], pCu[3]];
 
-  // Título
+  const colSlots = (ids) => ids.map(id => `
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3px 0">
+      ${slot(id)}
+    </div>`).join('');
+
+  const col4conn = (side) => `<div style="display:flex;flex-direction:column;width:12px">
+    ${side==='R' ? connR()+connR()+connR()+connR() : connL()+connL()+connL()+connL()}
+  </div>`;
+
+  const col2conn = (side) => `<div style="display:flex;flex-direction:column;width:12px">
+    ${side==='R' ? connR()+connR() : connL()+connL()}
+  </div>`;
+
+  const col1conn = (side) => `<div style="display:flex;flex-direction:column;width:12px">
+    ${side==='R' ? connR() : connL()}
+  </div>`;
+
   const title = (t) => `<div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--verde-texto);text-align:center;padding-bottom:6px;white-space:nowrap">${t}</div>`;
-
-  // Columna con título y slots
-  const colT = (tit, slots, minW='130px') => `
-    <div style="display:flex;flex-direction:column;min-width:${minW}">
-      ${title(tit)}
-      <div style="display:flex;flex-direction:column;flex:1">
-        ${slots}
-      </div>
-    </div>`;
-
-  const spacer = (w='12px') => `<div style="width:${w};flex-shrink:0"></div>`;
 
   const finalCard = pFi[0]
     ? mkBkPartido(pFi[0], null)
@@ -3667,46 +3655,85 @@ function renderLlaves() {
        </div>`;
 
   div.innerHTML = `<div style="overflow-x:auto;padding:8px 4px 24px">
-    <div style="display:flex;align-items:stretch;min-width:900px;gap:0">
+    <div style="display:flex;align-items:stretch;min-width:920px;gap:0">
 
-      <!-- LLAVE IZQ: L1 arriba, L2 abajo -->
-      ${colT('16avos', colSlots(L1) + colSlots(L2), '130px')}
-      ${conn4to2('R')}${conn4to2('R')}
+      <!-- 16avos IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:128px">
+        ${title('16avos')}
+        ${colSlots(LIZ)}
+      </div>
 
-      <!-- 8VOS IZQ -->
-      ${colT('8vos', [0,1,2,3].map(i => slotPost(p8v[i])).join(''), '120px')}
-      ${conn2to1('R')}${conn2to1('R')}
+      <!-- conector 16→8 izq -->
+      ${col4conn('R')}
 
-      <!-- CUARTOS IZQ -->
-      ${colT('Cuartos', [0,1].map(i => slotPost(pCu[i])).join(''), '115px')}
-      ${conn2to1('R')}
+      <!-- 8vos IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:118px;padding-top:20px">
+        ${title('8vos')}
+        ${iz8v.map(p => slotPost(p)).join('')}
+      </div>
 
-      <!-- SEMI IZQ -->
-      ${colT('Semis', [slotPost(pSe[0])].join(''), '115px')}
-      ${hline}
+      <!-- conector 8→Cuartos izq -->
+      ${col2conn('R')}
+
+      <!-- Cuartos IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:112px;padding-top:20px">
+        ${title('Cuartos')}
+        ${izCu.map(p => slotPost(p)).join('')}
+      </div>
+
+      <!-- conector Cuartos→Semi izq -->
+      ${col1conn('R')}
+
+      <!-- Semi IZQ -->
+      <div style="display:flex;flex-direction:column;min-width:108px;padding-top:20px">
+        ${title('Semis')}
+        ${[pSe[0]].map(p => slotPost(p)).join('')}
+      </div>
+
+      <!-- hline izq→final -->
+      <div style="display:flex;align-items:center;width:10px;padding-top:20px">${hline}</div>
 
       <!-- FINAL -->
-      <div style="display:flex;flex-direction:column;min-width:130px">
+      <div style="display:flex;flex-direction:column;min-width:128px;justify-content:center;padding-top:20px">
         ${title('🏆 Final')}
         <div style="display:flex;flex-direction:column;flex:1;justify-content:center">${finalCard}</div>
       </div>
 
-      ${hline}
+      <!-- hline final→der -->
+      <div style="display:flex;align-items:center;width:10px;padding-top:20px">${hline}</div>
 
-      <!-- SEMI DER -->
-      ${colT('Semis', [slotPost(pSe[1])].join(''), '115px')}
-      ${conn2to1('L')}
+      <!-- Semi DER -->
+      <div style="display:flex;flex-direction:column;min-width:108px;padding-top:20px">
+        ${title('Semis')}
+        ${[pSe[1]].map(p => slotPost(p)).join('')}
+      </div>
 
-      <!-- CUARTOS DER -->
-      ${colT('Cuartos', [2,3].map(i => slotPost(pCu[i])).join(''), '115px')}
-      ${conn2to1('L')}${conn2to1('L')}
+      <!-- conector Semi→Cuartos der -->
+      ${col1conn('L')}
 
-      <!-- 8VOS DER -->
-      ${colT('8vos', [4,5,6,7].map(i => slotPost(p8v[i])).join(''), '120px')}
-      ${conn4to2('L')}${conn4to2('L')}
+      <!-- Cuartos DER -->
+      <div style="display:flex;flex-direction:column;min-width:112px;padding-top:20px">
+        ${title('Cuartos')}
+        ${deCu.map(p => slotPost(p)).join('')}
+      </div>
 
-      <!-- LLAVE DER: L3 arriba, L4 abajo -->
-      ${colT('16avos', colSlots(L3) + colSlots(L4), '130px')}
+      <!-- conector Cuartos→8vos der -->
+      ${col2conn('L')}
+
+      <!-- 8vos DER -->
+      <div style="display:flex;flex-direction:column;min-width:118px;padding-top:20px">
+        ${title('8vos')}
+        ${de8v.map(p => slotPost(p)).join('')}
+      </div>
+
+      <!-- conector 8→16 der -->
+      ${col4conn('L')}
+
+      <!-- 16avos DER -->
+      <div style="display:flex;flex-direction:column;min-width:128px">
+        ${title('16avos')}
+        ${colSlots(LDER)}
+      </div>
 
     </div>
   </div>`;
