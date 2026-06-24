@@ -552,6 +552,13 @@
   }
 
   .mundial-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
+  .comp-tab {
+    flex:1; padding:10px 4px; font-size:.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.3px; background:none;
+    border:none; border-bottom:2px solid transparent;
+    color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif;
+    transition:color .15s, border-color .15s;
+  }
   .comp-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
   .mundial-tab {
     flex:1; padding:10px 4px; font-size:.78rem; font-weight:700;
@@ -854,8 +861,8 @@
       <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.9rem;"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
-      <button class="comp-tab active" id="ct-fixture" onclick="showCompTab('fixture')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fixture</button>
-      <button class="comp-tab" id="ct-posiciones" onclick="showCompTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Posiciones</button>
+      <button class="comp-tab" id="ct-fixture" onclick="showCompTab('fixture')">Fixture</button>
+      <button class="comp-tab" id="ct-posiciones" onclick="showCompTab('posiciones')">Posiciones</button>
     </div>
     <div id="comp-fixture-wrap" style="padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
     <div id="comp-posiciones-wrap" style="display:none;padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
@@ -2274,7 +2281,7 @@ function calcularPosiciones() {
 // ESTADO UI
 // ═══════════════════════════════════════════════
 const DIAS_ES  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-const MESES_ES = ['Jun','Jul','Ago'];
+const MESES_ES = ['Jun','Jul','Ago','Sep'];
 
 let tabActual     = 'fixture';
 let faseActual    = 'todos';
@@ -2350,9 +2357,9 @@ function showCompTab(tab) {
   compTabActual = tab;
   document.getElementById('comp-fixture-wrap').style.display = tab==='fixture' ? '' : 'none';
   document.getElementById('comp-posiciones-wrap').style.display = tab==='posiciones' ? '' : 'none';
-  document.querySelectorAll('.comp-tab').forEach(b=>{ b.style.color='var(--muted)'; b.style.borderBottomColor='transparent'; });
+  document.querySelectorAll('.comp-tab').forEach(b => b.classList.remove('active'));
   const ct = document.getElementById('ct-'+tab);
-  if (ct) { ct.style.color='var(--texto)'; ct.style.borderBottomColor='var(--verde-texto)'; }
+  if (ct) ct.classList.add('active');
 }
 
 async function cargarCompActual() {
@@ -2437,6 +2444,11 @@ async function cargarCompActual() {
         return 99;
       };
 
+      // Filtrar desde ayer en adelante para no mostrar todo el historial
+      const ayerTs = Date.now() - 24*60*60*1000;
+      const fixturesFiltrados = fixtures.filter(f => new Date(f.fixture.date).getTime() >= ayerTs);
+      if (fixturesFiltrados.length > 0) fixtures = fixturesFiltrados;
+
       // Agrupar por ronda
       const porRonda = {};
       fixtures.forEach(f => {
@@ -2517,6 +2529,10 @@ async function cargarCompActual() {
             // Group Stage - 1 → Fecha 1
             const mGS = ronda.match(/Group Stage\s*[-–]\s*(\d+)/i);
             if (mGS) return 'Fecha ' + mGS[1];
+            // Group X → Grupo X
+            const mG = ronda.match(/^Group\s+([A-Z0-9]+)$/i);
+            if (mG) return 'Grupo ' + mG[1].toUpperCase();
+            if (/3rd place/i.test(ronda)) return 'Tercer Puesto';
             // Round of 16 → 16avos de Final
             if (/round of 16/i.test(ronda)) return '16avos de Final';
             if (/round of 32/i.test(ronda)) return '16avos de Final';
@@ -2765,10 +2781,19 @@ function resultadoBadge(p) {
 }
 
 // Hora o FIN según estado
-function horaOFin(p) {
+function horaOFin(p, mostrarFecha=false) {
   const r = RESULTADOS[p.id];
   if (r?.estado === 'ft') return '<span class="hora-fin">FIN</span>';
   if (r?.estado === 'live') return `<span class="hora-live">${r.min ? r.min+"'" : 'EN VIVO'}</span>`;
+  if (mostrarFecha) {
+    const hoy = fechaHoyARG();
+    if (p.fecha !== hoy) {
+      const d = new Date(p.fecha+'T12:00:00');
+      const dia = d.getDate();
+      const mes = MESES_ES[d.getMonth()-5] || '';
+      return `<span class="hora" style="font-size:.65rem">${dia} ${mes}<br>${p.hora}</span>`;
+    }
+  }
   return `<span class="hora">${p.hora}</span>`;
 }
 
@@ -2780,7 +2805,7 @@ function buildFechaChips() {
     const d = new Date(f+'T12:00:00');
     const dow = DIAS_ES[d.getDay()];
     const num = d.getDate();
-    const mes = MESES_ES[d.getMonth()-6] || '';
+    const mes = MESES_ES[d.getMonth()-5] || '';
     return `<div class="fecha-chip ${fechaActiva===f?'active':''} ${f===hoy?'hoy-chip':''}"
       data-fecha="${f}"
       onclick="toggleFecha('${f}')">
@@ -2916,7 +2941,7 @@ function render() {
     const rows    = info.partidos.map(p => {
       const match = busqueda ? normalize(p.local+p.visita).includes(normalize(busqueda)) : false;
       return `<div class="partido ${match?'partido-highlight':''}" onclick="abrirPartido('${p.id}')">
-        <div style="width:50px;flex-shrink:0">${horaOFin(p)}</div>
+        <div style="width:50px;flex-shrink:0">${horaOFin(p, !!busqueda)}</div>
         <div class="partido-info">
           <div class="equipos">
             <span class="equipo-nombre local">
@@ -3420,6 +3445,29 @@ const FASES_ELIM = [
   { nombre:'Gran Final',       fase:'Final',   icono:'🏆' },
 ];
 
+// Resuelve "1°A", "2°B", "3°A/B/C" al equipo real según posiciones actuales
+let TABLA_GRUPOS = {};
+function actualizarTablaGrupos() {
+  const pos = calcularPosiciones();
+  TABLA_GRUPOS = {};
+  for (const [g, filas] of Object.entries(pos)) {
+    TABLA_GRUPOS[g] = filas.map(f => ({ equipo: f.nombre, pts: f.PTS, pj: f.PJ }));
+  }
+}
+
+function resolverEquipo(slot) {
+  if (!slot || !slot.includes('°')) return slot;
+  const m = slot.match(/^([123])°([A-L])(?:\/|$)/);
+  if (!m) return slot;
+  const pos = parseInt(m[1]);
+  const grupo = m[2];
+  const tabla = TABLA_GRUPOS[grupo];
+  if (!tabla || tabla.length < pos) return slot;
+  // Solo proyectar si el equipo ya jugó al menos 1 partido
+  if (tabla[pos-1]?.pj === 0) return slot;
+  return tabla[pos-1]?.equipo || slot;
+}
+
 function mkBkPartido(p, num) {
   const r   = RESULTADOS[p.id];
   const ft  = r?.estado === 'ft';
@@ -3437,27 +3485,34 @@ function mkBkPartido(p, num) {
   const numBadge = num != null
     ? `<span class="bk-num">${num}</span>` : '';
 
+  // Resolver equipos reales si aún son "1°A", "2°B" etc.
+  const localReal   = ft || lv ? p.local   : (resolverEquipo(p.local)   || p.local);
+  const visitaReal  = ft || lv ? p.visita  : (resolverEquipo(p.visita)  || p.visita);
+  const esProyeccion = !ft && !lv && (localReal !== p.local || visitaReal !== p.visita);
+
   return `<div class="bk-partido ${lv?'live-now':''}">
     <div class="bk-meta">
       ${numBadge}
       <span class="bk-meta-fecha">${fechaCorta}</span>
       <span class="bk-meta-hora">${p.hora}</span>
       ${lv?'<span class="bk-live-pip"></span>':''}
+      ${esProyeccion?'<span style="font-size:.55rem;color:var(--muted);margin-left:2px">proyec.</span>':''}
     </div>
     <div class="bk-eq ${clsL} ${ft||lv?'definido':''}">
-      <span class="bk-eq-flag">${flag(p.local)}</span>
-      <span class="bk-eq-name">${p.local}</span>
+      <span class="bk-eq-flag">${flag(localReal)}</span>
+      <span class="bk-eq-name">${localReal}</span>
       ${ft||lv?`<span class="bk-eq-gol">${r.gL}</span>`:''}
     </div>
     <div class="bk-eq ${clsV} ${ft||lv?'definido':''}">
-      <span class="bk-eq-flag">${flag(p.visita)}</span>
-      <span class="bk-eq-name">${p.visita}</span>
+      <span class="bk-eq-flag">${flag(visitaReal)}</span>
+      <span class="bk-eq-name">${visitaReal}</span>
       ${ft||lv?`<span class="bk-eq-gol">${r.gV}</span>`:''}
     </div>
   </div>`;
 }
 
 function renderLlaves() {
+  actualizarTablaGrupos(); // actualizar proyecciones con resultados actuales
   const div = document.getElementById('llaves');
   // Numerado global continuo por fase
   const contadores = { '32vos':1, 'Octavos':1, 'Cuartos':1, 'Semis':1, 'Final':1 };
