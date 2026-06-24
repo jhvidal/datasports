@@ -42,7 +42,7 @@
   }
 
   /* ── HEADER ── */
-  /* ── DRAWER MENU ── */
+  /* ── DRAWER MENU (mobile) ── */
   .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; }
   .drawer-overlay.open { display:flex; justify-content:flex-end; }
   .drawer {
@@ -64,17 +64,16 @@
   .drawer-item.active .drawer-item-label { color:var(--verde); font-weight:700; }
 
   /* ── SIDEBAR FIJO EN DESKTOP ── */
+  .sidebar-desktop { display:none; }
   @media (min-width:768px) {
-    .drawer-overlay { display:block !important; position:fixed; top:0; left:0; width:210px; height:100vh; background:none !important; z-index:29; pointer-events:none; }
-    .drawer-overlay .drawer {
-      width:210px; height:100vh; border-left:none;
-      border-right:1px solid var(--borde);
-      padding-top:90px; background:var(--fondo);
-      pointer-events:all;
+    .sidebar-desktop {
+      display:flex; flex-direction:column;
+      position:fixed; top:0; left:0; width:210px; height:100vh;
+      background:var(--fondo); border-right:1px solid var(--borde);
+      padding-top:90px; overflow-y:auto; z-index:29;
     }
-    .drawer-overlay .drawer-top { display:none; }
-    .drawer-close { display:none; }
     #app { margin-left:210px; }
+    .hamburguesa-btn { display:none; }
   }
 
   header {
@@ -724,7 +723,54 @@
 </head>
 <body>
 
-<!-- DRAWER -->
+<!-- SIDEBAR DESKTOP (fijo, solo visible en pantallas grandes) -->
+<div class="sidebar-desktop">
+  <div class="drawer-sec-title" style="padding:0 8px 5px">Mundial 2026</div>
+  <div class="drawer-item active" onclick="showTab('fixture')">
+    <span class="drawer-item-icon">⚽</span>
+    <span class="drawer-item-label">Fixture</span>
+  </div>
+  <div class="drawer-item" onclick="showTab('posiciones')">
+    <span class="drawer-item-icon">◫</span>
+    <span class="drawer-item-label">Grupos</span>
+  </div>
+  <div class="drawer-item" onclick="showTab('fase-final')">
+    <span class="drawer-item-icon">◈</span>
+    <span class="drawer-item-label">Fase Final</span>
+  </div>
+  <div class="drawer-sec-title" style="padding:12px 8px 5px">Argentina</div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">▣</span>
+    <span class="drawer-item-label">Primera Nacional</span>
+  </div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">▣</span>
+    <span class="drawer-item-label">Primera B Metro</span>
+  </div>
+  <div class="drawer-sec-title" style="padding:12px 8px 5px">Internacional</div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">◆</span>
+    <span class="drawer-item-label">Champions League</span>
+  </div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">◆</span>
+    <span class="drawer-item-label">La Liga</span>
+  </div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">◆</span>
+    <span class="drawer-item-label">Premier League</span>
+  </div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">◆</span>
+    <span class="drawer-item-label">Serie A</span>
+  </div>
+  <div class="drawer-item">
+    <span class="drawer-item-icon">◆</span>
+    <span class="drawer-item-label">Bundesliga</span>
+  </div>
+</div>
+
+<!-- DRAWER MOBILE -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)">
   <div class="drawer">
     <div class="drawer-top">
@@ -792,7 +838,7 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="toggleMenu()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0" aria-label="Menú">
+    <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0" aria-label="Menú">
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
