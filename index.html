@@ -553,7 +553,14 @@
 
   .mundial-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
   .comp-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
-  .mundial-tab { color:var(--muted) !important; border-bottom-color: transparent !important; }
+  .mundial-tab {
+    flex:1; padding:10px 4px; font-size:.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.3px; background:none;
+    border:none; border-bottom:2px solid transparent;
+    color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif;
+    transition:color .15s, border-color .15s;
+  }
+  .mundial-tab.active { color:var(--texto) !important; border-bottom-color:var(--verde-texto) !important; }
 
   .comp-grupo-header {
     display:flex; justify-content:space-between; align-items:center;
@@ -699,7 +706,7 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="partidoAbierto !== null ? abrirPartido(partidoAbierto) : cargarResultados()" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
+    <button onclick="if(partidoAbierto===null){cargarResultados()}else if(typeof partidoAbierto==='string'&&partidoAbierto.startsWith('menor_')){abrirPartidoMenor(parseInt(partidoAbierto.replace('menor_','')))}else{abrirPartido(partidoAbierto)}" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -739,9 +746,9 @@
 <!-- ══════════ FIXTURE TAB ══════════ -->
 <!-- sub-nav del Mundial -->
 <div style="display:flex;gap:0;border-bottom:1px solid var(--borde);background:var(--card);">
-  <button class="mundial-tab active" id="wt-fixture" onclick="showTab('fixture')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fixture</button>
-  <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Grupos</button>
-  <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')" style="flex:1;padding:10px 4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Inter',sans-serif;">Fase Final</button>
+  <button class="mundial-tab" id="wt-fixture" onclick="showTab('fixture')">Fixture</button>
+  <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')">Grupos</button>
+  <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')">Fase Final</button>
 </div>
 
 <div id="tab-fixture">
@@ -749,7 +756,7 @@
     <div class="search-box">
       <span>🔍</span>
       <input class="search-input" id="searchInput" type="search"
-        placeholder="Buscar selección o sede…" autocomplete="off" autocorrect="off" spellcheck="false">
+        placeholder="Buscar selección o equipo…" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     </div>
     <div class="sugerencias" id="sugerencias"></div>
@@ -1708,8 +1715,8 @@ async function abrirPartido(id) {
 
     const htmlResumen = `
       ${renderEventos('', goles)}
-      ${renderEventos('🟨🟥 Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
-      ${renderEventos('🔄 Cambios', cambios)}
+      ${renderEventos('Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
+      ${renderEventos('Cambios', cambios)}
       ${lineups.length >= 2 ? `
         <div class="po-seccion-titulo" style="margin-top:10px">👕 Formaciones</div>
         ${canchaHTML(lineups[0], lineups[1], eventos)}
@@ -1871,11 +1878,11 @@ async function abrirPartido(id) {
         </div>`;
       }
       return `<div class="po-seccion">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px">
+        ${titulo ? `<div style="border-top:1px solid var(--borde);margin:6px 0 4px"></div><div class="po-seccion-titulo">${titulo}</div>` : `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px">
           <div class="ev-col-header">${p.local}</div>
           <div class="ev-col-header" style="text-align:right">${p.visita}</div>
-        </div>
-        ${titulo ? `<div class="po-seccion-titulo">${titulo}</div>` : ''}
+        </div>`}
         ${rows}
       </div>`;
     }
@@ -2284,9 +2291,9 @@ function showTab(t) {
   ['fixture','posiciones','fase-final'].forEach(id => {
     document.getElementById('tab-'+id).style.display = t===id ? '' : 'none';
   });
-  document.querySelectorAll('.mundial-tab').forEach(b=>{ b.style.color='var(--muted)'; b.style.borderBottomColor='transparent'; });
+  document.querySelectorAll('.mundial-tab').forEach(b => b.classList.remove('active'));
   const wt = document.getElementById('wt-'+t);
-  if (wt) { wt.style.color='var(--texto)'; wt.style.borderBottomColor='var(--verde-texto)'; }
+  if (wt) wt.classList.add('active');
   if (t==='posiciones')    { buildGruposChips(); renderPosiciones(); }
   if (t==='fase-final') renderLlaves();
 }
@@ -2934,8 +2941,16 @@ function render() {
     const bloquesMenores = Object.entries(LIGAS_MENORES_INFO)
       .sort((a,b) => a[1].orden - b[1].orden)
       .map(([lid, infoLiga]) => {
-        const fixturesLiga = menoresDelDia[lid];
+        let fixturesLiga = menoresDelDia[lid];
         if (!fixturesLiga || !fixturesLiga.length) return '';
+        // Si hay búsqueda activa, filtrar solo los partidos que coincidan
+        if (busqueda) {
+          const q = normalize(busqueda);
+          fixturesLiga = fixturesLiga.filter(f =>
+            normalize(f.teams.home.name).includes(q) || normalize(f.teams.away.name).includes(q)
+          );
+          if (!fixturesLiga.length) return '';
+        }
         const abiertoMenor = diasAbiertos[fecha+'_'+lid] !== false;
         const tieneLiveMenor = fixturesLiga.some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short));
         const fixturesOrdenados = [...fixturesLiga].sort((a,b) => a.fixture.timestamp - b.fixture.timestamp);
@@ -3516,10 +3531,19 @@ const esAltaMadrugada = ahoraMins >= 0 && ahoraMins < 180; // entre 00:00 y 03:0
 const ayerFecha = (() => { const d = new Date(hoyFecha + 'T12:00:00'); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); })();
 const hayAyer = PARTIDOS.some(p => p.fecha === ayerFecha);
 const hayHoy  = PARTIDOS.some(p => p.fecha === hoyFecha);
-// Si es madrugada y hay partidos de ayer → mostrar ayer por defecto
-// (los partidos en vivo de ayer se detectan después de cargarResultados)
+// Si es madrugada, revisar localStorage para ver si había un partido en vivo ayer
+// Así arrancamos directo en el día correcto sin esperar a cargarResultados()
 if (esAltaMadrugada && hayAyer) {
-  fechaActiva = ayerFecha;
+  let hayVivoAyerCached = false;
+  try {
+    // Buscar en localStorage si algún partido de ayer estaba en vivo
+    const cacheKeys = Object.keys(localStorage).filter(k => k.startsWith('ds_'));
+    for (const k of cacheKeys) {
+      const val = JSON.parse(localStorage.getItem(k) || '{}');
+      if (val.estado === 'live') { hayVivoAyerCached = true; break; }
+    }
+  } catch(e) {}
+  fechaActiva = hayVivoAyerCached ? ayerFecha : (hayHoy ? hoyFecha : ayerFecha);
   buildFechaChips();
 } else if (hayHoy) {
   fechaActiva = hoyFecha;
@@ -3545,6 +3569,7 @@ function ajustarHeader() {
 ajustarHeader();
 window.addEventListener('resize', ajustarHeader);
 
+showTab('fixture');
 render();
 cargarResultados().then(() => {
   iniciarPolling();
