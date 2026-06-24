@@ -96,17 +96,10 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 210;
+    overflow: hidden;
   }
-  header::before {
-    content:''; position:absolute; top:-60px; right:-40px;
-    width:220px; height:220px; border-radius:50%;
-    border: 2px solid rgba(76,175,80,0.12);
-  }
-  header::after {
-    content:''; position:absolute; bottom:-50px; left:-30px;
-    width:140px; height:140px; border-radius:50%;
-    border: 2px solid rgba(76,175,80,0.08);
-  }
+  header::before { content:none; }
+  header::after  { content:none; }
   header h1 {
     font-family:'Inter',sans-serif;
     font-size: 2.6rem; letter-spacing:3px; color:#fff; line-height:1;
@@ -739,46 +732,46 @@
 <div id="sidebar-desktop">
   <div class="menu-sec-title">Mundial 2026</div>
   <div class="menu-item active" onclick="showTab('fixture');closeMenu()">
-    <span class="menu-item-icon">&#9917;</span>
     <span class="menu-item-label">Fixture</span>
   </div>
   <div class="menu-item" onclick="showTab('posiciones');closeMenu()">
-    <span class="menu-item-icon">&#9724;</span>
     <span class="menu-item-label">Grupos</span>
   </div>
   <div class="menu-item" onclick="showTab('fase-final');closeMenu()">
-    <span class="menu-item-icon">&#9670;</span>
     <span class="menu-item-label">Fase Final</span>
   </div>
   <div class="menu-sec-title">Argentina</div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9632;</span>
     <span class="menu-item-label">Primera Nacional</span>
   </div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9632;</span>
     <span class="menu-item-label">Primera B Metro</span>
   </div>
-  <div class="menu-sec-title">Internacional</div>
+  <div class="menu-sec-title">Sudamérica</div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">Copa Libertadores</span>
+  </div>
+  <div class="menu-item">
+    <span class="menu-item-label">Copa Sudamericana</span>
+  </div>
+  <div class="menu-sec-title">Europa</div>
+  <div class="menu-item">
     <span class="menu-item-label">Champions League</span>
   </div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9733;</span>
     <span class="menu-item-label">La Liga</span>
   </div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9733;</span>
     <span class="menu-item-label">Premier League</span>
   </div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9733;</span>
     <span class="menu-item-label">Serie A</span>
   </div>
   <div class="menu-item">
-    <span class="menu-item-icon">&#9733;</span>
     <span class="menu-item-label">Bundesliga</span>
+  </div>
+  <div class="menu-item">
+    <span class="menu-item-label">Ligue 1</span>
   </div>
 </div>
 
@@ -789,51 +782,48 @@
       <span class="drawer-titulo">Menú</span>
       <button class="drawer-close" onclick="toggleMenu()">✕</button>
     </div>
-
     <div class="drawer-sec-title">Mundial 2026</div>
     <div class="drawer-item active" onclick="showTab('fixture');closeMenu()">
-      <span class="drawer-item-icon">⚽</span>
       <span class="drawer-item-label">Fixture</span>
     </div>
     <div class="drawer-item" onclick="showTab('posiciones');closeMenu()">
-      <span class="drawer-item-icon">◫</span>
       <span class="drawer-item-label">Grupos</span>
     </div>
     <div class="drawer-item" onclick="showTab('fase-final');closeMenu()">
-      <span class="drawer-item-icon">◈</span>
       <span class="drawer-item-label">Fase Final</span>
     </div>
-
     <div class="drawer-sec-title">Argentina</div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">▣</span>
       <span class="drawer-item-label">Primera Nacional</span>
     </div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">▣</span>
       <span class="drawer-item-label">Primera B Metro</span>
     </div>
-
-    <div class="drawer-sec-title">Internacional</div>
+    <div class="drawer-sec-title">Sudamérica</div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">Copa Libertadores</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-label">Copa Sudamericana</span>
+    </div>
+    <div class="drawer-sec-title">Europa</div>
+    <div class="drawer-item">
       <span class="drawer-item-label">Champions League</span>
     </div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">◆</span>
       <span class="drawer-item-label">La Liga</span>
     </div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">◆</span>
       <span class="drawer-item-label">Premier League</span>
     </div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">◆</span>
       <span class="drawer-item-label">Serie A</span>
     </div>
     <div class="drawer-item">
-      <span class="drawer-item-icon">◆</span>
       <span class="drawer-item-label">Bundesliga</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-label">Ligue 1</span>
     </div>
   </div>
 </div>
@@ -850,7 +840,7 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0" aria-label="Menú">
+    <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:10" aria-label="Menú">
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
