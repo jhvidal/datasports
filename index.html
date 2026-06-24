@@ -42,19 +42,18 @@
   }
 
   /* ── HEADER ── */
-  /* ── DRAWER MENU (mobile) ── */
-  .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; }
-  .drawer-overlay.open { display:flex; justify-content:flex-end; }
-  .drawer {
-    width:260px; max-width:85vw; background:var(--card);
-    height:100%; overflow-y:auto;
-    border-left:1px solid var(--borde);
-    padding:16px; display:flex; flex-direction:column;
-  }
-  .drawer-top { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:4px; border-bottom:1px solid var(--borde); }
-  .drawer-titulo { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
-  .drawer-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:0; }
-  .drawer-sec-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; padding:12px 0 5px; border-bottom:1px solid var(--borde); margin-bottom:2px; }
+  /* ── MENU ITEMS (compartido mobile drawer + desktop sidebar) ── */
+  .menu-sec-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; padding:12px 8px 5px; border-bottom:1px solid var(--borde); margin-bottom:2px; }
+  .menu-item { display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:9px; cursor:pointer; transition:background .1s; }
+  .menu-item:hover { background:var(--mid); }
+  .menu-item.active { background:rgba(76,175,80,0.1); }
+  .menu-item-icon { font-size:14px; color:var(--muted); width:20px; text-align:center; flex-shrink:0; }
+  .menu-item.active .menu-item-icon { color:var(--verde); }
+  .menu-item-label { font-size:13px; color:var(--texto); }
+  .menu-item.active .menu-item-label { color:var(--verde); font-weight:700; }
+
+  /* estilos alias para drawer mobile */
+  .drawer-sec-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; padding:12px 8px 5px; border-bottom:1px solid var(--borde); margin-bottom:2px; }
   .drawer-item { display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:9px; cursor:pointer; transition:background .1s; }
   .drawer-item:hover { background:var(--mid); }
   .drawer-item.active { background:rgba(76,175,80,0.1); }
@@ -63,17 +62,31 @@
   .drawer-item-label { font-size:13px; color:var(--texto); }
   .drawer-item.active .drawer-item-label { color:var(--verde); font-weight:700; }
 
-  /* ── SIDEBAR FIJO EN DESKTOP ── */
-  .sidebar-desktop { display:none; }
+  /* ── DRAWER MOBILE ── */
+  .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:400; }
+  .drawer-overlay.open { display:flex; justify-content:flex-end; }
+  .drawer-panel {
+    width:260px; max-width:85vw; background:var(--card);
+    height:100%; overflow-y:auto;
+    border-left:1px solid var(--borde);
+    padding:16px; display:flex; flex-direction:column;
+  }
+  .drawer-top { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:4px; border-bottom:1px solid var(--borde); }
+  .drawer-titulo { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .drawer-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:0; line-height:1; }
+
+  /* ── SIDEBAR DESKTOP ── */
+  #sidebar-desktop {
+    display:none;
+    position:fixed; top:0; left:0; width:200px; height:100vh;
+    background:var(--fondo); border-right:1px solid var(--borde);
+    padding-top:85px; overflow-y:auto; z-index:28;
+    flex-direction:column;
+  }
   @media (min-width:768px) {
-    .sidebar-desktop {
-      display:flex; flex-direction:column;
-      position:fixed; top:0; left:0; width:210px; height:100vh;
-      background:var(--fondo); border-right:1px solid var(--borde);
-      padding-top:90px; overflow-y:auto; z-index:29;
-    }
-    #app { margin-left:210px; }
-    .hamburguesa-btn { display:none; }
+    #sidebar-desktop { display:flex; }
+    #app { margin-left:200px; }
+    .hamburguesa-btn { display:none !important; }
   }
 
   header {
@@ -723,56 +736,56 @@
 </head>
 <body>
 
-<!-- SIDEBAR DESKTOP (fijo, solo visible en pantallas grandes) -->
-<div class="sidebar-desktop">
-  <div class="drawer-sec-title" style="padding:0 8px 5px">Mundial 2026</div>
-  <div class="drawer-item active" onclick="showTab('fixture')">
-    <span class="drawer-item-icon">⚽</span>
-    <span class="drawer-item-label">Fixture</span>
+<!-- SIDEBAR DESKTOP -->
+<div id="sidebar-desktop">
+  <div class="menu-sec-title">Mundial 2026</div>
+  <div class="menu-item active" onclick="showTab('fixture');closeMenu()">
+    <span class="menu-item-icon">&#9917;</span>
+    <span class="menu-item-label">Fixture</span>
   </div>
-  <div class="drawer-item" onclick="showTab('posiciones')">
-    <span class="drawer-item-icon">◫</span>
-    <span class="drawer-item-label">Grupos</span>
+  <div class="menu-item" onclick="showTab('posiciones');closeMenu()">
+    <span class="menu-item-icon">&#9724;</span>
+    <span class="menu-item-label">Grupos</span>
   </div>
-  <div class="drawer-item" onclick="showTab('fase-final')">
-    <span class="drawer-item-icon">◈</span>
-    <span class="drawer-item-label">Fase Final</span>
+  <div class="menu-item" onclick="showTab('fase-final');closeMenu()">
+    <span class="menu-item-icon">&#9670;</span>
+    <span class="menu-item-label">Fase Final</span>
   </div>
-  <div class="drawer-sec-title" style="padding:12px 8px 5px">Argentina</div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">▣</span>
-    <span class="drawer-item-label">Primera Nacional</span>
+  <div class="menu-sec-title">Argentina</div>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9632;</span>
+    <span class="menu-item-label">Primera Nacional</span>
   </div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">▣</span>
-    <span class="drawer-item-label">Primera B Metro</span>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9632;</span>
+    <span class="menu-item-label">Primera B Metro</span>
   </div>
-  <div class="drawer-sec-title" style="padding:12px 8px 5px">Internacional</div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">◆</span>
-    <span class="drawer-item-label">Champions League</span>
+  <div class="menu-sec-title">Internacional</div>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">Champions League</span>
   </div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">◆</span>
-    <span class="drawer-item-label">La Liga</span>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">La Liga</span>
   </div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">◆</span>
-    <span class="drawer-item-label">Premier League</span>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">Premier League</span>
   </div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">◆</span>
-    <span class="drawer-item-label">Serie A</span>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">Serie A</span>
   </div>
-  <div class="drawer-item">
-    <span class="drawer-item-icon">◆</span>
-    <span class="drawer-item-label">Bundesliga</span>
+  <div class="menu-item">
+    <span class="menu-item-icon">&#9733;</span>
+    <span class="menu-item-label">Bundesliga</span>
   </div>
 </div>
 
 <!-- DRAWER MOBILE -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)">
-  <div class="drawer">
+  <div class="drawer-panel">
     <div class="drawer-top">
       <span class="drawer-titulo">Menú</span>
       <button class="drawer-close" onclick="toggleMenu()">✕</button>
