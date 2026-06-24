@@ -1311,7 +1311,7 @@ async function abrirPartido(id) {
       <div class="po-card">
         <div class="po-header">
           <button class="po-back" onclick="cerrarPartido()">← Volver</button>
-          <span class="po-fase">${p.grupo ? 'Grupo '+p.grupo : p.fase}</span>
+          <span class="po-fase">${p.grupo ? 'Grupo '+p.grupo : p.fase === '32vos' ? '16avos de Final' : p.fase === 'Octavos' ? '8vos de Final' : p.fase === 'Cuartos' ? 'Cuartos de Final' : p.fase === 'Semis' ? 'Semifinal' : p.fase === 'Final' ? 'Gran Final' : p.fase}</span>
         </div>
         <div class="po-marcador po-proxim">
           <div class="po-equipo">
@@ -1488,7 +1488,7 @@ async function abrirPartido(id) {
     <div class="po-card">
       <div class="po-header">
         <button class="po-back" onclick="cerrarPartido()">← Volver</button>
-        <span class="po-fase">${p.grupo ? 'Grupo '+p.grupo : p.fase}</span>
+        <span class="po-fase">${p.grupo ? 'Grupo '+p.grupo : p.fase === '32vos' ? '16avos de Final' : p.fase === 'Octavos' ? '8vos de Final' : p.fase === 'Cuartos' ? 'Cuartos de Final' : p.fase === 'Semis' ? 'Semifinal' : p.fase === 'Final' ? 'Gran Final' : p.fase}</span>
         ${estadoBadge}
       </div>
       <div class="po-marcador">
@@ -2948,8 +2948,8 @@ function render() {
         </div>
       </div>`;
     }).join('');
-    // Ligas menores (B Nacional, B Metro) para este día
-    const menoresDelDia = LIGAS_MENORES[fecha] || {};
+    // Ligas menores (B Nacional, B Metro) para este día — ocultar si hay filtro de fase
+    const menoresDelDia = faseActual !== 'todos' ? {} : (LIGAS_MENORES[fecha] || {});
     const bloquesMenores = Object.entries(LIGAS_MENORES_INFO)
       .sort((a,b) => a[1].orden - b[1].orden)
       .map(([lid, infoLiga]) => {
