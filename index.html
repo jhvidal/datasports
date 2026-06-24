@@ -631,24 +631,28 @@
   /* ── LLAVES ELIMINATORIAS — BRACKET ── */
   #tab-fase-final { padding:10px 12px 0; overflow-x:auto; }
 
-  /* ── BRACKET HORIZONTAL ── */
-  #tab-fase-final { overflow-x:auto; padding:0; }
-  .bracket-scroll { padding:16px 8px 24px; min-width:900px; }
-  .bracket-grid {
-    display:grid;
-    grid-template-columns: 160px 24px 130px 24px 130px 24px 130px 24px 130px 24px 130px 24px 160px;
-    align-items:stretch;
+  /* ── BRACKET MOBILE ── */
+  #tab-fase-final { padding:0; }
+  .bracket-scroll { padding:12px 8px 24px; }
+  .bracket-ronda-titulo {
+    font-size:.65rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:1px; color:var(--verde-texto); padding:12px 4px 6px;
+    display:flex; align-items:center; gap:8px;
   }
-  .bracket-col { display:flex; flex-direction:column; justify-content:space-around; gap:0; }
-  .bracket-col-title {
-    text-align:center; font-size:.6rem; font-weight:700; text-transform:uppercase;
-    letter-spacing:1px; color:var(--verde-texto); padding:0 0 8px;
+  .bracket-ronda-titulo::before,.bracket-ronda-titulo::after {
+    content:''; flex:1; height:1px; background:var(--borde);
   }
-  .bracket-connector { display:flex; flex-direction:column; justify-content:space-around; }
-  .bk-connector-pair { display:flex; flex-direction:column; flex:1; justify-content:center; }
-  .bk-conn-top    { flex:1; border-right:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 6px 0; }
-  .bk-conn-bottom { flex:1; border-right:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:0 6px 0 0; }
-  .bk-slot { flex:1; display:flex; flex-direction:column; justify-content:center; padding:3px 0; }
+  .bracket-dos-col {
+    display:grid; grid-template-columns:1fr 12px 1fr; gap:0; align-items:stretch;
+  }
+  .bracket-col-izq { display:flex; flex-direction:column; gap:4px; }
+  .bracket-col-der { display:flex; flex-direction:column; gap:4px; }
+  .bracket-centro { display:flex; flex-direction:column; justify-content:space-around; }
+  .bk-slot { display:flex; flex-direction:column; }
+  .bk-conn-izq-top    { flex:1; border-right:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 4px 0; }
+  .bk-conn-izq-bottom { flex:1; border-right:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:0 4px 0 0; }
+  .bk-conn-der-top    { flex:1; border-left:2px solid var(--borde); border-bottom:2px solid var(--borde); border-radius:0 0 0 4px; }
+  .bk-conn-der-bottom { flex:1; border-left:2px solid var(--borde); border-top:2px solid var(--borde); border-radius:4px 0 0 0; }
   /* Partido */
   .bk-partido {
     background:var(--card); border-radius:8px;
@@ -3578,147 +3582,122 @@ function renderLlaves() {
   actualizarTablaGrupos();
   const div = document.getElementById('llaves');
 
-  // Obtener partidos por fase
-  const p32 = PARTIDOS.filter(p => p.fase === '32vos');   // 16 partidos
-  const p8v = PARTIDOS.filter(p => p.fase === 'Octavos'); // 8 partidos (cuando existan)
-  const pCu = PARTIDOS.filter(p => p.fase === 'Cuartos'); // 4 partidos
-  const pSe = PARTIDOS.filter(p => p.fase === 'Semis');   // 2 partidos
-  const pFi = PARTIDOS.filter(p => p.fase === 'Final');   // 1 partido
+  const p32 = PARTIDOS.filter(p => p.fase === '32vos');
+  const p8v = PARTIDOS.filter(p => p.fase === 'Octavos');
+  const pCu = PARTIDOS.filter(p => p.fase === 'Cuartos');
+  const pSe = PARTIDOS.filter(p => p.fase === 'Semis');
+  const pFi = PARTIDOS.filter(p => p.fase === 'Final');
 
-  // Helper: slot vacío
   const empty = () => `<div class="bk-empty"><div class="bk-empty-slot"></div><div class="bk-empty-slot"></div></div>`;
+  const slot  = (p, num) => `<div class="bk-slot">${p ? mkBkPartido(p, num) : empty()}</div>`;
 
-  // Helper: partido o slot vacío
-  const slot = (p, num) => p ? mkBkPartido(p, num) : empty();
+  // Conectores: dado N partidos en columna izq, genera N/2 conectores
+  const connIzq = (n) => Array.from({length:n/2}).map(() =>
+    `<div style="flex:1;display:flex;flex-direction:column">
+      <div class="bk-conn-izq-top"></div>
+      <div class="bk-conn-izq-bottom"></div>
+    </div>`
+  ).join('');
 
-  // Helper: conectores entre rondas
-  // n = número de pares de partidos en la columna izquierda
-  const connectors = (n) => {
-    let html = '';
-    for (let i = 0; i < n; i++) {
-      html += `<div class="bk-connector-pair" style="flex:${2};display:flex;flex-direction:column">
-        <div class="bk-conn-top"></div>
-        <div class="bk-conn-bottom"></div>
-      </div>`;
-    }
-    return `<div class="bracket-connector" style="display:flex;flex-direction:column;gap:0">${html}</div>`;
-  };
+  const connDer = (n) => Array.from({length:n/2}).map(() =>
+    `<div style="flex:1;display:flex;flex-direction:column">
+      <div class="bk-conn-der-top"></div>
+      <div class="bk-conn-der-bottom"></div>
+    </div>`
+  ).join('');
 
-  // Construir cada ronda como columna de slots
-  const colSlots = (partidos, total, startIdx=0) => {
-    let html = '';
-    for (let i = 0; i < total; i++) {
-      html += `<div class="bk-slot">${slot(partidos[startIdx+i], startIdx+i+1)}</div>`;
-    }
-    return html;
-  };
+  // Mitades del bracket
+  const izq32 = p32.slice(0, 8);
+  const der32 = p32.slice(8, 16);
+  const izq8v = p8v.slice(0, 4);
+  const der8v = p8v.slice(4, 8);
+  const izqCu = pCu.slice(0, 2);
+  const derCu = pCu.slice(2, 4);
+  const izqSe = pSe.slice(0, 1);
+  const derSe = pSe.slice(1, 2);
 
-  // Layout: 16avos(16) → conector(8) → 8vos(8) → conector(4) → Cuartos(4) → conector(2) → Semis(2) → conector(1) → Final(1)
-  // En mobile mostramos esto scrolleable horizontalmente
-
-  // Mitad superior (partidos 1-8) y mitad inferior (partidos 9-16)
-  const top8  = p32.slice(0, 8);
-  const bot8  = p32.slice(8, 16);
-  const top8v = p8v.slice(0, 4);
-  const bot8v = p8v.slice(4, 8);
-  const topCu = pCu.slice(0, 2);
-  const botCu = pCu.slice(2, 4);
-  const topSe = pSe.slice(0, 1);
-  const botSe = pSe.slice(1, 2);
-
-  const mkCol = (slots, titulo='') => `
-    <div class="bracket-col">
-      ${titulo ? `<div class="bracket-col-title">${titulo}</div>` : '<div style="height:20px"></div>'}
-      ${slots}
-    </div>`;
-
-  const mkConn = (n) => `
-    <div style="display:flex;flex-direction:column;justify-content:space-around;padding-top:20px">
-      ${Array.from({length:n}).map(() => `
-        <div style="flex:1;display:flex;flex-direction:column">
-          <div style="flex:1;border-right:2px solid var(--borde);border-bottom:2px solid var(--borde);border-radius:0 0 6px 0"></div>
-          <div style="flex:1;border-right:2px solid var(--borde);border-top:2px solid var(--borde);border-radius:0 6px 0 0"></div>
-        </div>`).join('')}
-    </div>`;
-
-  const slotHtml = (p, num) => `<div class="bk-slot">${slot(p, num)}</div>`;
-
-  div.innerHTML = `<div class="bracket-scroll">
-    <!-- TÍTULO RONDAS -->
-    <div style="display:grid;grid-template-columns:160px 20px 140px 20px 140px 20px 140px 20px 100px 20px 140px 20px 140px 20px 140px 20px 160px;margin-bottom:8px;min-width:900px">
-      <div class="bracket-col-title">16avos</div><div></div>
-      <div class="bracket-col-title">8vos</div><div></div>
-      <div class="bracket-col-title">Cuartos</div><div></div>
-      <div class="bracket-col-title">Semis</div><div></div>
-      <div class="bracket-col-title">Final</div><div></div>
-      <div class="bracket-col-title">Semis</div><div></div>
-      <div class="bracket-col-title">Cuartos</div><div></div>
-      <div class="bracket-col-title">8vos</div><div></div>
-      <div class="bracket-col-title">16avos</div>
-    </div>
-
-    <!-- BRACKET -->
-    <div style="display:grid;grid-template-columns:160px 20px 140px 20px 140px 20px 140px 20px 100px 20px 140px 20px 140px 20px 140px 20px 160px;align-items:stretch;min-width:900px;gap:0">
-
-      <!-- 16avos TOP -->
-      <div class="bracket-col" style="gap:4px">
-        ${top8.map((p,i) => slotHtml(p, i+1)).join('')}
-      </div>
-
-      <!-- conector 16→8 top -->
-      ${mkConn(4)}
-
-      <!-- 8vos TOP -->
-      <div class="bracket-col" style="gap:4px;justify-content:space-around">
-        ${top8v.length ? top8v.map((p,i) => slotHtml(p, i+1)).join('') : Array(4).fill(`<div class="bk-slot">${empty()}</div>`).join('')}
-      </div>
-
-      <!-- conector 8→Cuartos top -->
-      ${mkConn(2)}
-
-      <!-- Cuartos TOP -->
-      <div class="bracket-col" style="gap:4px;justify-content:space-around">
-        ${topCu.length ? topCu.map((p,i) => slotHtml(p, i+1)).join('') : Array(2).fill(`<div class="bk-slot">${empty()}</div>`).join('')}
-      </div>
-
-      <!-- conector Cuartos→Semis top -->
-      ${mkConn(1)}
-
-      <!-- Semis TOP + Final + Semis BOT -->
-      <div class="bracket-col" style="gap:4px;justify-content:space-around">
-        ${topSe.length ? slotHtml(topSe[0], 1) : `<div class="bk-slot">${empty()}</div>`}
-        <div class="bk-slot" style="flex:2">
-          ${pFi.length ? `<div style="text-align:center;margin-bottom:4px"><span style="font-size:.55rem;font-weight:700;color:var(--verde-texto);text-transform:uppercase;letter-spacing:1px">🏆 Final</span></div>${mkBkPartido(pFi[0], null)}` : `<div class="bk-empty" style="border-color:var(--verde)"><div style="text-align:center;font-size:.6rem;color:var(--verde-texto);font-weight:700;padding:4px">🏆 FINAL</div><div class="bk-empty-slot"></div><div class="bk-empty-slot"></div></div>`}
+  const mkRonda = (titulo, izqSlots, derSlots, connN) => {
+    const izqHtml = izqSlots.map((p,i) => slot(p, i+1)).join('');
+    const derHtml = derSlots.map((p,i) => slot(p, izqSlots.length+i+1)).join('');
+    return `
+      <div class="bracket-ronda-titulo">${titulo}</div>
+      <div class="bracket-dos-col">
+        <div class="bracket-col-izq">${izqHtml}</div>
+        <div class="bracket-centro" style="display:flex;flex-direction:column">
+          ${connN > 0 ? connIzq(connN) : ''}
         </div>
-        ${botSe.length ? slotHtml(botSe[0], 2) : `<div class="bk-slot">${empty()}</div>`}
-      </div>
+        <div class="bracket-col-der">${derHtml}</div>
+      </div>`;
+  };
 
-      <!-- conector Semis→Cuartos bot -->
-      ${mkConn(1)}
+  // Para rondas donde hay conectores hacia la siguiente ronda
+  const mkRondaConn = (titulo, izqSlots, derSlots, connNizq, connNder) => {
+    const izqHtml = izqSlots.map((p,i) => slot(p, i+1)).join('');
+    const derHtml = derSlots.map((p,i) => slot(p, izqSlots.length+i+1)).join('');
+    return `
+      <div class="bracket-ronda-titulo">${titulo}</div>
+      <div style="display:grid;grid-template-columns:12px 1fr 12px 1fr 12px;gap:0;align-items:stretch">
+        <div style="display:flex;flex-direction:column">${connNizq>0?connDer(connNizq):''}</div>
+        <div class="bracket-col-izq">${izqHtml}</div>
+        <div style="display:flex;flex-direction:column">${connNizq>0?connIzq(connNizq):''}</div>
+        <div class="bracket-col-der">${derHtml}</div>
+        <div style="display:flex;flex-direction:column">${connNder>0?connDer(connNder):''}</div>
+      </div>`;
+  };
 
-      <!-- Cuartos BOT -->
-      <div class="bracket-col" style="gap:4px;justify-content:space-around">
-        ${botCu.length ? botCu.map((p,i) => slotHtml(p, i+3)).join('') : Array(2).fill(`<div class="bk-slot">${empty()}</div>`).join('')}
-      </div>
+  let html = '<div class="bracket-scroll">';
 
-      <!-- conector Cuartos→8vos bot -->
-      ${mkConn(2)}
+  // 16avos
+  html += mkRonda('16avos de Final', izq32, der32, 0);
 
-      <!-- 8vos BOT -->
-      <div class="bracket-col" style="gap:4px;justify-content:space-around">
-        ${bot8v.length ? bot8v.map((p,i) => slotHtml(p, i+5)).join('') : Array(4).fill(`<div class="bk-slot">${empty()}</div>`).join('')}
-      </div>
+  // 8vos con conectores desde 16avos
+  html += `
+    <div class="bracket-ronda-titulo">8vos de Final</div>
+    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
+      <div style="display:flex;flex-direction:column">${connDer(8)}</div>
+      <div class="bracket-col-izq">${izq8v.map((p,i)=>slot(p,i+1)).join('')||Array(4).fill(slot(null,0)).join('')}</div>
+      <div class="bracket-col-der">${der8v.map((p,i)=>slot(p,i+5)).join('')||Array(4).fill(slot(null,0)).join('')}</div>
+      <div style="display:flex;flex-direction:column">${connIzq(8)}</div>
+    </div>`;
 
-      <!-- conector 8→16 bot -->
-      ${mkConn(4)}
+  // Cuartos
+  html += `
+    <div class="bracket-ronda-titulo">Cuartos de Final</div>
+    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
+      <div style="display:flex;flex-direction:column">${connDer(4)}</div>
+      <div class="bracket-col-izq">${izqCu.map((p,i)=>slot(p,i+1)).join('')||Array(2).fill(slot(null,0)).join('')}</div>
+      <div class="bracket-col-der">${derCu.map((p,i)=>slot(p,i+3)).join('')||Array(2).fill(slot(null,0)).join('')}</div>
+      <div style="display:flex;flex-direction:column">${connIzq(4)}</div>
+    </div>`;
 
-      <!-- 16avos BOT -->
-      <div class="bracket-col" style="gap:4px">
-        ${bot8.map((p,i) => slotHtml(p, i+9)).join('')}
-      </div>
+  // Semis
+  html += `
+    <div class="bracket-ronda-titulo">Semifinales</div>
+    <div style="display:grid;grid-template-columns:12px 1fr 1fr 12px;gap:0;align-items:stretch">
+      <div style="display:flex;flex-direction:column">${connDer(2)}</div>
+      <div class="bracket-col-izq">${izqSe.map((p,i)=>slot(p,i+1)).join('')||slot(null,0)}</div>
+      <div class="bracket-col-der">${derSe.map((p,i)=>slot(p,i+2)).join('')||slot(null,0)}</div>
+      <div style="display:flex;flex-direction:column">${connIzq(2)}</div>
+    </div>`;
 
-    </div>
-  </div>`;
+  // Final
+  const finalCard = pFi.length
+    ? mkBkPartido(pFi[0], null)
+    : `<div class="bk-empty" style="border-color:var(--verde);border-style:solid;border-width:1px">
+        <div style="text-align:center;font-size:.65rem;font-weight:700;color:var(--verde-texto);padding:6px">🏆 GRAN FINAL</div>
+        <div class="bk-empty-slot"></div><div class="bk-empty-slot"></div>
+      </div>`;
+
+  html += `
+    <div class="bracket-ronda-titulo">🏆 Gran Final</div>
+    <div style="display:grid;grid-template-columns:12px 1fr 12px;gap:0;align-items:stretch">
+      <div style="display:flex;flex-direction:column">${connDer(2)}</div>
+      <div>${finalCard}</div>
+      <div style="display:flex;flex-direction:column">${connIzq(2)}</div>
+    </div>`;
+
+  html += '</div>';
+  div.innerHTML = html;
 }
 
 // ── PRE-CACHE EN BACKGROUND ──
