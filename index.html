@@ -42,13 +42,47 @@
   }
 
   /* ── HEADER ── */
+  /* ── DRAWER MENU ── */
+  .drawer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; }
+  .drawer-overlay.open { display:flex; justify-content:flex-end; }
+  .drawer {
+    width:260px; max-width:85vw; background:var(--card);
+    height:100%; overflow-y:auto;
+    border-left:1px solid var(--borde);
+    padding:16px; display:flex; flex-direction:column;
+  }
+  .drawer-top { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:4px; border-bottom:1px solid var(--borde); }
+  .drawer-titulo { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .drawer-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:0; }
+  .drawer-sec-title { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; padding:12px 0 5px; border-bottom:1px solid var(--borde); margin-bottom:2px; }
+  .drawer-item { display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:9px; cursor:pointer; transition:background .1s; }
+  .drawer-item:hover { background:var(--mid); }
+  .drawer-item.active { background:rgba(76,175,80,0.1); }
+  .drawer-item-icon { font-size:14px; color:var(--muted); width:20px; text-align:center; flex-shrink:0; }
+  .drawer-item.active .drawer-item-icon { color:var(--verde); }
+  .drawer-item-label { font-size:13px; color:var(--texto); }
+  .drawer-item.active .drawer-item-label { color:var(--verde); font-weight:700; }
+
+  /* ── SIDEBAR FIJO EN DESKTOP ── */
+  @media (min-width:768px) {
+    .drawer-overlay { display:block !important; position:fixed; top:0; left:0; width:210px; height:100vh; background:none; z-index:29; }
+    .drawer-overlay .drawer {
+      width:210px; height:100vh; border-left:none;
+      border-right:1px solid var(--borde);
+      padding-top:90px; background:var(--fondo);
+    }
+    .drawer-overlay .drawer-top { display:none; }
+    .drawer-close { display:none; }
+    #app { margin-left:210px; }
+  }
+
   header {
-    background: linear-gradient(135deg, var(--azul) 0%, #0e0e1a 100%);
+    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
     top: 0; left: 0; right: 0;
-    z-index: 30;
+    z-index: 210;
     overflow: hidden;
   }
   header::before {
@@ -689,6 +723,63 @@
 </head>
 <body>
 
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawerOutside(event)">
+  <div class="drawer">
+    <div class="drawer-top">
+      <span class="drawer-titulo">Menú</span>
+      <button class="drawer-close" onclick="toggleMenu()">✕</button>
+    </div>
+
+    <div class="drawer-sec-title">Mundial 2026</div>
+    <div class="drawer-item active" onclick="showTab('fixture');closeMenu()">
+      <span class="drawer-item-icon">⚽</span>
+      <span class="drawer-item-label">Fixture</span>
+    </div>
+    <div class="drawer-item" onclick="showTab('posiciones');closeMenu()">
+      <span class="drawer-item-icon">◫</span>
+      <span class="drawer-item-label">Grupos</span>
+    </div>
+    <div class="drawer-item" onclick="showTab('fase-final');closeMenu()">
+      <span class="drawer-item-icon">◈</span>
+      <span class="drawer-item-label">Fase Final</span>
+    </div>
+
+    <div class="drawer-sec-title">Argentina</div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">▣</span>
+      <span class="drawer-item-label">Primera Nacional</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">▣</span>
+      <span class="drawer-item-label">Primera B Metro</span>
+    </div>
+
+    <div class="drawer-sec-title">Internacional</div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">Champions League</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">La Liga</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">Premier League</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">Serie A</span>
+    </div>
+    <div class="drawer-item">
+      <span class="drawer-item-icon">◆</span>
+      <span class="drawer-item-label">Bundesliga</span>
+    </div>
+  </div>
+</div>
+
+<div id="app">
 <header>
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;">
     <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
@@ -700,7 +791,14 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="if(partidoAbierto===null){cargarResultados()}else if(typeof partidoAbierto==='string'&&partidoAbierto.startsWith('menor_')){abrirPartidoMenor(parseInt(partidoAbierto.replace('menor_','')))}else{abrirPartido(partidoAbierto)}" style="flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <button onclick="if(partidoAbierto===null){cargarResultados()}else if(typeof partidoAbierto==='string'&&partidoAbierto.startsWith('menor_')){abrirPartidoMenor(parseInt(partidoAbierto.replace('menor_','')))}else{abrirPartido(partidoAbierto)}" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;font-family:'Inter',sans-serif">↻</button>
+      <button onclick="toggleMenu()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center" aria-label="Menú">
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+      </button>
+    </div>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -3812,6 +3910,17 @@ ajustarHeader();
 window.addEventListener('resize', ajustarHeader);
 
 showTab('fixture');
+// ── DRAWER ──
+function toggleMenu() {
+  document.getElementById('drawerOverlay').classList.toggle('open');
+}
+function closeMenu() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+function closeDrawerOutside(e) {
+  if (e.target === document.getElementById('drawerOverlay')) closeMenu();
+}
+
 render();
 cargarResultados().then(() => {
   iniciarPolling();
@@ -3836,5 +3945,6 @@ cargarResultados().then(() => {
 });
 cargarFaseFinal();
 </script>
+</div>
 </body>
 </html>
