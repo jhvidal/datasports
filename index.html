@@ -539,7 +539,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: #1b5e20; border-top: none;
+    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -891,7 +891,6 @@
   <button class="mundial-tab" id="wt-fixture" onclick="showTab('fixture')">Fixture</button>
   <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')">Grupos</button>
   <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')">Fase Final</button>
-  <button class="mundial-tab" id="wt-ligas" onclick="showTab('ligas')">Ligas</button>
 </div>
 
 <div id="tab-ligas" style="display:none">
@@ -995,61 +994,38 @@
 
 <!-- TAB COMPETICIONES -->
 <div id="main-competiciones" style="display:none;">
-  <div style="padding:8px 0;">
 
-    <!-- MUNDIAL -->
-    <div class="comp-grupo comp-grupo-mundial">
-      <div class="comp-grupo-body" style="display:block;">
-        <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarComp(this)">FIFA World Cup 2026</button>
-      </div>
+  <!-- Desplegable de competiciones -->
+  <div style="padding:10px 14px;">
+    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1px solid var(--borde);border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:var(--texto);">
+      <span id="comp-selector-label">Seleccionar competición</span>
+      <span id="comp-selector-arrow" style="font-size:.8rem;color:var(--muted);transition:transform .2s">▾</span>
+    </button>
+    <div id="comp-selector-panel" style="display:none;background:var(--card);border:1px solid var(--borde);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;">
+      <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarCompDesde(this)">Mundial 2026</button>
+      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Argentina</div>
+      <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarCompDesde(this)">Liga Profesional</button>
+      <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarCompDesde(this)">Primera Nacional</button>
+      <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarCompDesde(this)">Copa Argentina</button>
+      <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarCompDesde(this)">Primera B Metro</button>
+      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Sudamérica</div>
+      <button class="comp-btn" data-league="13" data-season="2026" data-name="Copa Libertadores" onclick="seleccionarCompDesde(this)">Copa Libertadores</button>
+      <button class="comp-btn" data-league="11" data-season="2026" data-name="Copa Sudamericana" onclick="seleccionarCompDesde(this)">Copa Sudamericana</button>
+      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Europa</div>
+      <button class="comp-btn" data-league="2" data-season="2025" data-name="Champions League" onclick="seleccionarCompDesde(this)">Champions League</button>
+      <button class="comp-btn" data-league="39" data-season="2025" data-name="Premier League" onclick="seleccionarCompDesde(this)">Premier League</button>
+      <button class="comp-btn" data-league="140" data-season="2025" data-name="La Liga" onclick="seleccionarCompDesde(this)">La Liga</button>
+      <button class="comp-btn" data-league="135" data-season="2025" data-name="Serie A" onclick="seleccionarCompDesde(this)">Serie A</button>
+      <button class="comp-btn" data-league="78" data-season="2025" data-name="Bundesliga" onclick="seleccionarCompDesde(this)">Bundesliga</button>
+      <button class="comp-btn" data-league="61" data-season="2025" data-name="Ligue 1" onclick="seleccionarCompDesde(this)">Ligue 1</button>
     </div>
-
-    <!-- ARGENTINA -->
-    <div class="comp-grupo">
-      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
-        <span>Argentina</span><span class="comp-grupo-arrow">▾</span>
-      </div>
-      <div class="comp-grupo-body">
-        <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarComp(this)">Liga Profesional</button>
-        <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarComp(this)">Primera Nacional</button>
-        <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarComp(this)">Copa Argentina</button>
-        <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarComp(this)">Primera B Metro</button>
-      </div>
-    </div>
-
-    <!-- SUDAMÉRICA -->
-    <div class="comp-grupo">
-      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
-        <span>Sudamérica</span><span class="comp-grupo-arrow">▾</span>
-      </div>
-      <div class="comp-grupo-body">
-        <button class="comp-btn" data-league="13" data-season="2026" data-name="Copa Libertadores" onclick="seleccionarComp(this)">Copa Libertadores</button>
-        <button class="comp-btn" data-league="11" data-season="2026" data-name="Copa Sudamericana" onclick="seleccionarComp(this)">Copa Sudamericana</button>
-      </div>
-    </div>
-
-    <!-- EUROPA -->
-    <div class="comp-grupo">
-      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
-        <span>Europa</span><span class="comp-grupo-arrow">▾</span>
-      </div>
-      <div class="comp-grupo-body">
-        <button class="comp-btn" data-league="2" data-season="2025" data-name="Champions League" onclick="seleccionarComp(this)">Champions League</button>
-        <button class="comp-btn" data-league="39" data-season="2025" data-name="Premier League" onclick="seleccionarComp(this)">Premier League</button>
-        <button class="comp-btn" data-league="140" data-season="2025" data-name="La Liga" onclick="seleccionarComp(this)">La Liga</button>
-        <button class="comp-btn" data-league="135" data-season="2025" data-name="Serie A" onclick="seleccionarComp(this)">Serie A</button>
-        <button class="comp-btn" data-league="78" data-season="2025" data-name="Bundesliga" onclick="seleccionarComp(this)">Bundesliga</button>
-        <button class="comp-btn" data-league="61" data-season="2025" data-name="Ligue 1" onclick="seleccionarComp(this)">Ligue 1</button>
-      </div>
-    </div>
-
   </div>
 
-  <!-- Panel de fixture/posiciones (oculto hasta que se elige una competición) -->
+  <!-- Panel de fixture/posiciones -->
   <div id="comp-panel" style="display:none;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);border-top:1px solid var(--borde);">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);">
       <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">←</button>
-      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.9rem;"></span>
+      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.9rem;flex:1"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
       <button class="comp-tab" id="ct-fixture" onclick="showCompTab('fixture')">Fixture</button>
@@ -2525,6 +2501,31 @@ function showMainTab(tab) {
 function toggleCompGrupo(header) {
   header.classList.toggle('open');
   header.nextElementSibling.classList.toggle('open');
+}
+
+function toggleCompSelector() {
+  const panel = document.getElementById('comp-selector-panel');
+  const arrow = document.getElementById('comp-selector-arrow');
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? '' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function seleccionarCompDesde(btn) {
+  // Cerrar desplegable
+  document.getElementById('comp-selector-panel').style.display = 'none';
+  document.getElementById('comp-selector-arrow').style.transform = '';
+  // Actualizar label del botón
+  document.getElementById('comp-selector-label').textContent = btn.dataset.name;
+  // Marcar activo
+  document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  compRondaActiva = null;
+  compActual = { league: btn.dataset.league, season: btn.dataset.season, name: btn.dataset.name };
+  document.getElementById('comp-panel-titulo').textContent = btn.dataset.name;
+  document.getElementById('comp-panel').style.display = 'block';
+  showCompTab('fixture');
+  cargarCompActual();
 }
 
 function cerrarCompPanel() {
