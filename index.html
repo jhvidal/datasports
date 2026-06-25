@@ -539,7 +539,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--card); border-top: 1px solid var(--borde);
+    background: #1b5e20; border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -547,13 +547,13 @@
     flex: 1; display: flex; flex-direction: column; align-items: center;
     justify-content: center; padding: 8px 4px;
     cursor: pointer; background: none; border: none;
-    color: var(--muted); font-family: 'Inter', sans-serif;
+    color: rgba(255,255,255,0.55); font-family: 'Inter', sans-serif;
     font-size: .78rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .3px; border-top: 2px solid transparent;
     transition: color .2s, border-color .2s;
   }
   .sb-label { display: block; }
-  .sb-item.active { color: var(--texto); border-top-color: var(--verde-texto); }
+  .sb-item.active { color: #fff; border-top-color: #fff; }
   .main-content { 
     padding-top: var(--header-h); 
     padding-bottom: calc(var(--bottom-nav-h) + 8px); 
@@ -784,43 +784,43 @@
       <button class="drawer-close" onclick="toggleMenu()">✕</button>
     </div>
     <div class="drawer-sec-title">Mundial 2026</div>
-    <div class="drawer-item" id="dmenu-fixture" onclick="showTab('fixture');setDrawerActive('fixture');closeMenu()">
+    <div class="drawer-item" id="dmenu-fixture" onclick="showMainTab('partidos');showTab('fixture');setDrawerActive('fixture');closeMenu()">
       <span class="drawer-item-label">Fixture</span>
     </div>
-    <div class="drawer-item" id="dmenu-posiciones" onclick="showTab('posiciones');setDrawerActive('posiciones');closeMenu()">
+    <div class="drawer-item" id="dmenu-posiciones" onclick="showMainTab('partidos');showTab('posiciones');setDrawerActive('posiciones');closeMenu()">
       <span class="drawer-item-label">Grupos</span>
     </div>
-    <div class="drawer-item" id="dmenu-fase-final" onclick="showTab('fase-final');setDrawerActive('fase-final');closeMenu()">
+    <div class="drawer-item" id="dmenu-fase-final" onclick="showMainTab('partidos');showTab('fase-final');setDrawerActive('fase-final');closeMenu()">
       <span class="drawer-item-label">Fase Final</span>
     </div>
     <div class="drawer-sec-title">Argentina</div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('129','2026','Primera Nacional');closeMenu()">
+    <div class="drawer-item" id="dmenu-129" onclick="abrirDesdeDrawer('129','2026','Primera Nacional');closeMenu()">
       <span class="drawer-item-label">Primera Nacional</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('131','2026','Primera B Metro');closeMenu()">
+    <div class="drawer-item" id="dmenu-131" onclick="abrirDesdeDrawer('131','2026','Primera B Metro');closeMenu()">
       <span class="drawer-item-label">Primera B Metro</span>
     </div>
     <div class="drawer-sec-title">Sudamérica</div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('13','2026','Copa Libertadores');closeMenu()">
+    <div class="drawer-item" id="dmenu-13" onclick="abrirDesdeDrawer('13','2026','Copa Libertadores');closeMenu()">
       <span class="drawer-item-label">Copa Libertadores</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('11','2026','Copa Sudamericana');closeMenu()">
+    <div class="drawer-item" id="dmenu-11" onclick="abrirDesdeDrawer('11','2026','Copa Sudamericana');closeMenu()">
       <span class="drawer-item-label">Copa Sudamericana</span>
     </div>
     <div class="drawer-sec-title">Europa</div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('2','2025','Champions League');closeMenu()">
+    <div class="drawer-item" id="dmenu-2" onclick="abrirDesdeDrawer('2','2025','Champions League');closeMenu()">
       <span class="drawer-item-label">Champions League</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('140','2025','La Liga');closeMenu()">
+    <div class="drawer-item" id="dmenu-140" onclick="abrirDesdeDrawer('140','2025','La Liga');closeMenu()">
       <span class="drawer-item-label">La Liga</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('39','2025','Premier League');closeMenu()">
+    <div class="drawer-item" id="dmenu-39" onclick="abrirDesdeDrawer('39','2025','Premier League');closeMenu()">
       <span class="drawer-item-label">Premier League</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('135','2025','Serie A');closeMenu()">
+    <div class="drawer-item" id="dmenu-135" onclick="abrirDesdeDrawer('135','2025','Serie A');closeMenu()">
       <span class="drawer-item-label">Serie A</span>
     </div>
-    <div class="drawer-item" onclick="abrirDesdeDrawer('78','2025','Bundesliga');closeMenu()">
+    <div class="drawer-item" id="dmenu-78" onclick="abrirDesdeDrawer('78','2025','Bundesliga');closeMenu()">
       <span class="drawer-item-label">Bundesliga</span>
     </div>
     <div class="drawer-item">
@@ -841,11 +841,14 @@
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
     <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
-    <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:10" aria-label="Menú">
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:10">
+      <button onclick="cargarResultados()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.75rem;cursor:pointer" aria-label="Actualizar">↻</button>
+      <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center" aria-label="Menú">
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
       <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
     </button>
+    </div>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -888,6 +891,62 @@
   <button class="mundial-tab" id="wt-fixture" onclick="showTab('fixture')">Fixture</button>
   <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')">Grupos</button>
   <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')">Fase Final</button>
+  <button class="mundial-tab" id="wt-ligas" onclick="showTab('ligas')">Ligas</button>
+</div>
+
+<div id="tab-ligas" style="display:none">
+  <div style="padding:8px 0;">
+    <div class="comp-grupo comp-grupo-mundial">
+      <div class="comp-grupo-body" style="display:block;">
+        <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarComp(this)">FIFA World Cup 2026</button>
+      </div>
+    </div>
+    <div class="comp-grupo">
+      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
+        <span>Argentina</span><span class="comp-grupo-arrow">▾</span>
+      </div>
+      <div class="comp-grupo-body">
+        <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarComp(this)">Liga Profesional</button>
+        <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarComp(this)">Primera Nacional</button>
+        <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarComp(this)">Copa Argentina</button>
+        <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarComp(this)">Primera B Metro</button>
+      </div>
+    </div>
+    <div class="comp-grupo">
+      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
+        <span>Sudamérica</span><span class="comp-grupo-arrow">▾</span>
+      </div>
+      <div class="comp-grupo-body">
+        <button class="comp-btn" data-league="13" data-season="2026" data-name="Copa Libertadores" onclick="seleccionarComp(this)">Copa Libertadores</button>
+        <button class="comp-btn" data-league="11" data-season="2026" data-name="Copa Sudamericana" onclick="seleccionarComp(this)">Copa Sudamericana</button>
+      </div>
+    </div>
+    <div class="comp-grupo">
+      <div class="comp-grupo-header" onclick="toggleCompGrupo(this)">
+        <span>Europa</span><span class="comp-grupo-arrow">▾</span>
+      </div>
+      <div class="comp-grupo-body">
+        <button class="comp-btn" data-league="2" data-season="2025" data-name="Champions League" onclick="seleccionarComp(this)">Champions League</button>
+        <button class="comp-btn" data-league="39" data-season="2025" data-name="Premier League" onclick="seleccionarComp(this)">Premier League</button>
+        <button class="comp-btn" data-league="140" data-season="2025" data-name="La Liga" onclick="seleccionarComp(this)">La Liga</button>
+        <button class="comp-btn" data-league="135" data-season="2025" data-name="Serie A" onclick="seleccionarComp(this)">Serie A</button>
+        <button class="comp-btn" data-league="78" data-season="2025" data-name="Bundesliga" onclick="seleccionarComp(this)">Bundesliga</button>
+        <button class="comp-btn" data-league="61" data-season="2025" data-name="Ligue 1" onclick="seleccionarComp(this)">Ligue 1</button>
+      </div>
+    </div>
+  </div>
+  <div id="comp-panel2" style="display:none;">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);border-top:1px solid var(--borde);">
+      <button onclick="cerrarCompPanel2()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">←</button>
+      <span id="comp-panel-titulo2" style="color:var(--texto);font-weight:700;font-size:.9rem;"></span>
+    </div>
+    <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
+      <button class="comp-tab" id="ct-fixture2" onclick="showCompTab2('fixture')">Fixture</button>
+      <button class="comp-tab" id="ct-posiciones2" onclick="showCompTab2('posiciones')">Posiciones</button>
+    </div>
+    <div id="comp-fixture-wrap2" style="padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
+    <div id="comp-posiciones-wrap2" style="display:none;padding:8px 12px 0;"><div class="po-sin-datos">Cargando...</div></div>
+  </div>
 </div>
 
 <div id="tab-fixture">
@@ -2434,13 +2493,14 @@ let gruposAbiertos = {};
 // ═══════════════════════════════════════════════
 function showTab(t) {
   tabActual = t;
-  ['fixture','posiciones','fase-final'].forEach(id => {
-    document.getElementById('tab-'+id).style.display = t===id ? '' : 'none';
+  ['fixture','posiciones','fase-final','ligas'].forEach(id => {
+    const el = document.getElementById('tab-'+id);
+    if (el) el.style.display = t===id ? '' : 'none';
   });
   document.querySelectorAll('.mundial-tab').forEach(b => b.classList.remove('active'));
   const wt = document.getElementById('wt-'+t);
   if (wt) wt.classList.add('active');
-  if (t==='posiciones')    { buildGruposChips(); renderPosiciones(); }
+  if (t==='posiciones') { buildGruposChips(); renderPosiciones(); }
   if (t==='fase-final') renderLlaves();
 }
 
@@ -2478,10 +2538,19 @@ let compTabActual = 'fixture';
 function seleccionarComp(btn) {
   document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  compRondaActiva = null;
   compActual = { league: btn.dataset.league, season: btn.dataset.season, name: btn.dataset.name };
-  document.getElementById('comp-panel-titulo').textContent = btn.dataset.name;
-  document.getElementById('comp-panel').style.display = 'block';
-  showCompTab('fixture');
+  // Si estamos en tab-ligas, usar panel2; si no, usar panel original
+  const enLigas = document.getElementById('tab-ligas') && document.getElementById('tab-ligas').style.display !== 'none';
+  if (enLigas) {
+    document.getElementById('comp-panel-titulo2').textContent = btn.dataset.name;
+    document.getElementById('comp-panel2').style.display = 'block';
+    showCompTab2('fixture');
+  } else {
+    document.getElementById('comp-panel-titulo').textContent = btn.dataset.name;
+    document.getElementById('comp-panel').style.display = 'block';
+    showCompTab('fixture');
+  }
   cargarCompActual();
 }
 
@@ -2496,14 +2565,29 @@ function showCompTab(tab) {
   compTabActual = tab;
   document.getElementById('comp-fixture-wrap').style.display = tab==='fixture' ? '' : 'none';
   document.getElementById('comp-posiciones-wrap').style.display = tab==='posiciones' ? '' : 'none';
-  document.querySelectorAll('.comp-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#comp-panel .comp-tab').forEach(b => b.classList.remove('active'));
   const ct = document.getElementById('ct-'+tab);
   if (ct) ct.classList.add('active');
 }
 
+function showCompTab2(tab) {
+  document.getElementById('comp-fixture-wrap2').style.display = tab==='fixture' ? '' : 'none';
+  document.getElementById('comp-posiciones-wrap2').style.display = tab==='posiciones' ? '' : 'none';
+  document.querySelectorAll('#comp-panel2 .comp-tab').forEach(b => b.classList.remove('active'));
+  const ct = document.getElementById('ct-'+tab+'2');
+  if (ct) ct.classList.add('active');
+}
+
+function cerrarCompPanel2() {
+  document.getElementById('comp-panel2').style.display = 'none';
+}
+
 async function cargarCompActual() {
-  document.getElementById('comp-fixture-wrap').innerHTML = '<div class="po-sin-datos">Cargando...</div>';
-  document.getElementById('comp-posiciones-wrap').innerHTML = '<div class="po-sin-datos">Cargando...</div>';
+  const _enLigas = document.getElementById('tab-ligas') && document.getElementById('tab-ligas').style.display !== 'none';
+  const _fwId = _enLigas ? 'comp-fixture-wrap2' : 'comp-fixture-wrap';
+  const _pwId = _enLigas ? 'comp-posiciones-wrap2' : 'comp-posiciones-wrap';
+  document.getElementById(_fwId).innerHTML = '<div class="po-sin-datos">Cargando...</div>';
+  document.getElementById(_pwId).innerHTML = '<div class="po-sin-datos">Cargando...</div>';
   try {
     const [fixtData, standData] = await Promise.all([
       apiFetch(`fixtures?league=${compActual.league}&season=${compActual.season}`),
@@ -2562,7 +2646,7 @@ async function cargarCompActual() {
       if (filtrados.length > 0) fixtures = filtrados;
     }
     if (fixtures.length === 0) {
-      document.getElementById('comp-fixture-wrap').innerHTML = '<div class="po-sin-datos">Sin partidos disponibles</div>';
+      document.getElementById(_fwId).innerHTML = '<div class="po-sin-datos">Sin partidos disponibles</div>';
     } else {
       // Ordenar por fecha primero
       fixtures.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
@@ -2597,7 +2681,19 @@ async function cargarCompActual() {
       });
 
       // Ordenar rondas
-      const rondas = Object.keys(porRonda).sort((a,b) => rankRonda(b) - rankRonda(a));
+      let rondas = Object.keys(porRonda).sort((a,b) => rankRonda(b) - rankRonda(a));
+      // Si hay ronda activa seleccionada, mostrar solo esa
+      if (compRondaActiva && porRonda[compRondaActiva]) {
+        rondas = [compRondaActiva];
+      } else if (rondas.length > 0) {
+        // Mostrar solo la ronda más relevante por defecto (primera con NS o más reciente)
+        const rondasConNS = rondas.filter(r => porRonda[r].some(f => f.fixture.status.short === 'NS'));
+        const rondasConVivo = rondas.filter(r => porRonda[r].some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short)));
+        if (rondasConVivo.length > 0) rondas = [rondasConVivo[0]];
+        else if (rondasConNS.length > 0) rondas = [rondasConNS[0]];
+        else rondas = [rondas[0]];
+        compRondaActiva = rondas[0];
+      }
 
       const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
       let html = '';
@@ -2659,9 +2755,15 @@ async function cargarCompActual() {
           </div>`;
         }).join('');
 
+        const rondasArr = rondas;
+        const idxRonda = rondasArr.indexOf(ronda);
+        const prevRonda = idxRonda > 0 ? rondasArr[idxRonda-1] : null;
+        const nextRonda = idxRonda < rondasArr.length-1 ? rondasArr[idxRonda+1] : null;
+
         html += `<div class="dia-block">
-          <div class="dia-header" style="cursor:default">
-            <div class="dia-fecha">${(ronda => {
+          <div class="dia-header" style="cursor:default;justify-content:space-between">
+            <button onclick="navegarRondaComp('${prevRonda?.replace(/'/g,"\\'")}')" style="background:none;border:none;color:${prevRonda?'var(--verde-texto)':'var(--borde)'};cursor:${prevRonda?'pointer':'default'};font-size:1rem;padding:0 4px">‹</button>
+            <div class="dia-fecha" style="flex:1;text-align:center">${(ronda => {
             // Regular Season - 17 → Fecha 17
             const mRS = ronda.match(/Regular Season\s*[-–]\s*(\d+)/i);
             if (mRS) return 'Fecha ' + mRS[1];
@@ -2681,12 +2783,12 @@ async function cargarCompActual() {
             if (/3rd place/i.test(ronda)) return 'Tercer Puesto';
             return ronda;
           })(ronda)}</div>
-            <span class="dia-count">${partidos.length}p</span>
+            <button onclick="navegarRondaComp('${nextRonda?.replace(/'/g,"\\'")}')" style="background:none;border:none;color:${nextRonda?'var(--verde-texto)':'var(--borde)'};cursor:${nextRonda?'pointer':'default'};font-size:1rem;padding:0 4px">›</button>
           </div>
           <div class="partidos-list">${rows}</div>
         </div>`;
       });
-      document.getElementById('comp-fixture-wrap').innerHTML = html;
+      document.getElementById(_fwId).innerHTML = html;
       // Scroll al primer partido próximo (NS)
       setTimeout(() => {
         const wrap = document.getElementById('comp-fixture-wrap');
@@ -2717,21 +2819,27 @@ async function cargarCompActual() {
       } catch(e) {}
     }
     if (stands.length === 0) {
-      document.getElementById('comp-posiciones-wrap').innerHTML = '<div class="po-sin-datos">Sin posiciones disponibles</div>';
+      document.getElementById(_pwId).innerHTML = '<div class="po-sin-datos">Sin posiciones disponibles</div>';
     } else {
       let html = '';
       stands.forEach(grupo => {
         if (stands.length > 1) html += `<div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:10px 0 4px;letter-spacing:.5px;">${grupo[0]?.group || ''}</div>`;
-        html += `<table style="width:100%;border-collapse:collapse;font-size:.72rem;margin-bottom:12px;">
+        html += `<table style="width:100%;border-collapse:collapse;font-size:.72rem;margin-bottom:12px;table-layout:fixed">
+          <colgroup>
+            <col style="width:24px">
+            <col style="width:40%">
+            <col style="width:9%"><col style="width:9%"><col style="width:9%">
+            <col style="width:9%"><col style="width:9%"><col style="width:10%">
+          </colgroup>
           <thead><tr style="color:var(--muted);font-size:.62rem;text-transform:uppercase;">
-            <th style="text-align:left;padding:4px 0;width:20px;">#</th>
-            <th style="text-align:left;padding:4px 0;">Equipo</th>
-            <th style="padding:4px 4px;text-align:center;">PJ</th>
-            <th style="padding:4px 4px;text-align:center;">G</th>
-            <th style="padding:4px 4px;text-align:center;">E</th>
-            <th style="padding:4px 4px;text-align:center;">P</th>
-            <th style="padding:4px 4px;text-align:center;">DG</th>
-            <th style="padding:4px 4px;text-align:center;color:var(--texto);font-weight:700;">Pts</th>
+            <th style="text-align:left;padding:4px 2px;">#</th>
+            <th style="text-align:left;padding:4px 4px;">Equipo</th>
+            <th style="padding:4px 2px;text-align:center;">PJ</th>
+            <th style="padding:4px 2px;text-align:center;">G</th>
+            <th style="padding:4px 2px;text-align:center;">E</th>
+            <th style="padding:4px 2px;text-align:center;">P</th>
+            <th style="padding:4px 2px;text-align:center;">DG</th>
+            <th style="padding:4px 2px;text-align:center;color:var(--texto);font-weight:700;">Pts</th>
           </tr></thead><tbody>`;
         grupo.forEach(eq => {
           html += `<tr style="border-bottom:1px solid var(--borde);">
@@ -2750,10 +2858,10 @@ async function cargarCompActual() {
         });
         html += '</tbody></table>';
       });
-      document.getElementById('comp-posiciones-wrap').innerHTML = html;
+      document.getElementById(_pwId).innerHTML = html;
     }
   } catch(e) {
-    document.getElementById('comp-fixture-wrap').innerHTML = '<div class="po-sin-datos">Error cargando datos</div>';
+    document.getElementById(_fwId).innerHTML = '<div class="po-sin-datos">Error cargando datos</div>';
   }
 }
 
@@ -3970,18 +4078,34 @@ try {
 } catch(e) {}
 showTab('fixture');
 // ── DRAWER ──
+let compRondaActiva = null; // null = mostrar todas
+
+function navegarRondaComp(ronda) {
+  if (!ronda) return;
+  compRondaActiva = ronda;
+  cargarCompActual();
+}
+
 function abrirDesdeDrawer(league, season, name) {
-  // Ir a la pestaña Competiciones y abrir esa liga
-  showMainTab('competiciones');
+  compRondaActiva = null;
+  // Mostrar sección competiciones SIN autoSeleccionarMundial
+  ['partidos','competiciones','jugadores','noticias'].forEach(t => {
+    document.getElementById('main-'+t).style.display = t==='competiciones' ? '' : 'none';
+  });
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bn-competiciones').classList.add('active');
+
   compActual = { league, season, name };
   document.getElementById('comp-panel-titulo').textContent = name;
   document.getElementById('comp-panel').style.display = 'block';
   showCompTab('fixture');
   cargarCompActual();
-  // Marcar btn activo si existe
   document.querySelectorAll('.comp-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.league === league);
   });
+  document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active'));
+  const dmenu = document.getElementById('dmenu-' + league);
+  if (dmenu) dmenu.classList.add('active');
 }
 
 function setDrawerActive(tab) {
