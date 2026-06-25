@@ -14,7 +14,7 @@
   :root {
     --header-h: 80px;
     --sidebar-w: 160px;
-    --bottom-nav-h: 42px;
+    --bottom-nav-h: 48px;
     --azul:   #2A398D;
     --verde:  #4CAF50;
     --verde-texto: #2E7D32;
@@ -539,7 +539,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, #0f2d14 0%, #122016 100%); border-top: none;
+    background: linear-gradient(135deg, #2e5e35 0%, #2a5530 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -593,7 +593,7 @@
 
   .mundial-tab.active { color:var(--texto) !important; border-bottom-color: var(--verde-texto) !important; }
   .comp-tab {
-    flex:1; padding:10px 4px; font-size:.78rem; font-weight:700;
+    flex:1; padding:7px 4px; font-size:.72rem; font-weight:700;
     text-transform:uppercase; letter-spacing:.3px; background:none;
     border:none; border-bottom:2px solid transparent;
     color:var(--muted); cursor:pointer; font-family:'Inter',sans-serif;
@@ -996,8 +996,8 @@
 <div id="main-competiciones" style="display:none;">
 
   <!-- Desplegable de competiciones -->
-  <div style="padding:10px 14px;">
-    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card);border:1px solid var(--borde);border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:var(--texto);">
+  <div style="padding:8px 12px;">
+    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--borde);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:var(--texto);">
       <span id="comp-selector-label">Seleccionar competición</span>
       <span id="comp-selector-arrow" style="font-size:.8rem;color:var(--muted);transition:transform .2s">▾</span>
     </button>
@@ -1025,7 +1025,7 @@
   <div id="comp-panel" style="display:none;">
     <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);">
       <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">←</button>
-      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.9rem;flex:1"></span>
+      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.82rem;flex:1"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
       <button class="comp-tab" id="ct-fixture" onclick="showCompTab('fixture')">Fixture</button>
@@ -2835,12 +2835,12 @@ async function cargarCompActual() {
           <thead><tr style="color:var(--muted);font-size:.62rem;text-transform:uppercase;">
             <th style="text-align:left;padding:4px 2px;">#</th>
             <th style="text-align:left;padding:4px 4px;">Equipo</th>
+            <th style="padding:4px 2px;text-align:center;color:var(--texto);font-weight:700;">Pts</th>
             <th style="padding:4px 2px;text-align:center;">PJ</th>
             <th style="padding:4px 2px;text-align:center;">G</th>
             <th style="padding:4px 2px;text-align:center;">E</th>
             <th style="padding:4px 2px;text-align:center;">P</th>
             <th style="padding:4px 2px;text-align:center;">DG</th>
-            <th style="padding:4px 2px;text-align:center;color:var(--texto);font-weight:700;">Pts</th>
           </tr></thead><tbody>`;
         grupo.forEach(eq => {
           html += `<tr style="border-bottom:1px solid var(--borde);">
@@ -2849,12 +2849,12 @@ async function cargarCompActual() {
               <img src="${eq.team.logo}" width="16" height="16" style="object-fit:contain;" onerror="this.style.display='none'">
               <span style="color:var(--texto);font-weight:500;">${eq.team.name}</span>
             </div></td>
+            <td style="text-align:center;color:var(--texto);font-weight:700;">${eq.points}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.played}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.win}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.draw}</td>
             <td style="text-align:center;color:var(--muted);">${eq.all.lose}</td>
             <td style="text-align:center;color:var(--muted);">${eq.goalsDiff}</td>
-            <td style="text-align:center;color:var(--texto);font-weight:700;">${eq.points}</td>
           </tr>`;
         });
         html += '</tbody></table>';
