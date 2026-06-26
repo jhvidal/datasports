@@ -85,6 +85,8 @@
     flex-direction:column;
   }
   @media (min-width:768px) {
+    #posiciones { columns:2; column-gap:16px; }
+    #posiciones .grupo-card { break-inside:avoid; margin-bottom:12px; }
     #sidebar-desktop { display:flex; }
     #app { margin-left:200px; }
     .hamburguesa-btn { display:none !important; }
@@ -99,6 +101,9 @@
     z-index: 210;
     overflow: hidden;
   }
+  .sec-nav { background:none; border:none; border-bottom:2px solid transparent; padding:4px 8px; color:rgba(255,255,255,.55); font-family:'Inter',sans-serif; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.3px; cursor:pointer; white-space:nowrap; transition:color .15s,border-color .15s; flex-shrink:0; }
+  .sec-nav:hover { color:rgba(255,255,255,.85); }
+  .sec-nav.active { color:#fff; border-bottom-color:#4CAF50; }
   header::before { content:none; }
   header::after  { content:none; }
   header h1 {
@@ -624,12 +629,13 @@
   .comp-btn {
     display: block; width: 100%; padding: 10px 20px;
     border: none; border-left: 3px solid transparent;
-    background: none; color: var(--muted); font-size: .82rem; font-weight: 500;
+    background: none; color: rgba(255,255,255,.75); font-size: .82rem; font-weight: 500;
     cursor: pointer; font-family: 'Inter', sans-serif;
-    text-align: left; transition: all .2s; border-bottom: 1px solid var(--borde);
+    text-align: left; transition: all .2s; border-bottom: 1px solid rgba(255,255,255,.1);
   }
-  .comp-btn.active { color: var(--texto); border-left-color: var(--verde-texto); background: rgba(76,175,80,.08); }
-  .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #b8860b; font-size: .82rem; padding: 10px 16px; }
+  .comp-btn:hover { background: rgba(255,255,255,.08); }
+  .comp-btn.active { color: #fff; border-left-color: #4CAF50; background: rgba(76,175,80,.15); font-weight:700; }
+  .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #ffd700; font-size: .82rem; padding: 10px 16px; }
   .comp-btn-mundial.active { background: rgba(255,215,0,.12) !important; border-left-color: #ffd700 !important; }
   .comp-grupo-mundial { border: 1px solid rgba(255,215,0,.2); border-radius: 8px; margin-bottom: 8px; background: rgba(255,215,0,.04); }
   .comp-grupo-mundial .comp-grupo-body { padding: 4px 0; }
@@ -831,7 +837,8 @@
 
 <div id="app">
 <header>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;">
+  <!-- Fila 1: Logo | MUNDIAL 2026 | botones -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;">
     <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
       <svg width="38" height="38" viewBox="0 0 130 130" style="flex-shrink:0">
         <path d="M12,8 L118,8 L118,82 Q118,114 65,126 Q12,114 12,82 Z" fill="none" stroke="#4CAF50" stroke-width="5"/>
@@ -840,15 +847,23 @@
       <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
-    <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;text-align:right;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
+    <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:10">
       <button onclick="cargarResultados()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.75rem;cursor:pointer" aria-label="Actualizar">↻</button>
       <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center" aria-label="Menú">
-      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-      <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
-    </button>
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+        <span style="display:block;width:15px;height:2px;background:currentColor;border-radius:1px"></span>
+      </button>
     </div>
+  </div>
+  <!-- Fila 2: Nav secciones -->
+  <div style="display:flex;gap:0;overflow-x:auto;margin-top:4px;">
+    <button onclick="elegirSeccion('partidos')" class="sec-nav active" id="sec-partidos">Partidos</button>
+    <button onclick="elegirSeccion('competiciones')" class="sec-nav" id="sec-competiciones">Competiciones</button>
+    <button onclick="elegirSeccion('clubes')" class="sec-nav" id="sec-clubes">Clubes</button>
+    <button onclick="elegirSeccion('pases')" class="sec-nav" id="sec-pases">Pases</button>
+    <button onclick="elegirSeccion('noticias')" class="sec-nav" id="sec-noticias">Noticias</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
 </header>
@@ -863,17 +878,14 @@
 
 <!-- NAV LATERAL (desktop) / BOTTOM NAV (mobile) -->
 <nav class="sidebar" id="sidebar">
-  <button class="sb-item active" id="bn-partidos" onclick="showMainTab('partidos')">
-    <span class="sb-label">Partidos</span>
+  <button class="sb-item active" id="sb-fixture" onclick="showMainTab('partidos');showTab('fixture');setSbActive('sb-fixture')">
+    <span class="sb-label">Fixture</span>
   </button>
-  <button class="sb-item" id="bn-competiciones" onclick="showMainTab('competiciones')">
-    <span class="sb-label">Competiciones</span>
+  <button class="sb-item" id="sb-grupos" onclick="showMainTab('partidos');showTab('posiciones');setSbActive('sb-grupos')">
+    <span class="sb-label">Grupos</span>
   </button>
-  <!-- <button class="sb-item" id="bn-jugadores" onclick="showMainTab('jugadores')">
-    <span class="sb-label">Jugadores</span>
-  </button> -->
-  <button class="sb-item" id="bn-noticias" onclick="showMainTab('noticias')">
-    <span class="sb-label">Noticias</span>
+  <button class="sb-item" id="sb-fasefinal" onclick="showMainTab('partidos');showTab('fase-final');setSbActive('sb-fasefinal')">
+    <span class="sb-label">Fase Final</span>
   </button>
 </nav>
 
@@ -997,7 +1009,7 @@
 
   <!-- Desplegable de competiciones -->
   <div style="padding:8px 12px;">
-    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--borde);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:var(--texto);">
+    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#1a3d20;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:#fff;">
       <span id="comp-selector-label">Seleccionar competición</span>
       <span id="comp-selector-arrow" style="font-size:.8rem;color:var(--muted);transition:transform .2s">▾</span>
     </button>
@@ -1023,9 +1035,9 @@
 
   <!-- Panel de fixture/posiciones -->
   <div id="comp-panel" style="display:none;">
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--borde);">
-      <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">←</button>
-      <span id="comp-panel-titulo" style="color:var(--texto);font-weight:700;font-size:.82rem;flex:1"></span>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--borde);">
+      <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">← Volver</button>
+      <span id="comp-panel-titulo" style="display:none"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
       <button class="comp-tab" id="ct-fixture" onclick="showCompTab('fixture')">Fixture</button>
@@ -1042,6 +1054,16 @@
     <div style="color:var(--texto);font-size:1.1rem;font-weight:600;margin-bottom:8px;">Jugadores</div>
     <div style="color:var(--muted);font-size:.85rem;">Próximamente</div>
   </div>
+</div>
+
+<!-- TAB CLUBES -->
+<div id="main-clubes" style="display:none;">
+  <div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:.9rem;">Clubes — próximamente</div>
+</div>
+
+<!-- TAB MERCADO DE PASES -->
+<div id="main-pases" style="display:none;">
+  <div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:.9rem;">Mercado de Pases — próximamente</div>
 </div>
 
 <!-- TAB NOTICIAS -->
@@ -2484,15 +2506,11 @@ function showTab(t) {
 // MAIN TABS — Partidos / Competiciones / Jugadores / Noticias
 // ═══════════════════════════════════════════════
 function showMainTab(tab) {
-  ['partidos','competiciones','jugadores','noticias'].forEach(t => {
-    document.getElementById('main-'+t).style.display = t===tab ? '' : 'none';
+  ['partidos','competiciones','clubes','pases','noticias'].forEach(t => {
+    const el = document.getElementById('main-'+t);
+    if (el) el.style.display = t===tab ? '' : 'none';
   });
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('bn-'+tab).classList.add('active');
-  if (tab === 'competiciones') {
-    // Auto-seleccionar Mundial si no hay ninguna competición activa
-    setTimeout(autoSeleccionarMundial, 50);
-  }
+  if (tab === 'competiciones') setTimeout(autoSeleccionarMundial, 50);
 }
 
 // ═══════════════════════════════════════════════
@@ -4116,6 +4134,19 @@ function setDrawerActive(tab) {
 }
 // Inicializar fixture como activo
 document.addEventListener('DOMContentLoaded', () => setDrawerActive('fixture'));
+
+function elegirSeccion(tab) {
+  document.querySelectorAll('.sec-nav').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('sec-' + tab);
+  if (el) el.classList.add('active');
+  showMainTab(tab);
+}
+
+function setSbActive(id) {
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
 
 function toggleMenu() {
   document.getElementById('drawerOverlay').classList.toggle('open');
