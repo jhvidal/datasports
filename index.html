@@ -85,8 +85,7 @@
     flex-direction:column;
   }
   @media (min-width:768px) {
-    header { background: linear-gradient(135deg, #133318 0%, #122a16 100%) !important; }
-    .sidebar { background: linear-gradient(135deg, #133318 0%, #122a16 100%) !important; }
+
     #posiciones { columns:2; column-gap:16px; }
     #posiciones .grupo-card { break-inside:avoid; margin-bottom:12px; }
     #sidebar-desktop { display:flex; }
@@ -95,7 +94,7 @@
   }
 
   header {
-    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%);
+    background: linear-gradient(135deg, #0f2a14 0%, #0e2410 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
@@ -554,7 +553,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%); border-top: none;
+    background: linear-gradient(135deg, #0f2a14 0%, #0e2410 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -746,6 +745,11 @@
     font-size:.6rem; font-weight:700; color:var(--verde-texto);
     text-transform:uppercase; letter-spacing:1px;
   }
+  /* Desktop: header y sidebar más claros */
+  @media (min-width:768px) {
+    header { background: linear-gradient(135deg, #2d7a3a 0%, #266b32 100%) !important; }
+    .sidebar { background: linear-gradient(135deg, #2d7a3a 0%, #266b32 100%) !important; }
+  }
 </style>
 </head>
 <body>
@@ -888,7 +892,7 @@
 </div>
 
 <!-- ══════════ PARTIDO OVERLAY ══════════ -->
-<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-top:70px; padding-bottom:20px;"></div>
+<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-top:var(--header-h); padding-bottom:20px;"></div>
 
 <!-- NAV LATERAL (desktop) / BOTTOM NAV (mobile) -->
 <nav class="sidebar" id="sidebar">
@@ -984,7 +988,11 @@
     </div>
     <div class="sugerencias" id="sugerencias"></div>
   </div>
-  <div class="fecha-scroll" id="fechaScroll"></div>
+  <div style="display:flex;align-items:center;gap:4px;padding:0 12px;">
+    <button onclick="scrollFechas(-1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;line-height:1">‹</button>
+    <div class="fecha-scroll" id="fechaScroll" style="flex:1"></div>
+    <button onclick="scrollFechas(1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;line-height:1">›</button>
+  </div>
   <div class="fase-nav" id="faseNav">
     <button class="fase-btn active" data-fase="todos">Todos</button>
     <button class="fase-btn" data-fase="Grupos">Grupos</button>
@@ -3001,7 +3009,8 @@ function agrupar(lista) {
     // mostrarlo en el día anterior. Si el usuario seleccionó explícitamente el día real del partido, mostrarlo ahí.
     const fechaPrev = fechaAnterior(p.fecha);
     const debeIrAlDiaAnterior = p.hora.includes('*') && !RESULTADOS[p.id]?.estado &&
-      (!fechaActiva || fechaActiva === fechaPrev);
+      (!fechaActiva || fechaActiva === fechaPrev) &&
+      faseActual === 'todos'; // con filtro de fase, mostrar en fecha real
 
     if (debeIrAlDiaAnterior) {
       const pPrev = PARTIDOS.find(x => x.fecha === fechaPrev);
@@ -3091,12 +3100,14 @@ function horaOFin(p, mostrarFecha=false) {
     const hoy = fechaHoyARG();
     if (p.fecha !== hoy) {
       const d = new Date(p.fecha+'T12:00:00');
+      const DIAS_ES2 = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const dow = DIAS_ES2[d.getDay()];
       const dia = d.getDate();
-      const mes = MESES_ES[d.getMonth()-5] || '';
-      return `<span style="display:flex;flex-direction:column;align-items:center;gap:1px">
-        <span style="font-size:.62rem;color:var(--muted);font-weight:600">${dia} ${mes}</span>
-        <span class="hora" style="font-size:.72rem">${p.hora}</span>
-      </span>`;
+      const mes = d.getMonth()+1;
+      return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;text-align:center">
+        <span class="hora" style="font-size:.75rem;line-height:1">${p.hora.replace('*','')}</span>
+        <span style="font-size:.56rem;color:var(--muted);font-weight:700;white-space:nowrap;line-height:1">${dow} ${dia}/${mes}</span>
+      </div>`;
     }
   }
   return `<span class="hora">${p.hora}</span>`;
@@ -3132,8 +3143,20 @@ function buildFechaChips() {
   }, 0);
 }
 
+function scrollFechas(dir) {
+  const el = document.getElementById('fechaScroll');
+  el.scrollBy({ left: dir * 120, behavior: 'smooth' });
+}
+
 function toggleFecha(f) {
   fechaActiva = fechaActiva===f ? null : f;
+  // Al seleccionar fecha, resetear filtro de fase a Todos
+  if (fechaActiva) {
+    faseActual = 'todos';
+    document.querySelectorAll('.fase-btn').forEach(b => b.classList.remove('active'));
+    const btnTodos = document.querySelector('.fase-btn[data-fase="todos"]');
+    if (btnTodos) btnTodos.classList.add('active');
+  }
   busqueda=''; document.getElementById('searchInput').value='';
   document.getElementById('searchClear').classList.remove('visible');
   diasAbiertos={};
@@ -3148,6 +3171,21 @@ function clearSearch() {
 
 // Lista de todos los equipos para sugerencias
 const PAISES_MUNDIAL = [...new Set(PARTIDOS.flatMap(p => [p.local, p.visita]))].sort();
+
+// Equipos hardcodeados de Argentina para el buscador
+const EQUIPOS_ARG = [
+  'Boca Juniors','River Plate','Racing Club','Independiente','San Lorenzo','Huracán',
+  'Vélez Sársfield','Estudiantes','Gimnasia La Plata',"Newell's Old Boys",'Rosario Central',
+  'Talleres','Belgrano','Lanús','Banfield','Arsenal Sarandí','Colón','Unión',
+  'Defensa y Justicia','Platense','Godoy Cruz','Aldosivi','Patronato','Central Córdoba',
+  'Tigre','San Martín SJ','Atlético Tucumán','Instituto','Riestra','Barracas Central',
+  'Quilmes','All Boys','Atlanta','Chacarita Juniors','Deportivo Riestra','Fénix',
+  'Los Andes','Nueva Chicago','San Telmo','Tristán Suárez','Deportivo Madryn',
+  'Almirante Brown','Brown de Adrogué','Güemes','Deportivo Maipú','Agropecuario',
+  'Brown de Puerto Madryn','Chaco For Ever','Estudiantes RC','FC Justo José de Urquiza',
+  'Ferro Carril Oeste','Independiente Rivadavia','Mitre','Morón','Sacachispas',
+  'San Martín T','Sportivo Desamparados','Temperley','Tigre','Villa Dálmine'
+].sort();
 
 function getEquiposLigasMenores() {
   const mapa = new Map();
@@ -3168,7 +3206,10 @@ function mostrarSugerencias(q) {
   const qn = normalize(q);
 
   const matchesPaises = PAISES_MUNDIAL.filter(e => normalize(e).includes(qn)).slice(0, 4);
-  const matchesEquipos = getEquiposLigasMenores().filter(e => normalize(e.name).includes(qn)).slice(0, 5);
+  // Combinar equipos de LIGAS_MENORES con hardcodeados de Argentina
+  const equiposLigas = getEquiposLigasMenores().map(e => e.name);
+  const todosEquipos = [...new Set([...EQUIPOS_ARG, ...equiposLigas])].sort();
+  const matchesEquipos = todosEquipos.filter(e => normalize(e).includes(qn)).slice(0, 6);
 
   if (!matchesPaises.length && !matchesEquipos.length) { div.classList.remove('visible'); return; }
 
@@ -3184,11 +3225,13 @@ function mostrarSugerencias(q) {
   if (matchesEquipos.length) {
     html += `<div class="sug-header">🏟️ Clubes</div>`;
     html += matchesEquipos.map(e => {
-      const logoHtml = e.logo
-        ? `<img src="${e.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.src='';this.style.display='none'">`
+      // Buscar logo en LIGAS_MENORES si existe
+      const ligaEquipo = getEquiposLigasMenores().find(x => x.name === e);
+      const logoHtml = ligaEquipo?.logo
+        ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`
         : `<span style="font-size:12px">⚽</span>`;
-      return `<div class="sug-item" onclick="elegirSugerencia('${e.name.replace(/'/g, "\\'")}')">
-        ${logoHtml} <span>${e.name}</span>
+      return `<div class="sug-item" onclick="elegirSugerencia('${e.replace(/'/g, "\\'")}')">
+        ${logoHtml} <span>${e}</span>
       </div>`;
     }).join('');
   }
