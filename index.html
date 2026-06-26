@@ -747,8 +747,8 @@
   }
   /* Desktop: header y sidebar más claros */
   @media (min-width:768px) {
-    header { background: linear-gradient(135deg, #2d7a3a 0%, #266b32 100%) !important; }
-    .sidebar { background: linear-gradient(135deg, #2d7a3a 0%, #266b32 100%) !important; }
+    header { background: linear-gradient(135deg, #163d1c 0%, #143318 100%) !important; }
+    .sidebar { background: linear-gradient(135deg, #163d1c 0%, #143318 100%) !important; }
   }
 </style>
 </head>
@@ -3225,12 +3225,15 @@ function mostrarSugerencias(q) {
   if (matchesEquipos.length) {
     html += `<div class="sug-header">🏟️ Clubes</div>`;
     html += matchesEquipos.map(e => {
-      // Buscar logo en LIGAS_MENORES si existe
       const ligaEquipo = getEquiposLigasMenores().find(x => x.name === e);
       const logoHtml = ligaEquipo?.logo
         ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`
         : `<span style="font-size:12px">⚽</span>`;
-      return `<div class="sug-item" onclick="elegirSugerencia('${e.replace(/'/g, "\\'")}')">
+      // Si está en LIGAS_MENORES, buscar en fixture; si es hardcodeado, ir a clubes
+      const accion = ligaEquipo
+        ? `elegirSugerencia('${e.replace(/'/g, "\\'")}')`
+        : `elegirSeccion('clubes');setTimeout(()=>document.querySelector('.club-liga-btn')?.click(),100)`;
+      return `<div class="sug-item" onclick="${accion}">
         ${logoHtml} <span>${e}</span>
       </div>`;
     }).join('');
@@ -3241,6 +3244,10 @@ function mostrarSugerencias(q) {
 
 function elegirSugerencia(nombre) {
   busqueda = nombre;
+  faseActual = 'todos';
+  document.querySelectorAll('.fase-btn').forEach(b => b.classList.remove('active'));
+  const btnTodos = document.querySelector('.fase-btn[data-fase="todos"]');
+  if (btnTodos) btnTodos.classList.add('active');
   document.getElementById('searchInput').value = nombre;
   document.getElementById('searchClear').classList.add('visible');
   document.getElementById('sugerencias').classList.remove('visible');
