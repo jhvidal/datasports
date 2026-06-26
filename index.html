@@ -629,14 +629,19 @@
   .comp-btn {
     display: block; width: 100%; padding: 10px 20px;
     border: none; border-left: 3px solid transparent;
-    background: none; color: rgba(255,255,255,.75); font-size: .82rem; font-weight: 500;
+    background: none; color: var(--muted); font-size: .82rem; font-weight: 500;
     cursor: pointer; font-family: 'Inter', sans-serif;
-    text-align: left; transition: all .2s; border-bottom: 1px solid rgba(255,255,255,.1);
+    text-align: left; transition: all .2s; border-bottom: 1px solid var(--borde);
   }
-  .comp-btn:hover { background: rgba(255,255,255,.08); }
-  .comp-btn.active { color: #fff; border-left-color: #4CAF50; background: rgba(76,175,80,.15); font-weight:700; }
-  .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #ffd700; font-size: .82rem; padding: 10px 16px; }
-  .comp-btn-mundial.active { background: rgba(255,215,0,.12) !important; border-left-color: #ffd700 !important; }
+  .comp-btn:hover { background: var(--mid); }
+  .comp-btn.active { color: var(--verde-texto); border-left-color: var(--verde-texto); background: rgba(76,175,80,.08); font-weight:700; }
+  .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #b8860b; font-size: .82rem; padding: 10px 16px; }
+  .comp-btn-mundial.active { background: rgba(255,215,0,.12) !important; border-left-color: #ffd700 !important; color:#b8860b !important; }
+  /* Panel verde del selector usa override */
+  #comp-selector-panel .comp-btn { color:rgba(255,255,255,.8); border-bottom-color:rgba(255,255,255,.1); }
+  #comp-selector-panel .comp-btn:hover { background:rgba(255,255,255,.08); }
+  #comp-selector-panel .comp-btn.active { color:#fff; background:rgba(76,175,80,.2); border-left-color:#4CAF50; }
+  #comp-selector-panel .comp-btn-mundial { color:#ffd700; }
   .comp-grupo-mundial { border: 1px solid rgba(255,215,0,.2); border-radius: 8px; margin-bottom: 8px; background: rgba(255,215,0,.04); }
   .comp-grupo-mundial .comp-grupo-body { padding: 4px 0; }
   .comp-btn:hover { color: var(--texto); }
@@ -898,11 +903,11 @@
 <div id="main-partidos" style="display:block">
 
 <!-- ══════════ FIXTURE TAB ══════════ -->
-<!-- sub-nav del Mundial -->
-<div style="display:flex;gap:0;border-bottom:1px solid var(--borde);background:var(--card);">
-  <button class="mundial-tab" id="wt-fixture" onclick="showTab('fixture')">Fixture</button>
-  <button class="mundial-tab" id="wt-posiciones" onclick="showTab('posiciones')">Grupos</button>
-  <button class="mundial-tab" id="wt-fase-final" onclick="showTab('fase-final')">Fase Final</button>
+<!-- sub-nav oculto — los tabs están en la barra inferior -->
+<div style="display:none">
+  <button id="wt-fixture"></button>
+  <button id="wt-posiciones"></button>
+  <button id="wt-fase-final"></button>
 </div>
 
 <div id="tab-ligas" style="display:none">
@@ -2700,16 +2705,19 @@ async function cargarCompActual() {
       });
 
       // Ordenar rondas
-      let rondas = Object.keys(porRonda).sort((a,b) => rankRonda(b) - rankRonda(a));
+      // Ordenar rondas de menor a mayor (Group Stage primero, Final último)
+      let rondas = Object.keys(porRonda).sort((a,b) => rankRonda(a) - rankRonda(b));
       // Si hay ronda activa seleccionada, mostrar solo esa
       if (compRondaActiva && porRonda[compRondaActiva]) {
         rondas = [compRondaActiva];
       } else if (rondas.length > 0) {
-        // Mostrar solo la ronda más relevante por defecto (primera con NS o más reciente)
-        const rondasConNS = rondas.filter(r => porRonda[r].some(f => f.fixture.status.short === 'NS'));
+        // Elegir la ronda más relevante: en vivo > próxima (NS) > última con resultados
         const rondasConVivo = rondas.filter(r => porRonda[r].some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short)));
+        const rondasConNS = rondas.filter(r => porRonda[r].some(f => f.fixture.status.short === 'NS'));
+        const rondasConFT = rondas.filter(r => porRonda[r].some(f => ['FT','AET','PEN'].includes(f.fixture.status.short)));
         if (rondasConVivo.length > 0) rondas = [rondasConVivo[0]];
         else if (rondasConNS.length > 0) rondas = [rondasConNS[0]];
+        else if (rondasConFT.length > 0) rondas = [rondasConFT[rondasConFT.length - 1]]; // la más avanzada con FT
         else rondas = [rondas[0]];
         compRondaActiva = rondas[0];
       }
@@ -3210,18 +3218,25 @@ function render() {
         <div style="width:50px;flex-shrink:0">${horaOFin(p, !!busqueda)}</div>
         <div class="partido-info">
           <div class="equipos">
-            <span class="equipo-nombre local">
-              <span class="eq-flag">${flag(p.local)}</span>
-              <span class="eq-text">${nombreCorto(p.local)}</span>
-            </span>
-            ${resultadoBadge(p) || `<span class="vs-wrap">vs</span>`}
-            <span class="equipo-nombre visita">
-              <span class="eq-flag">${flag(p.visita)}</span>
-              <span class="eq-text">${nombreCorto(p.visita)}</span>
-            </span>
+            ${(() => {
+              const r = RESULTADOS[p.id];
+              const ft = r?.estado==='ft', lv = r?.estado==='live';
+              const loc = (ft||lv) ? p.local : (resolverEquipo(p.local)||p.local);
+              const vis = (ft||lv) ? p.visita : (resolverEquipo(p.visita)||p.visita);
+              const esProyec = !ft && !lv && (loc!==p.local || vis!==p.visita);
+              return `<span class="equipo-nombre local">
+                <span class="eq-flag">${flag(loc)}</span>
+                <span class="eq-text">${nombreCorto(loc)}${esProyec?'<span style="font-size:.6rem;color:var(--muted)"> *</span>':''}</span>
+              </span>
+              ${resultadoBadge(p) || '<span class="vs-wrap">vs</span>'}
+              <span class="equipo-nombre visita">
+                <span class="eq-flag">${flag(vis)}</span>
+                <span class="eq-text">${nombreCorto(vis)}${esProyec?'<span style="font-size:.6rem;color:var(--muted)"> *</span>':''}</span>
+              </span>`;
+            })()}
           </div>
           <div class="meta">
-            ${p.grupo ? `<span class="tag tag-grupo">Grupo ${p.grupo}</span>` : `<span class="tag tag-fase">${p.fase}</span>`}
+            ${p.grupo ? `<span class="tag tag-grupo">Grupo ${p.grupo}</span>` : `<span class="tag tag-fase">${p.fase==='32vos'?'16avos':p.fase}</span>`}
             <span class="tag tag-sede">${p.sede}</span>
           </div>
         </div>
