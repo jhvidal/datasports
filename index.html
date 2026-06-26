@@ -93,7 +93,7 @@
   }
 
   header {
-    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%);
+    background: linear-gradient(135deg, #0d2612 0%, #0e2010 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
@@ -483,9 +483,10 @@
     margin-bottom:16px;
   }
   .po-back {
-    background:none; border:none; color:var(--verde-texto);
-    font-size:.85rem; font-weight:700; cursor:pointer;
-    font-family:'Inter',sans-serif; padding:0;
+    background:none; border:1px solid var(--verde);
+    color:var(--verde-texto); font-size:.82rem; font-weight:700;
+    cursor:pointer; font-family:'Inter',sans-serif;
+    padding:4px 12px; border-radius:8px;
   }
   .po-fase { color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; flex:1; }
   .po-live { background:var(--verde); color:#fff; font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; animation:pulso 1.2s infinite; }
@@ -551,7 +552,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%); border-top: none;
+    background: linear-gradient(135deg, #0d2612 0%, #0e2010 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -859,7 +860,7 @@
       <div style="width:2px;height:28px;background:#4CAF50;margin:0 8px;flex-shrink:0;"></div>
       <div style="font-family:'Raleway',sans-serif;font-weight:400;font-size:1rem;color:#fff;line-height:1;">Data<span style="color:#4CAF50;font-weight:700">Sports</span></div>
     </div>
-    <div style="font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#fff;">MUNDIAL <span style="color:#4CAF50">2026</span></div>
+
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:10">
       <button onclick="cargarResultados()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 10px;font-size:.75rem;cursor:pointer" aria-label="Actualizar">↻</button>
       <button onclick="toggleMenu()" class="hamburguesa-btn" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);border-radius:8px;padding:6px 8px;cursor:pointer;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center" aria-label="Menú">
@@ -885,7 +886,7 @@
 </div>
 
 <!-- ══════════ PARTIDO OVERLAY ══════════ -->
-<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-top:90px; padding-bottom:20px;"></div>
+<div id="partido-overlay" style="display:none; position:fixed; inset:0; background:var(--fondo); z-index:100; overflow-y:auto; padding-top:70px; padding-bottom:20px;"></div>
 
 <!-- NAV LATERAL (desktop) / BOTTOM NAV (mobile) -->
 <nav class="sidebar" id="sidebar">
@@ -1562,7 +1563,7 @@ async function abrirPartido(id) {
         <div class="po-marcador po-proxim">
           <div class="po-equipo">
             <div class="po-flag">${flag(p.local, 32)}</div>
-            <div class="po-nombre">${p.local}</div>
+            <div class="po-nombre">${(()=>{const r=RESULTADOS[p.id];const ft=r?.estado==='ft',lv=r?.estado==='live';return (ft||lv)?p.local:(resolverEquipo(p.local)||p.local);})()}</div>
           </div>
           <div class="po-score-wrap">
             <div class="po-hora-big">${p.hora}</div>
@@ -1571,7 +1572,7 @@ async function abrirPartido(id) {
           </div>
           <div class="po-equipo">
             <div class="po-flag">${flag(p.visita, 32)}</div>
-            <div class="po-nombre">${p.visita}</div>
+            <div class="po-nombre">${(()=>{const r=RESULTADOS[p.id];const ft=r?.estado==='ft',lv=r?.estado==='live';return (ft||lv)?p.visita:(resolverEquipo(p.visita)||p.visita);})()}</div>
           </div>
         </div>
         <div id="po-convocados"><div class="po-sin-datos">Cargando convocados...</div></div>
@@ -3090,7 +3091,10 @@ function horaOFin(p, mostrarFecha=false) {
       const d = new Date(p.fecha+'T12:00:00');
       const dia = d.getDate();
       const mes = MESES_ES[d.getMonth()-5] || '';
-      return `<span class="hora" style="font-size:.65rem">${dia} ${mes}<br>${p.hora}</span>`;
+      return `<span style="display:flex;flex-direction:column;align-items:center;gap:1px">
+        <span style="font-size:.62rem;color:var(--muted);font-weight:600">${dia} ${mes}</span>
+        <span class="hora" style="font-size:.72rem">${p.hora}</span>
+      </span>`;
     }
   }
   return `<span class="hora">${p.hora}</span>`;
@@ -4220,8 +4224,33 @@ async function abrirClub(teamId, nombre, logo, league, season) {
     '<span style="font-weight:700;font-size:.9rem;color:var(--texto)">'+nombre+'</span></div>' +
     '<div class="po-sin-datos" id="club-cargando">Cargando próximos partidos...</div>';
   try {
-    const data = await apiFetch('fixtures?team='+teamId+'&season='+season+'&next=10');
+    // Traer próximos partidos y posición en paralelo
+    const [data, standData] = await Promise.all([
+      apiFetch('fixtures?team='+teamId+'&season='+season+'&next=10'),
+      apiFetch('standings?league='+league+'&season='+season)
+    ]);
     document.getElementById('club-cargando')?.remove();
+
+    // Mostrar posición si existe
+    if (standData?.response?.length) {
+      const grupos = standData.response[0]?.league?.standings || [];
+      let posInfo = null;
+      for (const grupo of grupos) {
+        const pos = grupo.find(t => t.team.id === teamId);
+        if (pos) { posInfo = pos; break; }
+      }
+      if (posInfo) {
+        lista.insertAdjacentHTML('beforeend',
+          '<div style="background:var(--mid);border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">' +
+          '<span style="font-size:1.2rem;font-weight:700;color:var(--verde-texto)">#'+posInfo.rank+'</span>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:.72rem;font-weight:700;color:var(--texto)">'+posInfo.group.replace('Group ','Grupo ')+'</div>' +
+            '<div style="font-size:.68rem;color:var(--muted)">'+posInfo.points+' pts · '+posInfo.all.played+'PJ · '+posInfo.all.win+'G '+posInfo.all.draw+'E '+posInfo.all.lose+'P</div>' +
+          '</div></div>'
+        );
+      }
+    }
+
     if (!data?.response?.length) {
       lista.insertAdjacentHTML('beforeend','<div class="po-sin-datos">Sin próximos partidos</div>');
       return;
@@ -4233,7 +4262,11 @@ async function abrirClub(teamId, nombre, logo, league, season) {
       const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
       const dia = d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
       const hora = d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');
-      const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' : '<span class="hora">'+hora+'</span>';
+      const diaStr = d.getDate()+'/'+(d.getUTCMonth()+1);
+      const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' :
+        '<span style="display:flex;flex-direction:column;align-items:center;gap:1px">' +
+        '<span style="font-size:.58rem;color:var(--muted);font-weight:600">'+diaStr+'</span>' +
+        '<span class="hora" style="font-size:.7rem">'+hora+'</span></span>';
       const rival = f.teams.home.id === teamId ? f.teams.away.name : f.teams.home.name;
       const rivalLogo = f.teams.home.id === teamId ? f.teams.away.logo : f.teams.home.logo;
       const esLocal = f.teams.home.id === teamId;
