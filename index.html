@@ -641,7 +641,7 @@
   #comp-selector-panel .comp-btn { color:rgba(255,255,255,.8); border-bottom-color:rgba(255,255,255,.1); }
   #comp-selector-panel .comp-btn:hover { background:rgba(255,255,255,.08); }
   #comp-selector-panel .comp-btn.active { color:#fff; background:rgba(76,175,80,.2); border-left-color:#4CAF50; }
-  #comp-selector-panel .comp-btn-mundial { color:#ffd700; }
+  #comp-selector-panel .comp-btn-mundial { color:rgba(255,255,255,.8); border-left-color:transparent !important; }
   .comp-grupo-mundial { border: 1px solid rgba(255,215,0,.2); border-radius: 8px; margin-bottom: 8px; background: rgba(255,215,0,.04); }
   .comp-grupo-mundial .comp-grupo-body { padding: 4px 0; }
   .comp-btn:hover { color: var(--texto); }
@@ -867,7 +867,6 @@
     <button onclick="elegirSeccion('partidos')" class="sec-nav active" id="sec-partidos">Partidos</button>
     <button onclick="elegirSeccion('competiciones')" class="sec-nav" id="sec-competiciones">Competiciones</button>
     <button onclick="elegirSeccion('clubes')" class="sec-nav" id="sec-clubes">Clubes</button>
-    <button onclick="elegirSeccion('pases')" class="sec-nav" id="sec-pases">Pases</button>
     <button onclick="elegirSeccion('noticias')" class="sec-nav" id="sec-noticias">Noticias</button>
   </div>
   <div class="header-bar"><span></span><span></span><span></span></div>
@@ -1012,23 +1011,24 @@
 <!-- TAB COMPETICIONES -->
 <div id="main-competiciones" style="display:none;">
 
-  <!-- Desplegable de competiciones -->
-  <div style="padding:8px 12px;">
-    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#1a3d20;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:#fff;">
+  <!-- Panel de fixture/posiciones — aparece cuando se elige una competición -->
+  <!-- Selector de competición -->
+  <div id="comp-empty" style="padding:12px 14px;">
+    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#122016;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:#fff;">
       <span id="comp-selector-label">Seleccionar competición</span>
-      <span id="comp-selector-arrow" style="font-size:.8rem;color:var(--muted);transition:transform .2s">▾</span>
+      <span id="comp-selector-arrow" style="font-size:.7rem;color:rgba(255,255,255,.5);transition:transform .2s">▾</span>
     </button>
-    <div id="comp-selector-panel" style="display:none;background:var(--card);border:1px solid var(--borde);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;">
+    <div id="comp-selector-panel" style="display:none;background:#122016;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;max-height:300px;overflow-y:auto;">
       <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarCompDesde(this)">Mundial 2026</button>
-      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Argentina</div>
+      <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;padding:6px 14px 3px;letter-spacing:.5px;border-top:1px solid rgba(255,255,255,.1)">Argentina</div>
       <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarCompDesde(this)">Liga Profesional</button>
       <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarCompDesde(this)">Primera Nacional</button>
       <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarCompDesde(this)">Copa Argentina</button>
       <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarCompDesde(this)">Primera B Metro</button>
-      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Sudamérica</div>
+      <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;padding:6px 14px 3px;letter-spacing:.5px;border-top:1px solid rgba(255,255,255,.1)">Sudamérica</div>
       <button class="comp-btn" data-league="13" data-season="2026" data-name="Copa Libertadores" onclick="seleccionarCompDesde(this)">Copa Libertadores</button>
       <button class="comp-btn" data-league="11" data-season="2026" data-name="Copa Sudamericana" onclick="seleccionarCompDesde(this)">Copa Sudamericana</button>
-      <div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:8px 14px 4px;letter-spacing:.5px;border-top:1px solid var(--borde)">Europa</div>
+      <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;padding:6px 14px 3px;letter-spacing:.5px;border-top:1px solid rgba(255,255,255,.1)">Europa</div>
       <button class="comp-btn" data-league="2" data-season="2025" data-name="Champions League" onclick="seleccionarCompDesde(this)">Champions League</button>
       <button class="comp-btn" data-league="39" data-season="2025" data-name="Premier League" onclick="seleccionarCompDesde(this)">Premier League</button>
       <button class="comp-btn" data-league="140" data-season="2025" data-name="La Liga" onclick="seleccionarCompDesde(this)">La Liga</button>
@@ -1038,11 +1038,11 @@
     </div>
   </div>
 
-  <!-- Panel de fixture/posiciones -->
+  <!-- Panel de fixture/posiciones — aparece al elegir una competición -->
   <div id="comp-panel" style="display:none;">
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--borde);">
-      <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;">← Volver</button>
-      <span id="comp-panel-titulo" style="display:none"></span>
+    <div style="padding:3px 12px;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;">
+      <button onclick="cerrarCompPanel()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.68rem;font-weight:600;padding:2px 0;">← volver</button>
+      <span id="comp-panel-titulo" style="font-size:.75rem;font-weight:700;color:var(--texto)"></span>
     </div>
     <div style="display:flex;border-bottom:1px solid var(--borde);background:var(--card);">
       <button class="comp-tab" id="ct-fixture" onclick="showCompTab('fixture')">Fixture</button>
@@ -2529,23 +2529,30 @@ function toggleCompGrupo(header) {
 function toggleCompSelector() {
   const panel = document.getElementById('comp-selector-panel');
   const arrow = document.getElementById('comp-selector-arrow');
+  // Si el comp-panel está oculto, mostrarlo primero
+  const cp = document.getElementById('comp-panel');
+  const ce = document.getElementById('comp-empty');
+  if (cp && cp.style.display === 'none') {
+    if (ce) ce.style.display = 'none';
+    cp.style.display = 'block';
+  }
   const open = panel.style.display === 'none';
   panel.style.display = open ? '' : 'none';
-  arrow.style.transform = open ? 'rotate(180deg)' : '';
+  if (arrow) arrow.style.transform = open ? 'rotate(180deg)' : '';
 }
 
 function seleccionarCompDesde(btn) {
-  // Cerrar desplegable
   document.getElementById('comp-selector-panel').style.display = 'none';
-  document.getElementById('comp-selector-arrow').style.transform = '';
-  // Actualizar label del botón
+  const arrow = document.getElementById('comp-selector-arrow');
+  if (arrow) arrow.style.transform = '';
   document.getElementById('comp-selector-label').textContent = btn.dataset.name;
-  // Marcar activo
   document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   compRondaActiva = null;
   compActual = { league: btn.dataset.league, season: btn.dataset.season, name: btn.dataset.name };
   document.getElementById('comp-panel-titulo').textContent = btn.dataset.name;
+  const ce = document.getElementById('comp-empty');
+  if (ce) ce.style.display = 'none';
   document.getElementById('comp-panel').style.display = 'block';
   showCompTab('fixture');
   cargarCompActual();
@@ -2554,6 +2561,9 @@ function seleccionarCompDesde(btn) {
 function cerrarCompPanel() {
   document.getElementById('comp-panel').style.display = 'none';
   document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
+  const ce = document.getElementById('comp-empty');
+  if (ce) ce.style.display = '';
+  document.getElementById('comp-selector-label').textContent = 'Seleccionar competición';
 }
 
 let compActual = { league: '1', season: '2026', name: 'Mundial 2026' };
