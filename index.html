@@ -93,7 +93,7 @@
   }
 
   header {
-    background: linear-gradient(135deg, #163d1c 0%, #143318 100%);
+    background: linear-gradient(135deg, #0f2a14 0%, #102212 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
@@ -551,7 +551,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, #1e4d24 0%, #1c4522 100%); border-top: none;
+    background: linear-gradient(135deg, #0f2a14 0%, #102212 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -2733,15 +2733,9 @@ async function cargarCompActual() {
         if (!porRonda[r]) porRonda[r] = [];
         porRonda[r].push(f);
       });
-      // Ordenar: jugados/en vivo primero, futuros después, por timestamp
+      // Ordenar por timestamp ASC
       Object.keys(porRonda).forEach(r => {
-        porRonda[r].sort((a,b) => {
-          const stA = a.fixture.status.short, stB = b.fixture.status.short;
-          const doneA = ['FT','AET','PEN','1H','2H','HT','ET','P'].includes(stA) ? 0 : 1;
-          const doneB = ['FT','AET','PEN','1H','2H','HT','ET','P'].includes(stB) ? 0 : 1;
-          if (doneA !== doneB) return doneA - doneB;
-          return a.fixture.timestamp - b.fixture.timestamp;
-        });
+        porRonda[r].sort((a,b) => a.fixture.timestamp - b.fixture.timestamp);
       });
 
       // Ordenar rondas
@@ -3232,6 +3226,7 @@ document.addEventListener('click', e => {
 });
 
 function render() {
+  actualizarTablaGrupos();
   const filtrados = filtrar();
   const grupos    = agrupar(filtrados);
   const hoy       = fechaHoyARG();
@@ -4210,17 +4205,60 @@ async function cargarClubes(league, season, btn) {
   const lista = document.getElementById('clubes-lista');
   lista.innerHTML = '<div class="po-sin-datos">Cargando...</div>';
   try {
-    const data = await apiFetch(`teams?league=${league}&season=${season}`);
+    const data = await apiFetch('teams?league='+league+'&season='+season);
     if (!data?.response?.length) { lista.innerHTML = '<div class="po-sin-datos">Sin datos</div>'; return; }
     const equipos = [...data.response].sort((a,b) => a.team.name.localeCompare(b.team.name));
-    lista.innerHTML = equipos.map(e => `
-      <div class="club-item">
-        <img class="club-escudo" src="${e.team.logo}" alt="" loading="lazy" onerror="this.style.display='none'">
-        <span class="club-nombre">${e.team.name}</span>
-      </div>`).join('');
+    lista.innerHTML = equipos.map(e =>
+      '<div class="club-item" onclick="abrirClub('+e.team.id+',\''+e.team.name.replace(/'/g,"\\'")+'\',' +
+      '\''+e.team.logo+'\','+league+','+season+')">' +
+      '<img class="club-escudo" src="'+e.team.logo+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">' +
+      '<span class="club-nombre">'+e.team.name+'</span>' +
+      '<span style="margin-left:auto;color:var(--muted);font-size:.8rem">›</span></div>'
+    ).join('');
   } catch(e) {
     lista.innerHTML = '<div class="po-sin-datos">Error cargando clubes</div>';
   }
+}
+
+async function abrirClub(teamId, nombre, logo, league, season) {
+  const lista = document.getElementById('clubes-lista');
+  lista.innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--borde);margin-bottom:8px;">' +
+    '<button onclick="document.querySelectorAll(\'.club-liga-btn\').forEach(b=>b.classList.remove(\'active\'));cargarClubes(' + league + ',' + season + ',document.querySelector(\'.club-liga-btn.active\')||document.querySelector(\'.club-liga-btn\'))" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;font-weight:600;">← volver</button>' +
+    '<img src="'+logo+'" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">' +
+    '<span style="font-weight:700;font-size:.9rem;color:var(--texto)">'+nombre+'</span></div>' +
+    '<div class="po-sin-datos" id="club-cargando">Cargando próximos partidos...</div>';
+  try {
+    const data = await apiFetch('fixtures?team='+teamId+'&season='+season+'&next=10');
+    document.getElementById('club-cargando')?.remove();
+    if (!data?.response?.length) {
+      lista.insertAdjacentHTML('beforeend','<div class="po-sin-datos">Sin próximos partidos</div>');
+      return;
+    }
+    const rows = data.response.map(function(f) {
+      const st = f.fixture.status.short;
+      const ft = ['FT','AET','PEN'].includes(st);
+      const lv = ['1H','2H','HT','ET','P'].includes(st);
+      const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
+      const dia = d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
+      const hora = d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');
+      const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' : '<span class="hora">'+hora+'</span>';
+      const rival = f.teams.home.id === teamId ? f.teams.away.name : f.teams.home.name;
+      const rivalLogo = f.teams.home.id === teamId ? f.teams.away.logo : f.teams.home.logo;
+      const esLocal = f.teams.home.id === teamId;
+      const goles = (ft||lv) ? (f.goals.home+' - '+f.goals.away) : '';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--borde)">' +
+        '<div style="width:42px;flex-shrink:0;text-align:center">'+estado+'</div>' +
+        '<img src="'+rivalLogo+'" style="width:22px;height:22px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:.78rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>' +
+          '<div style="font-size:.65rem;color:var(--muted)">'+dia+' · '+f.league.name+'</div>' +
+        '</div>' +
+        (goles ? '<div style="font-size:.85rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>' : '') +
+      '</div>';
+    }).join('');
+    lista.insertAdjacentHTML('beforeend', rows);
+  } catch(e) {}
 }
 
 function toggleMenu() {
