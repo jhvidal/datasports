@@ -194,8 +194,8 @@
   .fecha-chip {
     flex-shrink:0; display:flex; flex-direction:column; align-items:center;
     background:var(--mid); border:1.5px solid var(--borde);
-    border-radius:10px; padding:5px 9px; cursor:pointer;
-    transition:all .15s; min-width:44px;
+    border-radius:8px; padding:3px 7px; cursor:pointer;
+    transition:all .15s; min-width:38px;
   }
   .fecha-chip:hover { border-color:var(--verde); }
   .fecha-chip.active { background:var(--verde); border-color:var(--verde); box-shadow:0 2px 6px rgba(76,175,80,.3); }
@@ -3597,9 +3597,10 @@ document.getElementById('faseNav').addEventListener('click', e => {
   if (!e.target.classList.contains('fase-btn')) return;
   document.querySelectorAll('.fase-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
-  faseActual=e.target.dataset.fase; fechaActiva=null; busqueda='';
-  document.getElementById('searchInput').value='';
-  document.getElementById('searchClear').classList.remove('visible');
+  faseActual=e.target.dataset.fase;
+  fechaActiva=null; busqueda=''; grupoActivo=null;
+  try{document.getElementById('searchInput').value='';}catch(e){}
+  try{document.getElementById('searchClear').classList.remove('visible');}catch(e){}
   diasAbiertos={}; buildFechaChips(); render();
 });
 
