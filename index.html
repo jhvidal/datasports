@@ -93,7 +93,7 @@
   }
 
   header {
-    background: linear-gradient(135deg, #0f2a14 0%, #102212 100%);
+    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%);
     padding: 14px 16px 0;
     text-align: center;
     position: fixed;
@@ -228,7 +228,7 @@
     padding:6px 13px; border-radius:20px; cursor:pointer; transition:all .2s;
   }
   .fase-btn:hover { border-color:var(--verde); color:var(--verde-texto); }
-  .fase-btn.active { background:var(--card); border-color:var(--verde); color:var(--azul); }
+  .fase-btn.active { background:var(--verde); border-color:var(--verde); color:#fff; font-weight:700; box-shadow:0 2px 8px rgba(76,175,80,.35); }
 
   /* ── FIXTURE ── */
   main { padding:10px 12px 0; }
@@ -551,7 +551,7 @@
   /* ── LAYOUT RESPONSIVE ── */
   .sidebar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(135deg, #0f2a14 0%, #102212 100%); border-top: none;
+    background: linear-gradient(135deg, #0a1f0f 0%, #0b1a0e 100%); border-top: none;
     display: flex; z-index: 20; height: var(--bottom-nav-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -2762,17 +2762,8 @@ async function cargarCompActual() {
       rondas.forEach(ronda => {
         const ahora = Date.now();
         const partidos = porRonda[ronda].sort((a,b) => {
-          const ta = new Date(a.fixture.date).getTime();
-          const tb = new Date(b.fixture.date).getTime();
-          const stA = a.fixture.status.short;
-          const stB = b.fixture.status.short;
-          const esNSa = stA === 'NS';
-          const esNSb = stB === 'NS';
-          // NS primero (próximos), luego jugados más recientes
-          if (esNSa && !esNSb) return -1;
-          if (!esNSa && esNSb) return 1;
-          if (esNSa && esNSb) return ta - tb; // próximos: más cercano primero
-          return tb - ta; // jugados: más reciente primero
+          // Orden cronológico puro: timestamp ASC
+          return new Date(a.fixture.date).getTime() - new Date(b.fixture.date).getTime();
         });
         const rows = partidos.map(f => {
           const horaARG = new Date(new Date(f.fixture.date).getTime() - 3*60*60*1000);
@@ -3250,7 +3241,7 @@ function render() {
     const rows    = info.partidos.map(p => {
       const match = busqueda ? normalize(p.local+p.visita).includes(normalize(busqueda)) : false;
       return `<div class="partido ${match?'partido-highlight':''}" onclick="abrirPartido('${p.id}')">
-        <div style="width:50px;flex-shrink:0">${horaOFin(p, !!busqueda)}</div>
+        <div style="width:50px;flex-shrink:0">${horaOFin(p, !!busqueda || faseActual!=='todos')}</div>
         <div class="partido-info">
           <div class="equipos">
             ${(() => {
