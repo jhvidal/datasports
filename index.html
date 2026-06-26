@@ -2370,10 +2370,10 @@ const PARTIDOS = [
   {id:"32_1",  fecha:"2026-06-28",dia:"Domingo 28 de junio",    hora:"16:00",local:"2°A",          visita:"2°B",          grupo:"",sede:"SoFi Stadium, Los Ángeles",            fase:"32vos"},
   {id:"32_2",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"14:00",local:"1°C",          visita:"2°F",          grupo:"",sede:"NRG Stadium, Houston",                 fase:"32vos"},
   {id:"32_3",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"17:30",local:"1°E",          visita:"3°A/B/C/D/F",  grupo:"",sede:"Gillette Stadium, Boston",             fase:"32vos"},
-  {id:"32_4",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"22:00*",local:"1°F",         visita:"2°C",          grupo:"",sede:"Estadio BBVA, Monterrey",              fase:"32vos"},
+  {id:"32_4",  fecha:"2026-06-29",dia:"Lunes 29 de junio",      hora:"22:00", local:"1°F",         visita:"2°C",          grupo:"",sede:"Estadio BBVA, Monterrey",              fase:"32vos"},
   {id:"32_5",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"14:00",local:"2°E",          visita:"2°I",          grupo:"",sede:"AT&T Stadium, Dallas",                 fase:"32vos"},
   {id:"32_6",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"18:00",local:"1°I",          visita:"3°C/D/F/G/H",  grupo:"",sede:"MetLife Stadium, Nueva Jersey",        fase:"32vos"},
-  {id:"32_7",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"22:00*",local:"1°A",         visita:"3°C/E/F/H/I",  grupo:"",sede:"Estadio Azteca, Ciudad de México",    fase:"32vos"},
+  {id:"32_7",  fecha:"2026-06-30",dia:"Martes 30 de junio",     hora:"22:00", local:"1°A",         visita:"3°C/E/F/H/I",  grupo:"",sede:"Estadio Azteca, Ciudad de México",    fase:"32vos"},
   {id:"32_8",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"13:00",local:"1°L",          visita:"3°E/H/I/J/K",  grupo:"",sede:"Mercedes-Benz Stadium, Atlanta",       fase:"32vos"},
   {id:"32_9",  fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"17:00",local:"1°G",          visita:"3°A/E/H/I/J",  grupo:"",sede:"Lumen Field, Seattle",                 fase:"32vos"},
   {id:"32_10", fecha:"2026-07-01",dia:"Miércoles 1 de julio",   hora:"21:00",local:"1°D",          visita:"3°B/E/F/I/J",  grupo:"",sede:"Levi's Stadium, Santa Clara",          fase:"32vos"},
@@ -3062,10 +3062,13 @@ function filtrar() {
   }
   if (busqueda) {
     const q = normalize(busqueda);
-    res = res.filter(p =>
-      normalize(p.local).includes(q) || normalize(p.visita).includes(q) ||
-      normalize(p.sede).includes(q)  || normalize(p.dia).includes(q)
-    );
+    res = res.filter(p => {
+      const localReal  = resolverEquipo(p.local)  || p.local;
+      const visitaReal = resolverEquipo(p.visita) || p.visita;
+      return normalize(p.local).includes(q)    || normalize(p.visita).includes(q) ||
+             normalize(localReal).includes(q)  || normalize(visitaReal).includes(q) ||
+             normalize(p.sede).includes(q)     || normalize(p.dia).includes(q);
+    });
   }
   return res;
 }
@@ -3229,10 +3232,10 @@ function mostrarSugerencias(q) {
       const logoHtml = ligaEquipo?.logo
         ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`
         : `<span style="font-size:12px">⚽</span>`;
-      // Si está en LIGAS_MENORES, buscar en fixture; si es hardcodeado, ir a clubes
+      // Si está en LIGAS_MENORES tiene fixture; si no, buscar via API
       const accion = ligaEquipo
         ? `elegirSugerencia('${e.replace(/'/g, "\\'")}')`
-        : `elegirSeccion('clubes');setTimeout(()=>document.querySelector('.club-liga-btn')?.click(),100)`;
+        : `buscarYAbrirClub('${e.replace(/'/g, "\\'")}')`;
       return `<div class="sug-item" onclick="${accion}">
         ${logoHtml} <span>${e}</span>
       </div>`;
@@ -4335,6 +4338,33 @@ async function abrirClub(teamId, nombre, logo, league, season) {
     }).join('');
     lista.insertAdjacentHTML('beforeend', rows);
   } catch(e) {}
+}
+
+async function buscarYAbrirClub(nombre) {
+  document.getElementById('sugerencias').classList.remove('visible');
+  document.getElementById('searchInput').value = '';
+  busqueda = '';
+  // Ir a sección clubes
+  elegirSeccion('clubes');
+  // Buscar el equipo en la API
+  const lista = document.getElementById('clubes-lista');
+  if (lista) {
+    lista.innerHTML = '<div class="po-sin-datos">Buscando ' + nombre + '...</div>';
+    try {
+      const data = await apiFetch('teams?search=' + encodeURIComponent(nombre));
+      if (data?.response?.length) {
+        const e = data.response[0];
+        // Detectar liga y season del equipo
+        const season = 2026;
+        const league = e.team.country === 'Argentina' ? 129 : 0;
+        abrirClub(e.team.id, e.team.name, e.team.logo, league, season);
+      } else {
+        lista.innerHTML = '<div class="po-sin-datos">No se encontró ' + nombre + '</div>';
+      }
+    } catch(err) {
+      lista.innerHTML = '<div class="po-sin-datos">Error buscando equipo</div>';
+    }
+  }
 }
 
 function toggleMenu() {
