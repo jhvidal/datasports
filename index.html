@@ -4346,7 +4346,8 @@ async function cargarPosicionesClub(leagueId, teamId) {
   if (!pc) return;
   pc.innerHTML = '<div class="po-sin-datos">Cargando...</div>';
   try {
-    const data = await apiFetch('standings?league='+leagueId+'&season=2026');
+    let data = await apiFetch('standings?league='+leagueId+'&season=2026');
+    if (!data?.response?.length) data = await apiFetch('standings?league='+leagueId+'&season=2025');
     if (!data?.response?.length) { pc.innerHTML='<div class="po-sin-datos">Sin posiciones</div>'; return; }
     const grupos = data.response[0]?.league?.standings || [];
     let html = '';
@@ -4358,8 +4359,8 @@ async function cargarPosicionesClub(leagueId, teamId) {
         const esEste = eq.team.id === teamId;
         html += '<tr style="'+(esEste?'background:rgba(76,175,80,.1);font-weight:700':'')+'">'+
           '<td style="padding:4px 2px;color:var(--muted)">'+eq.rank+'</td>'+
-          '<td style="padding:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px">'+
-            '<img src="'+eq.team.logo+'" style="width:14px;height:14px;object-fit:contain" onerror="this.style.display=\'none\'">'+eq.team.name+'</td>'+
+          '<td style="padding:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+
+            '<img src="'+eq.team.logo+'" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px" onerror="this.style.display=\'none\'">'+eq.team.name+'</td>'+
           '<td style="text-align:center;color:var(--verde-texto);font-weight:700">'+eq.points+'</td>'+
           '<td style="text-align:center;color:var(--muted)">'+eq.all.played+'</td>'+
           '<td style="text-align:center;color:var(--muted)">'+eq.all.win+'</td>'+
@@ -4409,26 +4410,23 @@ async function buscarYAbrirClub(nombre) {
   document.getElementById('sugerencias').classList.remove('visible');
   document.getElementById('searchInput').value = '';
   busqueda = '';
-  // Ir a sección clubes
   elegirSeccion('clubes');
-  // Buscar el equipo en la API
+  // Esperar un tick para que el DOM se actualice
+  await new Promise(r => setTimeout(r, 50));
   const lista = document.getElementById('clubes-lista');
-  if (lista) {
-    lista.innerHTML = '<div class="po-sin-datos">Buscando ' + nombre + '...</div>';
-    try {
-      const data = await apiFetch('teams?search=' + encodeURIComponent(nombre));
-      if (data?.response?.length) {
-        const e = data.response[0];
-        elegirSeccion('clubes');
-        // Ir a sección clubes y abrir el club
-        document.getElementById('clubes-lista').innerHTML = '';
-        abrirClub(e.team.id, e.team.name, e.team.logo, 128, 2026);
-      } else {
-        lista.innerHTML = '<div class="po-sin-datos">No se encontró ' + nombre + '</div>';
-      }
-    } catch(err) {
-      lista.innerHTML = '<div class="po-sin-datos">Error buscando equipo</div>';
+  if (!lista) return;
+  lista.innerHTML = '<div class="po-sin-datos">Buscando ' + nombre + '...</div>';
+  try {
+    const data = await apiFetch('teams?search=' + encodeURIComponent(nombre));
+    if (data?.response?.length) {
+      const eq = data.response[0];
+      lista.innerHTML = '';
+      abrirClub(eq.team.id, eq.team.name, eq.team.logo, 128, 2026);
+    } else {
+      lista.innerHTML = '<div class="po-sin-datos">No se encontró ' + nombre + '</div>';
     }
+  } catch(err) {
+    lista.innerHTML = '<div class="po-sin-datos">Error buscando equipo</div>';
   }
 }
 
