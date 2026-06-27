@@ -4285,7 +4285,7 @@ async function abrirClub(teamId, nombre, logo, league, season) {
   try {
     // Traer próximos partidos y posición en paralelo
     const [data, standData] = await Promise.all([
-      apiFetch('fixtures?team='+teamId+'&season='+season+'&next=10'),
+      apiFetch('fixtures?team='+teamId+'&season='+season+'&status=NS-1H-HT-2H-ET-P&next=10'),
       apiFetch('standings?league='+league+'&season='+season)
     ]);
     document.getElementById('club-cargando')?.remove();
