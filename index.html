@@ -2806,7 +2806,7 @@ async function cargarCompActual() {
             <div class="partido-info">
               <div class="equipos">
                 <span class="equipo-nombre local">
-                  <img src="${f.teams.home.logo}" width="16" height="16" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                  <img src="${f.teams.home.logo}" width="16" height="16" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">
                   <span class="eq-text">${local}</span>
                 </span>
                 ${terminado || enVivo
@@ -2814,7 +2814,7 @@ async function cargarCompActual() {
                   : `<span class="vs-wrap">vs</span>`}
                 <span class="equipo-nombre visita">
                   <span class="eq-text">${visita}</span>
-                  <img src="${f.teams.away.logo}" width="16" height="16" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+                  <img src="${f.teams.away.logo}" width="16" height="16" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">
                 </span>
               </div>
               ${enVivo ? '<div class="meta"><span class="tag" style="background:var(--verde);color:#fff">EN VIVO</span></div>' : ''}
@@ -2912,7 +2912,7 @@ async function cargarCompActual() {
           html += `<tr style="border-bottom:1px solid var(--borde);">
             <td style="padding:6px 0;color:var(--muted);">${eq.rank}</td>
             <td style="padding:6px 0;"><div style="display:flex;align-items:center;gap:6px;">
-              <img src="${eq.team.logo}" width="16" height="16" style="object-fit:contain;" onerror="this.style.display='none'">
+              <img src="${eq.team.logo}" width="16" height="16" style="object-fit:contain;" onerror="this.style.display=\'none\'">
               <span style="color:var(--texto);font-weight:500;">${eq.team.name}</span>
             </div></td>
             <td style="text-align:center;color:var(--texto);font-weight:700;">${eq.points}</td>
@@ -2978,7 +2978,7 @@ async function buscarJugador(query) {
             <div style="font-size:.88rem;font-weight:600;color:var(--texto);">${p.name}</div>
             <div style="font-size:.72rem;color:var(--muted);">${s?.team?.name||''} · ${s?.games?.position||''} · ${p.nationality||''}</div>
           </div>
-          <img src="${s?.team?.logo||''}" width="24" height="24" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display='none'">
+          <img src="${s?.team?.logo||''}" width="24" height="24" style="object-fit:contain;flex-shrink:0;" onerror="this.style.display=\'none\'">
         </div>`;
       }).join('');
       document.getElementById('jugadores-resultado').innerHTML = html;
@@ -3234,7 +3234,7 @@ function mostrarSugerencias(q) {
     html += matchesEquipos.map(e => {
       const ligaEquipo = getEquiposLigasMenores().find(x => x.name === e);
       const logoHtml = ligaEquipo?.logo
-        ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`
+        ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display=\'none\'">`
         : `<span style="font-size:12px">⚽</span>`;
       // Si está en LIGAS_MENORES tiene fixture; si no, buscar via API
       const accion = ligaEquipo
@@ -3370,9 +3370,9 @@ function render() {
             <div style="width:50px;flex-shrink:0">${horaHtml}</div>
             <div class="partido-info">
               <div class="equipos">
-                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<span class="eq-text">${local}</span></span>
+                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display=\'none\'">`:''}<span class="eq-text">${local}</span></span>
                 ${resultadoHtml}
-                <span class="equipo-nombre visita"><span class="eq-text">${visita}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}</span>
+                <span class="equipo-nombre visita"><span class="eq-text">${visita}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display=\'none\'">`:''}</span>
               </div>
             </div>
           </div>`;
@@ -3384,7 +3384,7 @@ function render() {
         const logoLiga = LOGOS_LIGAS_FIJOS[lid] || fixturesLiga[0]?.league?.logo || '';
         return `<div class="dia-block dia-block-menor">
           <div class="dia-header ${abiertoMenor?'':'closed'} ${tieneLiveMenor?'tiene-live':''}" onclick="toggleDiaMenor('${fecha}','${lid}')">
-            ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display='none'">` : ''}
+            ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display=\'none\'">` : ''}
             <div class="dia-fecha-wrap">
               <div class="liga-label">${infoLiga.nombre}</div>
             </div>
@@ -3397,7 +3397,7 @@ function render() {
 
     return `<div class="dia-block">
       <div class="dia-header ${abierto?'':'closed'} ${tieneLive?'tiene-live':''}" onclick="toggleDia('${fecha}')">
-        <img class="liga-logo" src="https://assets.football-logos.cc/logos/tournaments/1500x1500/fifa-world-cup-2026.31d2489d.png" alt="" onerror="this.style.display='none'">
+        <img class="liga-logo" src="https://assets.football-logos.cc/logos/tournaments/1500x1500/fifa-world-cup-2026.31d2489d.png" alt="" onerror="this.style.display=\'none\'">
         <div class="dia-fecha-wrap">
           <div class="liga-label liga-mundial">Mundial 2026</div>
         </div>
@@ -3476,16 +3476,16 @@ function render() {
             </div>
             <div class="partido-info">
               <div class="equipos">
-                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<span class="eq-text">${f.teams.home.name}</span></span>
+                <span class="equipo-nombre local">${logoL?`<img class="eq-escudo" src="${logoL}" alt="" loading="lazy" onerror="this.style.display=\'none\'">`:''}<span class="eq-text">${f.teams.home.name}</span></span>
                 ${resHtml}
-                <span class="equipo-nombre visita"><span class="eq-text">${f.teams.away.name}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}</span>
+                <span class="equipo-nombre visita"><span class="eq-text">${f.teams.away.name}</span>${logoV?`<img class="eq-escudo" src="${logoV}" alt="" loading="lazy" onerror="this.style.display=\'none\'">`:''}</span>
               </div>
             </div>
           </div>`;
         }).join('');
         return `<div class="dia-block dia-block-menor" style="margin-top:10px">
           <div class="dia-header">
-            ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display='none'">` : ''}
+            ${logoLiga ? `<img class="liga-logo" src="${logoLiga}" alt="" onerror="this.style.display=\'none\'">` : ''}
             <div class="liga-label">${infoL?.nombre || 'Liga'}</div>
           </div>
           <div class="partidos-list">${filas}</div>
@@ -3527,7 +3527,7 @@ async function abrirPartidoMenor(fixtureId) {
       </div>
       <div class="po-marcador">
         <div class="po-equipo">
-          <img class="po-flag" src="${logoL}" width="32" height="32" style="object-fit:contain" onerror="this.style.display='none'">
+          <img class="po-flag" src="${logoL}" width="32" height="32" style="object-fit:contain" onerror="this.style.display=\'none\'">
           <div class="po-nombre">${local}</div>
         </div>
         <div class="po-score-wrap">
@@ -3536,7 +3536,7 @@ async function abrirPartidoMenor(fixtureId) {
             : `<div class="po-vs">VS</div><div class="po-estado">${new Date(new Date(f.fixture.date).getTime()-3*3600*1000).toISOString().slice(11,16)} hs</div>`}
         </div>
         <div class="po-equipo">
-          <img class="po-flag" src="${logoV}" width="32" height="32" style="object-fit:contain" onerror="this.style.display='none'">
+          <img class="po-flag" src="${logoV}" width="32" height="32" style="object-fit:contain" onerror="this.style.display=\'none\'">
           <div class="po-nombre">${visita}</div>
         </div>
       </div>
@@ -4276,83 +4276,133 @@ async function cargarClubes(league, season, btn) {
 
 async function abrirClub(teamId, nombre, logo, league, season) {
   const lista = document.getElementById('clubes-lista');
+  const clubId = 'club_'+teamId;
   lista.innerHTML =
-    '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--borde);margin-bottom:8px;">' +
+    '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--borde);margin-bottom:6px;">' +
     '<button onclick="document.querySelectorAll(\'.club-liga-btn\').forEach(b=>b.classList.remove(\'active\'));cargarClubes(' + league + ',' + season + ',document.querySelector(\'.club-liga-btn.active\')||document.querySelector(\'.club-liga-btn\'))" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;font-weight:600;">← volver</button>' +
     '<img src="'+logo+'" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display=\'none\'">' +
     '<span style="font-weight:700;font-size:.9rem;color:var(--texto)">'+nombre+'</span></div>' +
-    '<div class="po-sin-datos" id="club-cargando">Cargando próximos partidos...</div>';
+    '<div style="display:flex;border-bottom:1px solid var(--borde);margin-bottom:8px;">' +
+      '<button onclick="clubTab(\'proximos\','+teamId+',\''+nombre+'\',\''+logo+'\','+league+','+season+')" id="ctab-proximos" style="flex:1;padding:7px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:none;border:none;border-bottom:2px solid var(--verde);color:var(--texto);cursor:pointer">Próximos</button>' +
+      '<button onclick="clubTab(\'resultados\','+teamId+',\''+nombre+'\',\''+logo+'\','+league+','+season+')" id="ctab-resultados" style="flex:1;padding:7px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer">Resultados</button>' +
+      '<button onclick="clubTab(\'posiciones\','+teamId+',\''+nombre+'\',\''+logo+'\','+league+','+season+')" id="ctab-posiciones" style="flex:1;padding:7px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer">Posiciones</button>' +
+    '</div>' +
+    '<div id="club-content"></div>';
+  clubTab('proximos', teamId, nombre, logo, league, season);
+}
+
+async function clubTab(tab, teamId, nombre, logo, league, season) {
+  // Actualizar tabs activos
+  ['proximos','resultados','posiciones'].forEach(t => {
+    const btn = document.getElementById('ctab-'+t);
+    if (!btn) return;
+    btn.style.borderBottomColor = t===tab ? 'var(--verde)' : 'transparent';
+    btn.style.color = t===tab ? 'var(--texto)' : 'var(--muted)';
+  });
+  const cont = document.getElementById('club-content');
+  if (!cont) return;
+  cont.innerHTML = '<div class="po-sin-datos">Cargando...</div>';
+
   try {
-    // Traer próximos partidos y posición en paralelo
-    const [data, standData] = await Promise.all([
-      apiFetch('fixtures?team='+teamId+'&season='+season+'&status=NS-1H-HT-2H-ET-P&next=10'),
-      apiFetch('standings?league='+league+'&season='+season)
-    ]);
-    document.getElementById('club-cargando')?.remove();
+    if (tab === 'proximos') {
+      const data = await apiFetch('fixtures?team='+teamId+'&next=10');
+      cont.innerHTML = '';
+      if (!data?.response?.length) { cont.innerHTML='<div class="po-sin-datos">Sin próximos partidos</div>'; return; }
+      const partidos = [...data.response].sort((a,b)=>a.fixture.timestamp-b.fixture.timestamp);
+      cont.innerHTML = partidos.map(f => mkClubPartido(f, teamId)).join('');
 
-    // Mostrar posición si existe
-    if (standData?.response?.length) {
-      const grupos = standData.response[0]?.league?.standings || [];
-      let posInfo = null;
-      for (const grupo of grupos) {
-        const pos = grupo.find(t => t.team.id === teamId);
-        if (pos) { posInfo = pos; break; }
-      }
-      if (posInfo) {
-        lista.insertAdjacentHTML('beforeend',
-          '<div style="background:var(--mid);border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">' +
-          '<span style="font-size:1.2rem;font-weight:700;color:var(--verde-texto)">#'+posInfo.rank+'</span>' +
-          '<div style="flex:1">' +
-            '<div style="font-size:.72rem;font-weight:700;color:var(--texto)">'+posInfo.group.replace('Group ','Grupo ')+'</div>' +
-            '<div style="font-size:.68rem;color:var(--muted)">'+posInfo.points+' pts · '+posInfo.all.played+'PJ · '+posInfo.all.win+'G '+posInfo.all.draw+'E '+posInfo.all.lose+'P</div>' +
-          '</div></div>'
-        );
-      }
-    }
+    } else if (tab === 'resultados') {
+      const data = await apiFetch('fixtures?team='+teamId+'&last=10');
+      cont.innerHTML = '';
+      if (!data?.response?.length) { cont.innerHTML='<div class="po-sin-datos">Sin resultados</div>'; return; }
+      const partidos = [...data.response].sort((a,b)=>b.fixture.timestamp-a.fixture.timestamp);
+      cont.innerHTML = partidos.map(f => mkClubPartido(f, teamId)).join('');
 
-    if (!data?.response?.length) {
-      lista.insertAdjacentHTML('beforeend','<div class="po-sin-datos">Sin próximos partidos</div>');
-      return;
+    } else if (tab === 'posiciones') {
+      // Traer todas las ligas del equipo en la temporada actual
+      const data = await apiFetch('leagues?team='+teamId+'&current=true');
+      cont.innerHTML = '';
+      if (!data?.response?.length) { cont.innerHTML='<div class="po-sin-datos">Sin ligas disponibles</div>'; return; }
+      // Mostrar selector de ligas
+      const ligas = data.response.filter(l => l.seasons?.some(s=>s.current));
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
+      ligas.forEach((l,i) => {
+        html += '<button onclick="cargarPosicionesClub('+l.league.id+','+teamId+')" class="club-liga-btn" id="cpos-'+l.league.id+'" style="'+(i===0?'background:var(--verde);color:#fff;border-color:var(--verde)':'')+'">'+
+          (l.league.logo?'<img src="'+l.league.logo+'" style="width:14px;height:14px;object-fit:contain;margin-right:4px;vertical-align:middle" onerror="this.style.display=\'none\'">':'')+
+          l.league.name+'</button>';
+      });
+      html += '</div><div id="pos-content"><div class="po-sin-datos">Seleccioná una liga</div></div>';
+      cont.innerHTML = html;
+      if (ligas.length > 0) cargarPosicionesClub(ligas[0].league.id, teamId);
     }
-    // Ordenar por fecha ASC
-    const partidos = [...data.response].sort((a,b) => a.fixture.timestamp - b.fixture.timestamp);
-    lista.insertAdjacentHTML('beforeend',
-      '<div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px;border-bottom:1px solid var(--borde);margin-bottom:2px">Próximos partidos</div>'
-    );
-    const rows = partidos.map(function(f) {
-      const st = f.fixture.status.short;
-      const ft = ['FT','AET','PEN'].includes(st);
-      const lv = ['1H','2H','HT','ET','P'].includes(st);
-      const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
-      const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-      const dow = DIAS[d.getDay()];
-      const diaStr = dow+' '+d.getDate()+'/'+(d.getMonth()+1);
-      const hora = d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');
-      const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' :
-        '<span style="display:flex;flex-direction:column;align-items:center;gap:2px">' +
-        '<span class="hora" style="font-size:.72rem;line-height:1">'+hora+'</span>' +
-        '<span style="font-size:.55rem;color:var(--muted);font-weight:600;line-height:1;white-space:nowrap">'+diaStr+'</span></span>';
-      const rival = f.teams.home.id === teamId ? f.teams.away.name : f.teams.home.name;
-      const rivalLogo = f.teams.home.id === teamId ? f.teams.away.logo : f.teams.home.logo;
-      const esLocal = f.teams.home.id === teamId;
-      const goles = (ft||lv) ? (f.goals.home+' - '+f.goals.away) : '';
-      const ligaNombre = LIGAS_MENORES_INFO[f.league.id]?.nombre || f.league.name;
-      const ligaLogo = LIGAS_MENORES_INFO[f.league.id]?.logo || f.league.logo;
-      const ligaBadge = '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--mid);border-radius:4px;padding:1px 5px;font-size:.58rem;font-weight:700;color:var(--muted)">' +
-        (ligaLogo ? '<img src="'+ligaLogo+'" style="width:10px;height:10px;object-fit:contain" onerror="this.style.display=\'none\'">' : '') +
-        ligaNombre+'</span>';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)">' +
-        '<div style="width:46px;flex-shrink:0;text-align:center">'+estado+'</div>' +
-        '<img src="'+rivalLogo+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' +
-        '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:.8rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>' +
-          '<div style="margin-top:2px">'+ligaBadge+'</div>' +
-        '</div>' +
-        (goles ? '<div style="font-size:.88rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>' : '') +
-      '</div>';
-    }).join('');
-    lista.insertAdjacentHTML('beforeend', rows);
-  } catch(e) {}
+  } catch(e) { cont.innerHTML='<div class="po-sin-datos">Error cargando datos</div>'; }
+}
+
+async function cargarPosicionesClub(leagueId, teamId) {
+  document.querySelectorAll('[id^="cpos-"]').forEach(b => { b.style.background=''; b.style.color=''; b.style.borderColor=''; });
+  const btn = document.getElementById('cpos-'+leagueId);
+  if (btn) { btn.style.background='var(--verde)'; btn.style.color='#fff'; btn.style.borderColor='var(--verde)'; }
+  const pc = document.getElementById('pos-content');
+  if (!pc) return;
+  pc.innerHTML = '<div class="po-sin-datos">Cargando...</div>';
+  try {
+    const data = await apiFetch('standings?league='+leagueId+'&season=2026');
+    if (!data?.response?.length) { pc.innerHTML='<div class="po-sin-datos">Sin posiciones</div>'; return; }
+    const grupos = data.response[0]?.league?.standings || [];
+    let html = '';
+    for (const grupo of grupos) {
+      if (grupos.length > 1) html += '<div style="font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 0 4px">'+grupo[0]?.group?.replace('Group ','Grupo ')+'</div>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:.72rem;table-layout:fixed"><colgroup><col style="width:24px"><col style="width:40%"><col style="width:10%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:8%"><col style="width:10%"></colgroup>';
+      html += '<thead><tr style="color:var(--muted);font-size:.6rem"><th style="text-align:left;padding:2px">#</th><th style="text-align:left;padding:2px">Equipo</th><th style="text-align:center;font-weight:700;color:var(--texto)">Pts</th><th style="text-align:center">PJ</th><th style="text-align:center">G</th><th style="text-align:center">E</th><th style="text-align:center">P</th><th style="text-align:center">DG</th></tr></thead><tbody>';
+      grupo.forEach(eq => {
+        const esEste = eq.team.id === teamId;
+        html += '<tr style="'+(esEste?'background:rgba(76,175,80,.1);font-weight:700':'')+'">'+
+          '<td style="padding:4px 2px;color:var(--muted)">'+eq.rank+'</td>'+
+          '<td style="padding:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px">'+
+            '<img src="'+eq.team.logo+'" style="width:14px;height:14px;object-fit:contain" onerror="this.style.display=\'none\'">'+eq.team.name+'</td>'+
+          '<td style="text-align:center;color:var(--verde-texto);font-weight:700">'+eq.points+'</td>'+
+          '<td style="text-align:center;color:var(--muted)">'+eq.all.played+'</td>'+
+          '<td style="text-align:center;color:var(--muted)">'+eq.all.win+'</td>'+
+          '<td style="text-align:center;color:var(--muted)">'+eq.all.draw+'</td>'+
+          '<td style="text-align:center;color:var(--muted)">'+eq.all.lose+'</td>'+
+          '<td style="text-align:center;color:var(--muted)">'+eq.goalsDiff+'</td>'+
+        '</tr>';
+      });
+      html += '</tbody></table>';
+    }
+    pc.innerHTML = html;
+  } catch(e) { pc.innerHTML='<div class="po-sin-datos">Error</div>'; }
+}
+
+function mkClubPartido(f, teamId) {
+  const st = f.fixture.status.short;
+  const ft = ['FT','AET','PEN'].includes(st);
+  const lv = ['1H','2H','HT','ET','P'].includes(st);
+  const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
+  const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const diaStr = DIAS[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1);
+  const hora = d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');
+  const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' :
+    '<span style="display:flex;flex-direction:column;align-items:center;gap:2px">'+
+    '<span class="hora" style="font-size:.72rem;line-height:1">'+hora+'</span>'+
+    '<span style="font-size:.55rem;color:var(--muted);font-weight:600;line-height:1;white-space:nowrap">'+diaStr+'</span></span>';
+  const rival = f.teams.home.id === teamId ? f.teams.away.name : f.teams.home.name;
+  const rivalLogo = f.teams.home.id === teamId ? f.teams.away.logo : f.teams.home.logo;
+  const esLocal = f.teams.home.id === teamId;
+  const goles = ft||lv ? (f.goals.home+' - '+f.goals.away) : '';
+  const ligaNombre = LIGAS_MENORES_INFO[f.league.id]?.nombre || f.league.name;
+  const ligaLogo = LIGAS_MENORES_INFO[f.league.id]?.logo || f.league.logo;
+  const ligaBadge = '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--mid);border-radius:4px;padding:1px 5px;font-size:.58rem;font-weight:700;color:var(--muted)">'+
+    (ligaLogo?'<img src="'+ligaLogo+'" style="width:10px;height:10px;object-fit:contain" onerror="this.style.display=\'none\'">':'')+ligaNombre+'</span>';
+  return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)">'+
+    '<div style="width:46px;flex-shrink:0;text-align:center">'+estado+'</div>'+
+    '<img src="'+rivalLogo+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">'+
+    '<div style="flex:1;min-width:0">'+
+      '<div style="font-size:.8rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>'+
+      '<div style="margin-top:2px">'+ligaBadge+'</div>'+
+    '</div>'+
+    (goles?'<div style="font-size:.88rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>':'')+
+  '</div>';
 }
 
 async function buscarYAbrirClub(nombre) {
@@ -4369,10 +4419,10 @@ async function buscarYAbrirClub(nombre) {
       const data = await apiFetch('teams?search=' + encodeURIComponent(nombre));
       if (data?.response?.length) {
         const e = data.response[0];
-        // Detectar liga y season del equipo
-        const season = 2026;
-        const league = e.team.country === 'Argentina' ? 129 : 0;
-        abrirClub(e.team.id, e.team.name, e.team.logo, league, season);
+        elegirSeccion('clubes');
+        // Ir a sección clubes y abrir el club
+        document.getElementById('clubes-lista').innerHTML = '';
+        abrirClub(e.team.id, e.team.name, e.team.logo, 128, 2026);
       } else {
         lista.innerHTML = '<div class="po-sin-datos">No se encontró ' + nombre + '</div>';
       }
