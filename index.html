@@ -935,7 +935,7 @@
         <span>Argentina</span><span class="comp-grupo-arrow">▾</span>
       </div>
       <div class="comp-grupo-body">
-        <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarComp(this)">Liga Profesional</button>
+        <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional Argentina" onclick="seleccionarComp(this)">Liga Profesional</button>
         <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarComp(this)">Primera Nacional</button>
         <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarComp(this)">Copa Argentina</button>
         <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarComp(this)">Primera B Metro</button>
@@ -1147,8 +1147,12 @@ let pollingInterval = null;
 // Estructura: { 'YYYY-MM-DD': { 129: [fixtures...], 131: [fixtures...] } }
 const LIGAS_MENORES = {};
 const LIGAS_MENORES_INFO = {
-  129: { nombre: 'Primera Nacional', orden: 1 },
-  131: { nombre: 'Primera B Metro',  orden: 2 },
+  128: { nombre: 'Liga Profesional',    logo: 'https://media.api-sports.io/football/leagues/128.png', orden: 0 },
+  129: { nombre: 'Primera Nacional',    orden: 1 },
+  130: { nombre: 'Copa Argentina',      logo: 'https://media.api-sports.io/football/leagues/130.png', orden: 2 },
+  131: { nombre: 'Primera B Metro',     orden: 3 },
+  13:  { nombre: 'Copa Libertadores',   logo: 'https://media.api-sports.io/football/leagues/13.png',  orden: 4 },
+  11:  { nombre: 'Copa Sudamericana',   logo: 'https://media.api-sports.io/football/leagues/11.png',  orden: 5 },
 };
 
 function fechaARGDeFixture(fechaISO) {
@@ -1161,7 +1165,7 @@ function fechaARGDeFixture(fechaISO) {
 
 async function cargarLigasMenores() {
   try {
-    const ligaIds = [129, 131];
+    const ligaIds = [128, 129, 130, 131, 13, 11];
     const calls = ligaIds.map(lid =>
       apiFetch(`fixtures?league=${lid}&season=2026&status=NS-1H-HT-2H-ET-P-FT-AET-PEN`)
     );
@@ -4331,7 +4335,10 @@ async function abrirClub(teamId, nombre, logo, league, season) {
         '<img src="'+rivalLogo+'" style="width:22px;height:22px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' +
         '<div style="flex:1;min-width:0">' +
           '<div style="font-size:.78rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>' +
-          '<div style="font-size:.65rem;color:var(--muted)">'+dia+' · '+f.league.name+'</div>' +
+          '<div style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:3px">' +
+            (LIGAS_MENORES_INFO[f.league.id]?.logo ? '<img src="'+(LIGAS_MENORES_INFO[f.league.id].logo)+'" style="width:11px;height:11px;object-fit:contain" onerror="this.style.display=\'none\'">' : '') +
+            dia+' - '+(LIGAS_MENORES_INFO[f.league.id]?.nombre || f.league.name)+
+          '</div>' +
         '</div>' +
         (goles ? '<div style="font-size:.85rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>' : '') +
       '</div>';
