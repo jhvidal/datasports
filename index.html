@@ -4314,33 +4314,41 @@ async function abrirClub(teamId, nombre, logo, league, season) {
       lista.insertAdjacentHTML('beforeend','<div class="po-sin-datos">Sin próximos partidos</div>');
       return;
     }
-    const rows = data.response.map(function(f) {
+    // Ordenar por fecha ASC
+    const partidos = [...data.response].sort((a,b) => a.fixture.timestamp - b.fixture.timestamp);
+    lista.insertAdjacentHTML('beforeend',
+      '<div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px;border-bottom:1px solid var(--borde);margin-bottom:2px">Próximos partidos</div>'
+    );
+    const rows = partidos.map(function(f) {
       const st = f.fixture.status.short;
       const ft = ['FT','AET','PEN'].includes(st);
       const lv = ['1H','2H','HT','ET','P'].includes(st);
       const d = new Date(new Date(f.fixture.date).getTime() - 3*3600*1000);
-      const dia = d.toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
+      const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const dow = DIAS[d.getDay()];
+      const diaStr = dow+' '+d.getDate()+'/'+(d.getMonth()+1);
       const hora = d.getUTCHours().toString().padStart(2,'0')+':'+d.getUTCMinutes().toString().padStart(2,'0');
-      const diaStr = d.getDate()+'/'+(d.getUTCMonth()+1);
       const estado = ft ? '<span class="hora-fin">FIN</span>' : lv ? '<span class="live-badge">EN VIVO</span>' :
-        '<span style="display:flex;flex-direction:column;align-items:center;gap:1px">' +
-        '<span style="font-size:.58rem;color:var(--muted);font-weight:600">'+diaStr+'</span>' +
-        '<span class="hora" style="font-size:.7rem">'+hora+'</span></span>';
+        '<span style="display:flex;flex-direction:column;align-items:center;gap:2px">' +
+        '<span class="hora" style="font-size:.72rem;line-height:1">'+hora+'</span>' +
+        '<span style="font-size:.55rem;color:var(--muted);font-weight:600;line-height:1;white-space:nowrap">'+diaStr+'</span></span>';
       const rival = f.teams.home.id === teamId ? f.teams.away.name : f.teams.home.name;
       const rivalLogo = f.teams.home.id === teamId ? f.teams.away.logo : f.teams.home.logo;
       const esLocal = f.teams.home.id === teamId;
       const goles = (ft||lv) ? (f.goals.home+' - '+f.goals.away) : '';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--borde)">' +
-        '<div style="width:42px;flex-shrink:0;text-align:center">'+estado+'</div>' +
-        '<img src="'+rivalLogo+'" style="width:22px;height:22px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' +
+      const ligaNombre = LIGAS_MENORES_INFO[f.league.id]?.nombre || f.league.name;
+      const ligaLogo = LIGAS_MENORES_INFO[f.league.id]?.logo || f.league.logo;
+      const ligaBadge = '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--mid);border-radius:4px;padding:1px 5px;font-size:.58rem;font-weight:700;color:var(--muted)">' +
+        (ligaLogo ? '<img src="'+ligaLogo+'" style="width:10px;height:10px;object-fit:contain" onerror="this.style.display=\'none\'">' : '') +
+        ligaNombre+'</span>';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)">' +
+        '<div style="width:46px;flex-shrink:0;text-align:center">'+estado+'</div>' +
+        '<img src="'+rivalLogo+'" style="width:24px;height:24px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' +
         '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:.78rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>' +
-          '<div style="font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:3px">' +
-            (LIGAS_MENORES_INFO[f.league.id]?.logo ? '<img src="'+(LIGAS_MENORES_INFO[f.league.id].logo)+'" style="width:11px;height:11px;object-fit:contain" onerror="this.style.display=\'none\'">' : '') +
-            dia+' - '+(LIGAS_MENORES_INFO[f.league.id]?.nombre || f.league.name)+
-          '</div>' +
+          '<div style="font-size:.8rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(esLocal?'vs '+rival:rival+' (V)')+'</div>' +
+          '<div style="margin-top:2px">'+ligaBadge+'</div>' +
         '</div>' +
-        (goles ? '<div style="font-size:.85rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>' : '') +
+        (goles ? '<div style="font-size:.88rem;font-weight:700;color:var(--texto);flex-shrink:0">'+goles+'</div>' : '') +
       '</div>';
     }).join('');
     lista.insertAdjacentHTML('beforeend', rows);
