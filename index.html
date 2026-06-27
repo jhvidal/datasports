@@ -3250,18 +3250,27 @@ function mostrarSugerencias(q) {
 }
 
 function elegirSugerencia(nombre) {
-  busqueda = nombre;
-  faseActual = 'todos';
-  document.querySelectorAll('.fase-btn').forEach(b => b.classList.remove('active'));
-  const btnTodos = document.querySelector('.fase-btn[data-fase="todos"]');
-  if (btnTodos) btnTodos.classList.add('active');
-  document.getElementById('searchInput').value = nombre;
-  document.getElementById('searchClear').classList.add('visible');
   document.getElementById('sugerencias').classList.remove('visible');
-  fechaActiva = null;
-  diasAbiertos = {};
-  buildFechaChips();
-  render();
+  // Si está en PAISES_MUNDIAL es una selección — buscar en fixture
+  const esSelecion = PAISES_MUNDIAL.includes(nombre);
+  if (esSelecion) {
+    busqueda = nombre;
+    faseActual = 'todos';
+    document.querySelectorAll('.fase-btn').forEach(b => b.classList.remove('active'));
+    const btnTodos = document.querySelector('.fase-btn[data-fase="todos"]');
+    if (btnTodos) btnTodos.classList.add('active');
+    document.getElementById('searchInput').value = nombre;
+    document.getElementById('searchClear').classList.add('visible');
+    fechaActiva = null;
+    diasAbiertos = {};
+    buildFechaChips();
+    render();
+  } else {
+    // Es un club — ir a pantalla de clubes
+    document.getElementById('searchInput').value = '';
+    busqueda = '';
+    buscarYAbrirClub(nombre);
+  }
 }
 
 document.getElementById('searchInput').addEventListener('input', e => {
@@ -4359,7 +4368,7 @@ async function cargarPosicionesClub(leagueId, teamId) {
         const esEste = eq.team.id === teamId;
         html += '<tr style="'+(esEste?'background:rgba(76,175,80,.1);font-weight:700':'')+'">'+
           '<td style="padding:4px 2px;color:var(--muted)">'+eq.rank+'</td>'+
-          '<td style="padding:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+
+          '<td style="padding:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left">'+
             '<img src="'+eq.team.logo+'" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;margin-right:4px" onerror="this.style.display=\'none\'">'+eq.team.name+'</td>'+
           '<td style="text-align:center;color:var(--verde-texto);font-weight:700">'+eq.points+'</td>'+
           '<td style="text-align:center;color:var(--muted)">'+eq.all.played+'</td>'+
