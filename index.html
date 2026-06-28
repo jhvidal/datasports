@@ -2751,16 +2751,22 @@ async function cargarCompActual() {
         return 99;
       };
 
-      // Filtrar desde ayer en adelante para no mostrar todo el historial
-      const ayerTs = Date.now() - 24*60*60*1000;
-      const fixturesFiltrados = fixtures.filter(f => new Date(f.fixture.date).getTime() >= ayerTs);
-      // Para copas/knockouts (Copa Arg, B Nacional): si no hay próximos, mostrar pendientes NS
-      if (fixturesFiltrados.length > 0) {
-        fixtures = fixturesFiltrados;
-      } else if (['129','130'].includes(compActual.league)) {
-        // Mostrar todos los NS (pendientes) sin importar cuándo sean
-        const pendientes = fixtures.filter(f => f.fixture.status.short === 'NS');
-        if (pendientes.length > 0) fixtures = pendientes;
+      // Copa Argentina: mostrar TODOS los NS pendientes de todas las rondas
+      if (compActual.league === '130') {
+        const enVivoCopa = fixtures.filter(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short));
+        const pendientesCopa = fixtures.filter(f => f.fixture.status.short === 'NS');
+        if (enVivoCopa.length > 0) fixtures = enVivoCopa;
+        else if (pendientesCopa.length > 0) fixtures = pendientesCopa;
+      } else {
+        // Resto: filtrar desde ayer en adelante
+        const ayerTs = Date.now() - 24*60*60*1000;
+        const fixturesFiltrados = fixtures.filter(f => new Date(f.fixture.date).getTime() >= ayerTs);
+        if (fixturesFiltrados.length > 0) {
+          fixtures = fixturesFiltrados;
+        } else if (compActual.league === '129') {
+          const pendientesB = fixtures.filter(f => f.fixture.status.short === 'NS');
+          if (pendientesB.length > 0) fixtures = pendientesB;
+        }
       }
 
       // Agrupar por ronda
