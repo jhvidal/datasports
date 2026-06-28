@@ -2751,10 +2751,10 @@ async function cargarCompActual() {
         return 99;
       };
 
-      // Copa Argentina: mostrar TODOS los NS pendientes de todas las rondas
+      // Copa Argentina: mostrar NS + PST (postergados) de todas las rondas
       if (compActual.league === '130') {
         const enVivoCopa = fixtures.filter(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short));
-        const pendientesCopa = fixtures.filter(f => f.fixture.status.short === 'NS');
+        const pendientesCopa = fixtures.filter(f => ['NS','PST','TBD'].includes(f.fixture.status.short));
         if (enVivoCopa.length > 0) fixtures = enVivoCopa;
         else if (pendientesCopa.length > 0) fixtures = pendientesCopa;
       } else {
@@ -2827,6 +2827,7 @@ async function cargarCompActual() {
           const st = f.fixture.status.short;
           const terminado = ['FT','AET','PEN'].includes(st);
           const enVivo = ['1H','HT','2H','ET'].includes(st);
+          const postergado = ['PST','SUSP','CANC'].includes(st);
           const local = f.teams.home.name;
           const visita = f.teams.away.name;
           const gL = f.goals.home ?? '';
@@ -2835,6 +2836,8 @@ async function cargarCompActual() {
             ? `<span style="font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--texto)">${gL}-${gV}</span>`
             : enVivo
             ? `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--rojo)">${gL}-${gV}</span>`
+            : postergado
+            ? `<span style="font-family:'Inter',sans-serif;font-size:.6rem;color:var(--muted);font-weight:600">PST</span>`
             : `<span style="font-family:'Inter',sans-serif;font-size:1rem;color:var(--verde-texto)">${hh}:${mm}</span>`;
           return `<div class="partido" style="cursor:default">
             <div style="width:50px;flex-shrink:0;text-align:center;">
