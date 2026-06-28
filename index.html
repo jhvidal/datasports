@@ -646,11 +646,14 @@
   .comp-btn.active { color: var(--verde-texto); border-left-color: var(--verde-texto); background: rgba(76,175,80,.08); font-weight:700; }
   .comp-btn-mundial { border-left-color: #ffd700 !important; font-weight: 600; color: #b8860b; font-size: .82rem; padding: 10px 16px; }
   .comp-btn-mundial.active { background: rgba(255,215,0,.12) !important; border-left-color: #ffd700 !important; color:#b8860b !important; }
-  /* Panel verde del selector usa override */
-  #comp-selector-panel .comp-btn { color:rgba(255,255,255,.8); border-bottom-color:rgba(255,255,255,.1); }
-  #comp-selector-panel .comp-btn:hover { background:rgba(255,255,255,.08); }
-  #comp-selector-panel .comp-btn.active { color:#fff; background:rgba(76,175,80,.2); border-left-color:#4CAF50; }
-  #comp-selector-panel .comp-btn-mundial { color:rgba(255,255,255,.8); border-left-color:transparent !important; }
+  /* Paneles de selector: overrides */
+  #comp-selector-panel .comp-btn,
+  #club-liga-selector-panel .comp-btn { color:rgba(255,255,255,.85); border-bottom-color:rgba(255,255,255,.1); font-size:.8rem; padding:8px 14px; }
+  #comp-selector-panel .comp-btn:hover,
+  #club-liga-selector-panel .comp-btn:hover { background:rgba(255,255,255,.1); color:#fff; }
+  #comp-selector-panel .comp-btn.active,
+  #club-liga-selector-panel .comp-btn.active { color:#fff; background:rgba(76,175,80,.25); border-left-color:#4CAF50; }
+  #comp-selector-panel .comp-btn-mundial { color:rgba(255,255,255,.85); border-left-color:transparent !important; }
   .comp-grupo-mundial { border: 1px solid rgba(255,215,0,.2); border-radius: 8px; margin-bottom: 8px; background: rgba(255,215,0,.04); }
   .comp-grupo-mundial .comp-grupo-body { padding: 4px 0; }
   .comp-btn:hover { color: var(--texto); }
@@ -1031,11 +1034,11 @@
 
   <!-- Selector siempre visible -->
   <div style="padding:10px 14px 0;">
-    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#122016;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:#fff;">
+    <button onclick="toggleCompSelector()" id="comp-selector-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#1a3d22;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:600;color:#fff;">
       <span id="comp-selector-label">Seleccionar competición</span>
       <span id="comp-selector-arrow" style="font-size:.7rem;color:rgba(255,255,255,.5);transition:transform .2s">▾</span>
     </button>
-    <div id="comp-selector-panel" style="display:none;background:#122016;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;max-height:300px;overflow-y:auto;z-index:50;position:relative;">
+    <div id="comp-selector-panel" style="display:none;background:#1a3d22;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;max-height:300px;overflow-y:auto;z-index:50;position:relative;">
       <button class="comp-btn comp-btn-mundial" data-league="1" data-season="2026" data-name="Mundial 2026" onclick="seleccionarCompDesde(this)">Mundial 2026</button>
       <div style="font-size:.6rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;padding:6px 14px 3px;letter-spacing:.5px;border-top:1px solid rgba(255,255,255,.1)">Argentina</div>
       <button class="comp-btn" data-league="128" data-season="2026" data-name="Liga Profesional" onclick="seleccionarCompDesde(this)">Liga Profesional</button>
@@ -1096,19 +1099,19 @@
     <!-- Dropdown selector de liga -->
     <div style="position:relative;margin-bottom:12px;">
       <button onclick="toggleClubLigaSelector()" id="club-liga-selector-btn"
-        style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#122016;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;color:#fff;">
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#1a3d22;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;color:#fff;">
         <span id="club-liga-selector-label">Seleccionar liga</span>
         <span id="club-liga-selector-arrow" style="font-size:.7rem;color:rgba(255,255,255,.5);transition:transform .2s">▾</span>
       </button>
-      <div id="club-liga-selector-panel" style="display:none;background:#122016;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;z-index:50;position:relative;">
-        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Argentina</div>
+      <div id="club-liga-selector-panel" style="display:none;background:#1a3d22;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;z-index:50;position:relative;">
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.25);">Argentina</div>
         <button class="comp-btn" onclick="elegirLigaClubes(128,2026,'Liga Profesional')">Liga Profesional</button>
         <button class="comp-btn" onclick="elegirLigaClubes(129,2026,'Primera Nacional')">Primera Nacional</button>
         <button class="comp-btn" onclick="elegirLigaClubes(131,2026,'Primera B Metro')">Primera B Metro</button>
-        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Sudamérica</div>
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.25);">Sudamérica</div>
         <button class="comp-btn" onclick="elegirLigaClubes(13,2026,'Copa Libertadores')">Copa Libertadores</button>
         <button class="comp-btn" onclick="elegirLigaClubes(11,2026,'Copa Sudamericana')">Copa Sudamericana</button>
-        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Europa</div>
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.25);">Europa</div>
         <button class="comp-btn" onclick="elegirLigaClubes(2,2025,'Champions League')">Champions League</button>
         <button class="comp-btn" onclick="elegirLigaClubes(39,2025,'Premier League')">Premier League</button>
         <button class="comp-btn" onclick="elegirLigaClubes(140,2025,'La Liga')">La Liga</button>
@@ -2751,7 +2754,14 @@ async function cargarCompActual() {
       // Filtrar desde ayer en adelante para no mostrar todo el historial
       const ayerTs = Date.now() - 24*60*60*1000;
       const fixturesFiltrados = fixtures.filter(f => new Date(f.fixture.date).getTime() >= ayerTs);
-      if (fixturesFiltrados.length > 0) fixtures = fixturesFiltrados;
+      // Para copas/knockouts (Copa Arg, B Nacional): si no hay próximos, mostrar pendientes NS
+      if (fixturesFiltrados.length > 0) {
+        fixtures = fixturesFiltrados;
+      } else if (['129','130'].includes(compActual.league)) {
+        // Mostrar todos los NS (pendientes) sin importar cuándo sean
+        const pendientes = fixtures.filter(f => f.fixture.status.short === 'NS');
+        if (pendientes.length > 0) fixtures = pendientes;
+      }
 
       // Agrupar por ronda
       const porRonda = {};
@@ -2772,15 +2782,25 @@ async function cargarCompActual() {
       if (compRondaActiva && porRonda[compRondaActiva]) {
         rondas = [compRondaActiva];
       } else if (rondas.length > 0) {
-        // Elegir la ronda más relevante: en vivo > próxima (NS) > última con resultados
-        const rondasConVivo = rondas.filter(r => porRonda[r].some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short)));
-        const rondasConNS = rondas.filter(r => porRonda[r].some(f => f.fixture.status.short === 'NS'));
-        const rondasConFT = rondas.filter(r => porRonda[r].some(f => ['FT','AET','PEN'].includes(f.fixture.status.short)));
-        if (rondasConVivo.length > 0) rondas = [rondasConVivo[0]];
-        else if (rondasConNS.length > 0) rondas = [rondasConNS[0]];
-        else if (rondasConFT.length > 0) rondas = [rondasConFT[rondasConFT.length - 1]]; // la más avanzada con FT
-        else rondas = [rondas[0]];
-        compRondaActiva = rondas[0];
+        // Copa Argentina: mostrar TODAS las rondas con partidos NS pendientes
+        if (compActual.league === '130') {
+          const rondasConVivo = rondas.filter(r => porRonda[r].some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short)));
+          if (rondasConVivo.length > 0) {
+            rondas = [rondasConVivo[0]];
+          }
+          // else: dejar todas las rondas para mostrar el cuadro completo
+          compRondaActiva = null; // no fijar ronda activa en Copa Arg
+        } else {
+          // Elegir la ronda más relevante: en vivo > próxima (NS) > última con resultados
+          const rondasConVivo = rondas.filter(r => porRonda[r].some(f => ['1H','2H','HT','ET','P'].includes(f.fixture.status.short)));
+          const rondasConNS = rondas.filter(r => porRonda[r].some(f => f.fixture.status.short === 'NS'));
+          const rondasConFT = rondas.filter(r => porRonda[r].some(f => ['FT','AET','PEN'].includes(f.fixture.status.short)));
+          if (rondasConVivo.length > 0) rondas = [rondasConVivo[0]];
+          else if (rondasConNS.length > 0) rondas = [rondasConNS[0]];
+          else if (rondasConFT.length > 0) rondas = [rondasConFT[rondasConFT.length - 1]];
+          else rondas = [rondas[0]];
+          compRondaActiva = rondas[0];
+        }
       }
 
       const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -2855,7 +2875,7 @@ async function cargarCompActual() {
             if (/3rd place/i.test(ronda)) return 'Tercer Puesto';
             // Round of 16 → 16avos de Final
             if (/round of 16/i.test(ronda)) return '16avos de Final';
-            if (/round of 32/i.test(ronda)) return '16avos de Final';
+            if (/round of 32/i.test(ronda)) return '32avos de Final';
             if (/quarter.final/i.test(ronda)) return 'Cuartos de Final';
             if (/semi.final/i.test(ronda)) return 'Semifinales';
             if (/^final$/i.test(ronda.trim())) return 'Final';
