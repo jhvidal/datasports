@@ -1080,31 +1080,43 @@
 <!-- TAB CLUBES -->
 <div id="main-clubes" style="display:none;">
   <div style="padding:12px 14px;">
-    <div style="margin-bottom:10px;">
-      <div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Argentina</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button onclick="cargarClubes(128,2026,this)" class="club-liga-btn">Liga Profesional</button>
-        <button onclick="cargarClubes(129,2026,this)" class="club-liga-btn">Primera Nacional</button>
-        <button onclick="cargarClubes(131,2026,this)" class="club-liga-btn">Primera B Metro</button>
+
+    <!-- Buscador de club -->
+    <div id="clubes-search-wrap" style="position:relative;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;background:var(--card);border:1px solid var(--borde);border-radius:10px;padding:0 10px;gap:8px;">
+        <span style="color:var(--muted);font-size:.9rem;">&#128269;</span>
+        <input id="clubesSearchInput" type="text" placeholder="Buscar club…"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          style="flex:1;border:none;background:transparent;padding:10px 0;font-size:.85rem;color:var(--texto);font-family:'Inter',sans-serif;outline:none;">
+        <span id="clubesSearchClear" onclick="limpiarBusquedaClubes()" style="display:none;cursor:pointer;color:var(--muted);font-size:.8rem;padding:4px;">✕</span>
+      </div>
+      <div class="sugerencias" id="sugerenciasClubes"></div>
+    </div>
+
+    <!-- Dropdown selector de liga -->
+    <div style="position:relative;margin-bottom:12px;">
+      <button onclick="toggleClubLigaSelector()" id="club-liga-selector-btn"
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#122016;border:1px solid rgba(255,255,255,.2);border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;color:#fff;">
+        <span id="club-liga-selector-label">Seleccionar liga</span>
+        <span id="club-liga-selector-arrow" style="font-size:.7rem;color:rgba(255,255,255,.5);transition:transform .2s">▾</span>
+      </button>
+      <div id="club-liga-selector-panel" style="display:none;background:#122016;border:1px solid rgba(255,255,255,.15);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;z-index:50;position:relative;">
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Argentina</div>
+        <button class="comp-btn" onclick="elegirLigaClubes(128,2026,'Liga Profesional')">Liga Profesional</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(129,2026,'Primera Nacional')">Primera Nacional</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(131,2026,'Primera B Metro')">Primera B Metro</button>
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Sudamérica</div>
+        <button class="comp-btn" onclick="elegirLigaClubes(13,2026,'Copa Libertadores')">Copa Libertadores</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(11,2026,'Copa Sudamericana')">Copa Sudamericana</button>
+        <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);">Europa</div>
+        <button class="comp-btn" onclick="elegirLigaClubes(2,2025,'Champions League')">Champions League</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(39,2025,'Premier League')">Premier League</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(140,2025,'La Liga')">La Liga</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(135,2025,'Serie A')">Serie A</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(78,2025,'Bundesliga')">Bundesliga</button>
       </div>
     </div>
-    <div style="margin-bottom:10px;">
-      <div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Sudamérica</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button onclick="cargarClubes(13,2026,this)" class="club-liga-btn">Copa Libertadores</button>
-        <button onclick="cargarClubes(11,2026,this)" class="club-liga-btn">Copa Sudamericana</button>
-      </div>
-    </div>
-    <div style="margin-bottom:10px;">
-      <div style="font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Europa</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        <button onclick="cargarClubes(2,2025,this)" class="club-liga-btn">Champions League</button>
-        <button onclick="cargarClubes(39,2025,this)" class="club-liga-btn">Premier League</button>
-        <button onclick="cargarClubes(140,2025,this)" class="club-liga-btn">La Liga</button>
-        <button onclick="cargarClubes(135,2025,this)" class="club-liga-btn">Serie A</button>
-        <button onclick="cargarClubes(78,2025,this)" class="club-liga-btn">Bundesliga</button>
-      </div>
-    </div>
+
     <div id="clubes-lista"></div>
   </div>
 </div>
@@ -4262,9 +4274,84 @@ function setSbActive(id) {
   if (el) el.classList.add('active');
 }
 
+// ── CLUBES: dropdown liga ──
+function toggleClubLigaSelector() {
+  const panel = document.getElementById('club-liga-selector-panel');
+  const arrow = document.getElementById('club-liga-selector-arrow');
+  const open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function elegirLigaClubes(league, season, nombre) {
+  document.getElementById('club-liga-selector-label').textContent = nombre;
+  document.getElementById('club-liga-selector-panel').style.display = 'none';
+  document.getElementById('club-liga-selector-arrow').style.transform = '';
+  cargarClubes(league, season, null);
+}
+
+// ── CLUBES: buscador con autocomplete ──
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('clubesSearchInput');
+  const clear = document.getElementById('clubesSearchClear');
+  const sug = document.getElementById('sugerenciasClubes');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    clear.style.display = q ? 'inline' : 'none';
+    mostrarSugerenciasClubes(q);
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#clubes-search-wrap')) sug.classList.remove('visible');
+  });
+});
+
+function limpiarBusquedaClubes() {
+  const input = document.getElementById('clubesSearchInput');
+  input.value = '';
+  document.getElementById('clubesSearchClear').style.display = 'none';
+  document.getElementById('sugerenciasClubes').classList.remove('visible');
+}
+
+function mostrarSugerenciasClubes(q) {
+  const sug = document.getElementById('sugerenciasClubes');
+  if (!q || q.length < 2) { sug.classList.remove('visible'); return; }
+  const qn = normalize(q);
+  const equiposLigas = getEquiposLigasMenores();
+  const todosEquipos = [...new Set([...EQUIPOS_ARG, ...equiposLigas.map(e => e.name)])].sort();
+  const matches = todosEquipos.filter(e => normalize(e).includes(qn)).slice(0, 8);
+  if (!matches.length) { sug.classList.remove('visible'); return; }
+
+  sug.innerHTML = matches.map(e => {
+    const ligaEquipo = equiposLigas.find(x => x.name === e);
+    const logoHtml = ligaEquipo?.logo
+      ? `<img src="${ligaEquipo.logo}" width="16" height="16" style="object-fit:contain;border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`
+      : `<span style="font-size:12px">⚽</span>`;
+    return `<div class="sug-item" onclick="elegirClubDesdeSearch('${e.replace(/'/g,"\\'")}')">
+      ${logoHtml} <span>${e}</span>
+    </div>`;
+  }).join('');
+  sug.classList.add('visible');
+}
+
+function elegirClubDesdeSearch(nombre) {
+  document.getElementById('clubesSearchInput').value = nombre;
+  document.getElementById('sugerenciasClubes').classList.remove('visible');
+  buscarYAbrirClub(nombre);
+}
+
+// ── CLUBES: cierra dropdown al clickear afuera ──
+document.addEventListener('click', e => {
+  if (!e.target.closest('#club-liga-selector-btn') && !e.target.closest('#club-liga-selector-panel')) {
+    const panel = document.getElementById('club-liga-selector-panel');
+    const arrow = document.getElementById('club-liga-selector-arrow');
+    if (panel) { panel.style.display = 'none'; arrow.style.transform = ''; }
+  }
+});
+
 async function cargarClubes(league, season, btn) {
-  document.querySelectorAll('.club-liga-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
   const lista = document.getElementById('clubes-lista');
   lista.innerHTML = '<div class="po-sin-datos">Cargando...</div>';
   try {
