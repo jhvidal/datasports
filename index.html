@@ -828,6 +828,9 @@
     <div class="drawer-item" id="dmenu-131" onclick="abrirDesdeDrawer('131','2026','Primera B Metro');closeMenu()">
       <span class="drawer-item-label">Primera B Metro</span>
     </div>
+    <div class="drawer-item" id="dmenu-134" onclick="abrirDesdeDrawer('134','2026','Federal A');closeMenu()">
+      <span class="drawer-item-label">Federal A</span>
+    </div>
     <div class="drawer-sec-title">Sudamérica</div>
     <div class="drawer-item" id="dmenu-13" onclick="abrirDesdeDrawer('13','2026','Copa Libertadores');closeMenu()">
       <span class="drawer-item-label">Copa Libertadores</span>
@@ -942,6 +945,7 @@
         <button class="comp-btn" data-league="129" data-season="2026" data-name="Primera Nacional" onclick="seleccionarComp(this)">Primera Nacional</button>
         <button class="comp-btn" data-league="130" data-season="2026" data-name="Copa Argentina" onclick="seleccionarComp(this)">Copa Argentina</button>
         <button class="comp-btn" data-league="131" data-season="2026" data-name="Primera B Metro" onclick="seleccionarComp(this)">Primera B Metro</button>
+        <button class="comp-btn" data-league="134" data-season="2026" data-name="Federal A" onclick="seleccionarComp(this)">Federal A</button>
       </div>
     </div>
     <div class="comp-grupo">
@@ -1108,6 +1112,7 @@
         <button class="comp-btn" onclick="elegirLigaClubes(128,2026,'Liga Profesional')">Liga Profesional</button>
         <button class="comp-btn" onclick="elegirLigaClubes(129,2026,'Primera Nacional')">Primera Nacional</button>
         <button class="comp-btn" onclick="elegirLigaClubes(131,2026,'Primera B Metro')">Primera B Metro</button>
+        <button class="comp-btn" onclick="elegirLigaClubes(134,2026,'Federal A')">Federal A</button>
         <div style="padding:4px 12px 2px;font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.25);">Sudamérica</div>
         <button class="comp-btn" onclick="elegirLigaClubes(13,2026,'Copa Libertadores')">Copa Libertadores</button>
         <button class="comp-btn" onclick="elegirLigaClubes(11,2026,'Copa Sudamericana')">Copa Sudamericana</button>
@@ -1166,8 +1171,9 @@ const LIGAS_MENORES_INFO = {
   129: { nombre: 'Primera Nacional',    orden: 1 },
   130: { nombre: 'Copa Argentina',      logo: 'https://media.api-sports.io/football/leagues/130.png', orden: 2 },
   131: { nombre: 'Primera B Metro',     orden: 3 },
-  13:  { nombre: 'Copa Libertadores',   logo: 'https://media.api-sports.io/football/leagues/13.png',  orden: 4 },
-  11:  { nombre: 'Copa Sudamericana',   logo: 'https://media.api-sports.io/football/leagues/11.png',  orden: 5 },
+  134: { nombre: 'Federal A',            logo: 'https://media.api-sports.io/football/leagues/134.png', orden: 4 },
+  13:  { nombre: 'Copa Libertadores',   logo: 'https://media.api-sports.io/football/leagues/13.png',  orden: 5 },
+  11:  { nombre: 'Copa Sudamericana',   logo: 'https://media.api-sports.io/football/leagues/11.png',  orden: 6 },
 };
 
 function fechaARGDeFixture(fechaISO) {
@@ -1180,7 +1186,7 @@ function fechaARGDeFixture(fechaISO) {
 
 async function cargarLigasMenores() {
   try {
-    const ligaIds = [128, 129, 130, 131, 13, 11];
+    const ligaIds = [128, 129, 130, 131, 134, 13, 11];
     const calls = ligaIds.map(lid =>
       apiFetch(`fixtures?league=${lid}&season=2026&status=NS-1H-HT-2H-ET-P-FT-AET-PEN`)
     );
