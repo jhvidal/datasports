@@ -1793,9 +1793,9 @@ async function abrirPartido(id) {
           <div class="po-nombre">${p.local}</div>
         </div>
         <div class="po-score-wrap">
-          <div class="po-score">${r.gL} - ${r.gV}</div>
-          ${(r.penL !== null && r.penL !== undefined && r.penV !== null && r.penV !== undefined) ? `<div style="font-size:.75rem;color:var(--muted);font-weight:600;margin-top:2px">Penales: ${r.penL} - ${r.penV}</div>` : ''}
+          <div class="po-score">${(r.penL !== null && r.penL !== undefined) ? `<span style="font-size:.6em;color:var(--muted);vertical-align:middle">(${r.penL})</span> ` : ''}${r.gL} - ${r.gV}${(r.penV !== null && r.penV !== undefined) ? ` <span style="font-size:.6em;color:var(--muted);vertical-align:middle">(${r.penV})</span>` : ''}</div>
         </div>
+        
         <div class="po-equipo">
           <div class="po-flag">${flag(p.visita, 36)}</div>
           <div class="po-nombre">${p.visita}</div>
@@ -2027,7 +2027,7 @@ async function abrirPartido(id) {
         ${estadioStr ? `${estadioStr}<br>` : ''}
         ${arbitro ? `🟡 Árbitro: ${arbitro}` : ''}
       </div>` : ''}
-      ${!goles.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
+      ${!golesNormales.length && !penales.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
     `;
 
     // Tab Estadísticas con colores reales
@@ -3159,10 +3159,11 @@ function resultadoBadge(p) {
   if (r.estado === 'ft') {
     const tienePenales = r.penL !== null && r.penL !== undefined && r.penV !== null && r.penV !== undefined;
     return `<div class="resultado-badge finalizado">
+      ${tienePenales ? `<span style="font-size:.6em;color:var(--muted);vertical-align:middle">(${r.penL})</span>` : ''}
       <span class="gol-local">${r.gL}</span>
       <span class="sep-gol">-</span>
       <span class="gol-visita">${r.gV}</span>
-      ${tienePenales ? `<span style="font-size:.65rem;color:var(--muted);margin-left:4px;font-weight:600">(${r.penL}-${r.penV})</span>` : ''}
+      ${tienePenales ? `<span style="font-size:.6em;color:var(--muted);vertical-align:middle">(${r.penV})</span>` : ''}
     </div>`;
   }
   return '';
@@ -3443,7 +3444,7 @@ function render() {
           else if (lv) horaHtml = `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`;
           else horaHtml = `<span class="hora">${hh}:${mm}</span>`;
           const resultadoHtml = (ft || lv)
-            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<span style="font-size:.6rem;color:var(--muted);margin-left:3px;font-weight:600">(${f.score.penalty.home}-${f.score.penalty.away})</span>` : ''}</div>`
+            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}">${(ft && f.score?.penalty?.home != null) ? `<span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.home})</span>` : ''}<span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.away != null) ? `<span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.away})</span>` : ''}</div>`
             : `<span class="vs-wrap">vs</span>`;
           return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
             <div style="width:50px;flex-shrink:0">${horaHtml}</div>
@@ -3545,7 +3546,7 @@ function render() {
             : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
             : `<span class="hora">${hh}:${mm}</span>`;
           const resHtml = (ft||lv)
-            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<span style="font-size:.6rem;color:var(--muted);margin-left:3px;font-weight:600">(${f.score.penalty.home}-${f.score.penalty.away})</span>` : ''}</div>`
+            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}">${(ft && f.score?.penalty?.home != null) ? `<span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.home})</span>` : ''}<span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.away != null) ? `<span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.away})</span>` : ''}</div>`
             : `<span class="vs-wrap">vs</span>`;
           const logoL = f.teams.home.logo, logoV = f.teams.away.logo;
           return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
@@ -3610,7 +3611,7 @@ async function abrirPartidoMenor(fixtureId) {
           <div class="po-nombre">${local}</div>
         </div>
         <div class="po-score-wrap">
-          ${ft ? `<div class="po-score">${f.goals.home} - ${f.goals.away}</div>${(f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<div style="font-size:.72rem;color:var(--muted);font-weight:600;margin:2px 0">Penales: ${f.score.penalty.home} - ${f.score.penalty.away}</div>` : ''}<div class="po-estado">Finalizado</div>`
+          ${ft ? `<div class="po-score">${(f.score?.penalty?.home != null) ? `<span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.home})</span> ` : ''}${f.goals.home} - ${f.goals.away}${(f.score?.penalty?.away != null) ? ` <span style="font-size:.6em;color:var(--muted)">(${f.score.penalty.away})</span>` : ''}</div><div class="po-estado">Finalizado</div>`
             : lv ? `<div class="po-score">${f.goals.home} - ${f.goals.away}</div><div class="po-live">EN VIVO ${f.fixture.status.elapsed ? f.fixture.status.elapsed+"'" : ''}</div>`
             : `<div class="po-vs">VS</div><div class="po-estado">${new Date(new Date(f.fixture.date).getTime()-3*3600*1000).toISOString().slice(11,16)} hs</div>`}
         </div>
