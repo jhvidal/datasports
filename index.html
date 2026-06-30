@@ -1405,7 +1405,7 @@ function findPartidoLocal(localAPI, visitaAPI) {
 
 // ── Procesar fixture de la API y guardar en RESULTADOS ──
 function procesarFixture(fixture) {
-  const { fixture: f, teams, goals, events } = fixture;
+  const { fixture: f, teams, goals, events, score } = fixture;
   const localAPI  = teams.home.name;
   const visitaAPI = teams.away.name;
   const partido   = findPartidoLocal(localAPI, visitaAPI);
@@ -1422,11 +1422,17 @@ function procesarFixture(fixture) {
   const invertido = mapTeam(localAPI) !== partido.local;
   const gL = invertido ? goals.away  : goals.home;
   const gV = invertido ? goals.home  : goals.away;
+  const penL = score?.penalty?.home ?? null;
+  const penV = score?.penalty?.away ?? null;
+  const penaltiesL = invertido ? penV : penL;
+  const penaltiesV = invertido ? penL : penV;
 
   RESULTADOS[partido.id] = {
     estado,
     gL: gL ?? 0,
     gV: gV ?? 0,
+    penL: penaltiesL,
+    penV: penaltiesV,
     min: f.status.elapsed,
     fixtureId: f.id,
     eventos: events || [],
@@ -1539,11 +1545,17 @@ function procesarFixtureAF(f) {
   const invertido = mapTeam(localAPI) !== partido.local;
   const gL = parseInt(invertido ? f.goals?.away : f.goals?.home) || 0;
   const gV = parseInt(invertido ? f.goals?.home : f.goals?.away) || 0;
+  const penL = f.score?.penalty?.home ?? null;
+  const penV = f.score?.penalty?.away ?? null;
+  const penaltiesL = invertido ? penV : penL;
+  const penaltiesV = invertido ? penL : penV;
 
   RESULTADOS[partido.id] = {
     estado,
     gL,
     gV,
+    penL: penaltiesL,
+    penV: penaltiesV,
     min: f.fixture?.status?.elapsed || null,
     fixtureId: f.fixture?.id,
     eventos: f.events || [],
@@ -1782,6 +1794,7 @@ async function abrirPartido(id) {
         </div>
         <div class="po-score-wrap">
           <div class="po-score">${r.gL} - ${r.gV}</div>
+          ${(r.penL !== null && r.penL !== undefined && r.penV !== null && r.penV !== undefined) ? `<div style="font-size:.75rem;color:var(--muted);font-weight:600;margin-top:2px">Penales: ${r.penL} - ${r.penV}</div>` : ''}
         </div>
         <div class="po-equipo">
           <div class="po-flag">${flag(p.visita, 36)}</div>
@@ -1962,7 +1975,8 @@ async function abrirPartido(id) {
     const arbitro = fixtureInfo?.fixture?.referee || null;
     const venue = fixtureInfo?.fixture?.venue;
     const estadioStr = venue?.name ? `🏟 ${venue.name}${venue.city ? ', '+venue.city : ''}` : null;
-    const goles     = eventos.filter(e => e.type === 'Goal');
+    const golesNormales = eventos.filter(e => e.type === 'Goal' && e.detail !== 'Missed Penalty' && e.detail !== 'Penalty');
+    const penales   = eventos.filter(e => e.type === 'Goal' && (e.detail === 'Missed Penalty' || e.detail === 'Penalty'));
     const amarillas = eventos.filter(e => e.type === 'Card' && e.detail === 'Yellow Card');
     const rojas     = eventos.filter(e => e.type === 'Card' && (e.detail === 'Red Card' || e.detail === 'Yellow Red Card'));
     const cambios   = eventos.filter(e => e.type === 'subst');
@@ -1992,7 +2006,8 @@ async function abrirPartido(id) {
     const colorVisita = lineups[1]?.team?.colors?.player?.primary ? `#${lineups[1].team.colors.player.primary}` : '#E61D25';
 
     const htmlResumen = `
-      ${renderEventos('', goles)}
+      ${renderEventos('', golesNormales)}
+      ${renderEventos('Penales', penales)}
       ${renderEventos('Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
       ${renderEventos('Cambios', cambios)}
       ${lineups.length >= 2 ? `
@@ -2129,15 +2144,19 @@ async function abrirPartido(id) {
       const equipoNombre = mapTeam(ev.team?.name || '');
       const esLocal = equipoNombre === p.local;
       const esPenErrado = ev.type === 'Goal' && ev.detail === 'Missed Penalty';
-      const icon = esPenErrado ? '' : ev.type === 'Goal' ? '⚽' : ev.detail === 'Yellow Card' ? '🟨' : ev.detail === 'Red Card' ? '🟥' : '';
+      const esPenConvertido = ev.type === 'Goal' && ev.detail === 'Penalty';
+      const icon = esPenErrado ? '<span style="display:inline-block;position:relative;font-size:.85em">⚽<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#E61D25;font-weight:900;font-size:1.3em;line-height:1">✕</span></span>'
+        : esPenConvertido ? '⚽<span style="font-size:.6em;color:var(--muted)">(P)</span>'
+        : ev.type === 'Goal' ? '⚽'
+        : ev.detail === 'Yellow Card' ? '🟨'
+        : ev.detail === 'Red Card' ? '🟥' : '';
       const nombre = ev.type === 'subst'
         ? `▲ ${ev.assist?.name?.split(' ').pop()||''} / ▼ ${ev.player?.name?.split(' ').pop()||''}`
         : (ev.player?.name?.split(' ').pop() || '');
-      const asist = ev.type === 'Goal' && !esPenErrado && ev.assist?.name
+      const asist = ev.type === 'Goal' && !esPenErrado && !esPenConvertido && ev.assist?.name
         ? ` (${ev.assist.name.split(' ').pop()})` : '';
-      const sufijo = esPenErrado ? ` · Pen. errado (${nombre})` : nombre + asist;
-      const nombreFinal = esPenErrado ? sufijo : sufijo;
-      return { esLocal, icon, nombre: esPenErrado ? `Pen. errado (${nombre})` : nombre + asist, min: ev.time?.elapsed, esPenErrado };
+      const nombreFinal = (esPenErrado || esPenConvertido) ? nombre : nombre + asist;
+      return { esLocal, icon, nombre: nombreFinal, min: ev.time?.elapsed, esPenErrado };
     }
 
     function renderEventos(titulo, lista) {
@@ -3138,10 +3157,12 @@ function resultadoBadge(p) {
     </div>`;
   }
   if (r.estado === 'ft') {
+    const tienePenales = r.penL !== null && r.penL !== undefined && r.penV !== null && r.penV !== undefined;
     return `<div class="resultado-badge finalizado">
       <span class="gol-local">${r.gL}</span>
       <span class="sep-gol">-</span>
       <span class="gol-visita">${r.gV}</span>
+      ${tienePenales ? `<span style="font-size:.65rem;color:var(--muted);margin-left:4px;font-weight:600">(${r.penL}-${r.penV})</span>` : ''}
     </div>`;
   }
   return '';
@@ -3422,7 +3443,7 @@ function render() {
           else if (lv) horaHtml = `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`;
           else horaHtml = `<span class="hora">${hh}:${mm}</span>`;
           const resultadoHtml = (ft || lv)
-            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
+            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<span style="font-size:.6rem;color:var(--muted);margin-left:3px;font-weight:600">(${f.score.penalty.home}-${f.score.penalty.away})</span>` : ''}</div>`
             : `<span class="vs-wrap">vs</span>`;
           return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
             <div style="width:50px;flex-shrink:0">${horaHtml}</div>
@@ -3524,7 +3545,7 @@ function render() {
             : lv ? `<span class="badge-live">${f.fixture.status.elapsed||''}'</span>`
             : `<span class="hora">${hh}:${mm}</span>`;
           const resHtml = (ft||lv)
-            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span></div>`
+            ? `<div class="resultado-badge ${lv?'en-vivo':'finalizado'}"><span class="gol-local">${gL}</span><span class="sep-gol">-</span><span class="gol-visita">${gV}</span>${(ft && f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<span style="font-size:.6rem;color:var(--muted);margin-left:3px;font-weight:600">(${f.score.penalty.home}-${f.score.penalty.away})</span>` : ''}</div>`
             : `<span class="vs-wrap">vs</span>`;
           const logoL = f.teams.home.logo, logoV = f.teams.away.logo;
           return `<div class="partido" onclick="abrirPartidoMenor(${f.fixture.id})">
@@ -3589,7 +3610,7 @@ async function abrirPartidoMenor(fixtureId) {
           <div class="po-nombre">${local}</div>
         </div>
         <div class="po-score-wrap">
-          ${ft ? `<div class="po-score">${f.goals.home} - ${f.goals.away}</div><div class="po-estado">Finalizado</div>`
+          ${ft ? `<div class="po-score">${f.goals.home} - ${f.goals.away}</div>${(f.score?.penalty?.home != null && f.score?.penalty?.away != null) ? `<div style="font-size:.72rem;color:var(--muted);font-weight:600;margin:2px 0">Penales: ${f.score.penalty.home} - ${f.score.penalty.away}</div>` : ''}<div class="po-estado">Finalizado</div>`
             : lv ? `<div class="po-score">${f.goals.home} - ${f.goals.away}</div><div class="po-live">EN VIVO ${f.fixture.status.elapsed ? f.fixture.status.elapsed+"'" : ''}</div>`
             : `<div class="po-vs">VS</div><div class="po-estado">${new Date(new Date(f.fixture.date).getTime()-3*3600*1000).toISOString().slice(11,16)} hs</div>`}
         </div>
@@ -3617,7 +3638,8 @@ async function abrirPartidoMenor(fixtureId) {
     const statsResp = resSt.status === 'fulfilled' ? (resSt.value.response || []) : [];
     const lineups = resLi.status === 'fulfilled' ? (resLi.value.response || []) : [];
 
-    const goles = eventos.filter(e => e.type === 'Goal');
+    const golesNormales = eventos.filter(e => e.type === 'Goal' && e.detail !== 'Missed Penalty' && e.detail !== 'Penalty');
+    const penales = eventos.filter(e => e.type === 'Goal' && (e.detail === 'Missed Penalty' || e.detail === 'Penalty'));
     const tarjetas = eventos.filter(e => e.type === 'Card');
 
     // Resumen por columna: local a la izquierda, visita a la derecha
@@ -3629,12 +3651,14 @@ async function abrirPartidoMenor(fixtureId) {
       if (!lista.length) return `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
       return lista.filter(e => e.team?.name === (esLocal ? local : visita)).map(e => {
         const esPenErrado = e.type === 'Goal' && e.detail === 'Missed Penalty';
-        const icono = esPenErrado ? '' : e.type === 'Goal' ? '⚽' : e.type === 'subst' ? '🔄' : (e.detail?.includes('Red') ? '🟥' : '🟨');
+        const esPenConvertido = e.type === 'Goal' && e.detail === 'Penalty';
+        const icono = esPenErrado ? '<span style="display:inline-block;position:relative">⚽<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#E61D25;font-weight:900;font-size:1.2em;line-height:1">✕</span></span>'
+          : esPenConvertido ? '⚽<span style="font-size:.7em;color:var(--muted)">(P)</span>'
+          : e.type === 'Goal' ? '⚽' : e.type === 'subst' ? '🔄' : (e.detail?.includes('Red') ? '🟥' : '🟨');
         const jugador = e.type === 'subst'
           ? `▲ ${e.assist?.name?.split(' ').pop()||''} ▼ ${e.player?.name?.split(' ').pop()||''}`
           : (e.player?.name?.split(' ').pop()||'');
-        const nombre = esPenErrado ? `Pen. errado (${jugador})` : jugador;
-        const txt = `${icono}${icono?' ':''}${e.time?.elapsed||''}' ${nombre}`;
+        const txt = `${icono}${icono?' ':''}${e.time?.elapsed||''}' ${jugador}`;
         return `<div style="font-size:.72rem;color:var(--texto);padding:2px 0;${esLocal?'':'text-align:right'}">${txt}</div>`;
       }).join('') || `<div style="font-size:.68rem;color:var(--muted);padding:4px 0">—</div>`;
     };
@@ -3655,10 +3679,11 @@ async function abrirPartidoMenor(fixtureId) {
         <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase">${local}</div>
         <div style="font-size:.65rem;font-weight:700;color:var(--azul);text-transform:uppercase;text-align:right">${visita}</div>
       </div>
-      ${mkSeccion('', goles)}
+      ${mkSeccion('', golesNormales)}
+      ${mkSeccion('Penales', penales)}
       ${mkSeccion('🟨🟥 Tarjetas', [...amarillas, ...rojas].sort((a,b)=>(a.time?.elapsed||0)-(b.time?.elapsed||0)))}
       ${mkSeccion('🔄 Cambios', cambios)}
-      ${!goles.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
+      ${!golesNormales.length && !penales.length && !amarillas.length && !rojas.length && !cambios.length ? '<div class="po-sin-datos">Sin eventos registrados</div>' : ''}
     `;
 
     const listaTarjetas = '';
